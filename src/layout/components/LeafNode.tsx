@@ -1,15 +1,21 @@
 // src/layout/components/LeafNode.tsx
-import React from 'react';
+import React, { useState } from 'react';
+import { Button } from 'antd';
 import type { LeafNode } from '../types';
+import type { WidgetRef } from '../types';
 import { useLayoutStore } from '../store/layoutStore';
 import { WidgetRenderer } from '../widgets/WidgetRenderer';
+import { WidgetGallery } from '../widgets/WidgetGallery';
+import { LeafOverlay } from './LeafOverlay';
 
 type Props = { node: LeafNode };
 
 export function LeafNodeComponent({ node }: Props) {
+  const [galleryOpen, setGalleryOpen] = useState(false);
   const editMode = useLayoutStore(s => s.editMode);
   const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
   const setActiveWidgetEdit = useLayoutStore(s => s.setActiveWidgetEdit);
+  const setWidget = useLayoutStore(s => s.setWidget);
 
   const isWidgetEdit = activeWidgetEditId === node.id;
   const isAnyWidgetEdit = activeWidgetEditId !== null;
@@ -17,8 +23,31 @@ export function LeafNodeComponent({ node }: Props) {
 
   function handleDoubleClick() {
     if (!editMode) return;
-    setActiveWidgetEdit(isWidgetEdit ? null : node.id);
+    if (!node.widget) {
+      setGalleryOpen(true);
+    } else {
+      setActiveWidgetEdit(isWidgetEdit ? null : node.id);
+    }
   }
+
+  function handleSelectWidget(widget: WidgetRef) {
+    setWidget(node.id, widget);
+    setGalleryOpen(false);
+  }
+
+  function handleDone() {
+    setActiveWidgetEdit(null);
+  }
+
+  // ESC exits widget edit mode
+  React.useEffect(() => {
+    if (!isWidgetEdit) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setActiveWidgetEdit(null);
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [isWidgetEdit, setActiveWidgetEdit]);
 
   return (
     <div
@@ -34,6 +63,17 @@ export function LeafNodeComponent({ node }: Props) {
         transition: 'opacity 0.15s',
       }}
     >
+      {/* Widget edit toolbar */}
+      {isWidgetEdit && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'rgba(42,32,16,0.95)', borderBottom: '1px solid #faad14' }}>
+          <span style={{ fontSize: 11, color: '#faad14', fontWeight: 600 }}>⚙ Widget Edit</span>
+          <div style={{ flex: 1 }} />
+          <Button size="small" onClick={() => setGalleryOpen(true)}>Replace</Button>
+          <Button size="small" type="primary" onClick={handleDone}>Done</Button>
+        </div>
+      )}
+
+      {/* Widget content or empty placeholder */}
       {node.widget
         ? <WidgetRenderer widget={node.widget} />
         : (
@@ -42,7 +82,12 @@ export function LeafNodeComponent({ node }: Props) {
           </div>
         )
       }
-      {/* Overlay and gallery added in Tasks 9 & 10 */}
+
+      {/* Layout edit overlay — shown in layout edit mode when no widget edit is active */}
+      {editMode && !isAnyWidgetEdit && <LeafOverlay node={node} />}
+
+      {/* Widget gallery */}
+      <WidgetGallery open={galleryOpen} onSelect={handleSelectWidget} onClose={() => setGalleryOpen(false)} />
     </div>
   );
 }
