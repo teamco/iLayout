@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { findNode, getDepth, splitNode, removeNode } from './treeUtils';
+import { findNode, getDepth, splitNode, removeNode, updateNode } from './treeUtils';
 import type { LayoutNode, SplitterNode } from '../types';
 
 const leaf = (id: string): LayoutNode => ({ id, type: 'leaf' });
@@ -55,7 +55,7 @@ describe('getDepth', () => {
 describe('splitNode', () => {
   it('wraps lone leaf in horizontal splitter when splitting right', () => {
     const root = leaf('a');
-    const result = splitNode(root, root, 'right', 'new');
+    const result = splitNode(root, root, 'right', 'new', 'wrapper-1');
     expect(result.type).toBe('splitter');
     const s = result as SplitterNode;
     expect(s.direction).toBe('horizontal');
@@ -69,7 +69,7 @@ describe('splitNode', () => {
     const a = leaf('a');
     const b = leaf('b');
     const root = h('root', [a, b], [60, 40]);
-    const result = splitNode(root, a, 'right', 'c') as SplitterNode;
+    const result = splitNode(root, a, 'right', 'c', 'unused') as SplitterNode;
     expect(result.children.map(n => n.id)).toEqual(['a', 'c', 'b']);
     expect(result.sizes).toEqual([30, 30, 40]);
   });
@@ -78,11 +78,33 @@ describe('splitNode', () => {
     const a = leaf('a');
     const b = leaf('b');
     const root = h('root', [a, b]);
-    const result = splitNode(root, a, 'bottom', 'c') as SplitterNode;
+    const result = splitNode(root, a, 'bottom', 'c', 'wrapper-2') as SplitterNode;
     const aWrapper = result.children[0] as SplitterNode;
     expect(aWrapper.type).toBe('splitter');
     expect(aWrapper.direction).toBe('vertical');
     expect(aWrapper.children.map(n => n.id)).toEqual(['a', 'c']);
+  });
+});
+
+describe('updateNode', () => {
+  it('updates a node by id', () => {
+    const a = leaf('a');
+    const root = h('root', [a, leaf('b')]);
+    const result = updateNode(root, 'a', n => ({ ...n, id: 'a-updated' }));
+    expect((result as SplitterNode).children[0].id).toBe('a-updated');
+  });
+
+  it('returns root unchanged if id not found', () => {
+    const root = leaf('a');
+    const result = updateNode(root, 'x', n => ({ ...n, id: 'y' }));
+    expect(result).toBe(root);
+  });
+
+  it('does not mutate original tree', () => {
+    const a = leaf('a');
+    const root = h('root', [a, leaf('b')]);
+    updateNode(root, 'a', n => ({ ...n, id: 'changed' }));
+    expect(a.id).toBe('a'); // original unchanged
   });
 });
 

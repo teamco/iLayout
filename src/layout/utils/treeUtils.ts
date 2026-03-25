@@ -1,4 +1,3 @@
-import { nanoid } from 'nanoid';
 import type { LayoutNode, SplitterNode, SplitDirection } from '../types';
 
 type FindResult = { node: LayoutNode; parent: SplitterNode | null; index: number };
@@ -51,6 +50,7 @@ export function splitNode(
   target: LayoutNode,
   direction: SplitDirection,
   newId: string,
+  wrapperId: string,
 ): LayoutNode {
   const newLeaf: LayoutNode = { id: newId, type: 'leaf' };
   const axis = directionAxis(direction);
@@ -79,7 +79,7 @@ export function splitNode(
   }
 
   const wrapper: SplitterNode = {
-    id: nanoid(),
+    id: wrapperId,
     type: 'splitter',
     direction: axis,
     sizes: [50, 50],
