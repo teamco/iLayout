@@ -7,6 +7,7 @@ import { useLayoutStore } from '../store/layoutStore';
 import { WidgetRenderer } from '../widgets/WidgetRenderer';
 import { WidgetGallery } from '../widgets/WidgetGallery';
 import { LeafOverlay } from './LeafOverlay';
+import { usePanelDnd } from '../dnd/usePanelDnd';
 
 type Props = { node: LeafNode };
 
@@ -20,6 +21,8 @@ export function LeafNodeComponent({ node }: Props) {
   const isWidgetEdit = activeWidgetEditId === node.id;
   const isAnyWidgetEdit = activeWidgetEditId !== null;
   const dimmed = isAnyWidgetEdit && !isWidgetEdit;
+
+  const { attributes, listeners, setDragRef, setDropRef, isDragging, isOver } = usePanelDnd(node);
 
   function handleDoubleClick() {
     if (!editMode) return;
@@ -51,14 +54,15 @@ export function LeafNodeComponent({ node }: Props) {
 
   return (
     <div
+      ref={(el) => { setDragRef(el); setDropRef(el); }}
       onDoubleClick={handleDoubleClick}
       style={{
         width: '100%',
         height: '100%',
         position: 'relative',
-        opacity: dimmed ? 0.35 : 1,
+        opacity: dimmed ? 0.35 : isDragging ? 0.5 : 1,
         pointerEvents: dimmed ? 'none' : 'auto',
-        border: isWidgetEdit ? '2px solid #faad14' : undefined,
+        border: isWidgetEdit ? '2px solid #faad14' : isOver ? '2px solid #52c41a' : undefined,
         boxSizing: 'border-box',
         transition: 'opacity 0.15s',
       }}
@@ -84,7 +88,9 @@ export function LeafNodeComponent({ node }: Props) {
       }
 
       {/* Layout edit overlay — shown in layout edit mode when no widget edit is active */}
-      {editMode && !isAnyWidgetEdit && <LeafOverlay node={node} />}
+      {editMode && !isAnyWidgetEdit && (
+        <LeafOverlay node={node} dragListeners={listeners} dragAttributes={attributes} />
+      )}
 
       {/* Widget gallery */}
       <WidgetGallery open={galleryOpen} onSelect={handleSelectWidget} onClose={() => setGalleryOpen(false)} />

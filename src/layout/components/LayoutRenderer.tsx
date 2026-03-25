@@ -4,6 +4,7 @@ import { useLayoutStore } from '../store/layoutStore';
 import { SplitterNodeComponent } from './SplitterNode';
 import { LeafNodeComponent } from './LeafNode';
 import type { LayoutNode } from '../types';
+import { LayoutDndContext } from '../dnd/DndContext';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function renderNode(node: LayoutNode): React.ReactNode {
@@ -13,5 +14,9 @@ export function renderNode(node: LayoutNode): React.ReactNode {
 
 export function LayoutRenderer() {
   const root = useLayoutStore(s => s.root);
-  return <div style={{ width: '100%', height: '100%' }}>{renderNode(root)}</div>;
+  return (
+    <LayoutDndContext>
+      <div style={{ width: '100%', height: '100%' }}>{renderNode(root)}</div>
+    </LayoutDndContext>
+  );
 }
