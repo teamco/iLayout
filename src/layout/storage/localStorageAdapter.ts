@@ -7,7 +7,12 @@ const KEY = (id: string) => `layout:${id}`;
 export const localStorageAdapter: LayoutStorage = {
   async load(layoutId) {
     const raw = localStorage.getItem(KEY(layoutId));
-    return raw ? (JSON.parse(raw) as LayoutNode) : null;
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as LayoutNode;
+    } catch {
+      return null;
+    }
   },
   async save(layoutId, root) {
     localStorage.setItem(KEY(layoutId), JSON.stringify(root));
