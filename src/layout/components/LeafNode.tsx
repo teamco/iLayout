@@ -22,7 +22,8 @@ export function LeafNodeComponent({ node }: Props) {
   const isAnyWidgetEdit = activeWidgetEditId !== null;
   const dimmed = isAnyWidgetEdit && !isWidgetEdit;
 
-  const { attributes, listeners, setDragRef, setDropRef, isDragging, isOver } = usePanelDnd(node);
+  const dndDisabled = !editMode || activeWidgetEditId !== null;
+  const { attributes, listeners, setDragRef, setDropRef, isDragging, isOver } = usePanelDnd(node, dndDisabled);
 
   function handleDoubleClick() {
     if (!editMode) return;
@@ -63,6 +64,7 @@ export function LeafNodeComponent({ node }: Props) {
         opacity: dimmed ? 0.35 : isDragging ? 0.5 : 1,
         pointerEvents: dimmed ? 'none' : 'auto',
         border: isWidgetEdit ? '2px solid #faad14' : isOver ? '2px solid #52c41a' : undefined,
+        background: isOver ? 'rgba(82,196,26,0.15)' : undefined,
         boxSizing: 'border-box',
         transition: 'opacity 0.15s',
       }}
