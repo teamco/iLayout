@@ -1,6 +1,6 @@
 // src/layout/components/LeafNode.tsx
-import React, { useState } from 'react';
-import { Button } from 'antd';
+import React, { useState, useRef, useCallback } from 'react';
+import { Button, Input } from 'antd';
 import type { LeafNode } from '../types';
 import type { WidgetRef } from '../types';
 import { useLayoutStore } from '../store/layoutStore';
@@ -8,8 +8,68 @@ import { WidgetRenderer } from '../widgets/WidgetRenderer';
 import { WidgetGallery } from '../widgets/WidgetGallery';
 import { LeafOverlay } from './LeafOverlay';
 import { usePanelDnd } from '../dnd/usePanelDnd';
+import { findNode } from '../utils/treeUtils';
 
 type Props = { node: LeafNode };
+
+function ResizeHandle({ nodeId }: { nodeId: string }) {
+  const setWidget = useLayoutStore(s => s.setWidget);
+  const root = useLayoutStore(s => s.root);
+  const startPos = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
+  const containerRef = useRef<Element | null>(null);
+
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const found = findNode(root, nodeId);
+    if (!found) return;
+    const node = found.node as LeafNode;
+    if (!node.widget) return;
+    const container = (e.currentTarget as HTMLElement).parentElement?.parentElement;
+    if (!container) return;
+    containerRef.current = container;
+    const rect = container.getBoundingClientRect();
+    startPos.current = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height };
+
+    function onMouseMove(ev: MouseEvent) {
+      if (!startPos.current || !containerRef.current) return;
+      const dx = ev.clientX - startPos.current.x;
+      const dy = ev.clientY - startPos.current.y;
+      const newW = Math.max(50, startPos.current.w + dx);
+      const newH = Math.max(50, startPos.current.h + dy);
+      setWidget(nodeId, {
+        ...node.widget!,
+        bounds: { ...(node.widget!.bounds ?? {}), width: newW, height: newH },
+      });
+    }
+
+    function onMouseUp() {
+      startPos.current = null;
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    }
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }, [root, nodeId, setWidget]);
+
+  return (
+    <div
+      onMouseDown={onMouseDown}
+      style={{
+        position: 'absolute',
+        bottom: 4,
+        right: 4,
+        width: 12,
+        height: 12,
+        borderRight: '2px solid #faad14',
+        borderBottom: '2px solid #faad14',
+        cursor: 'se-resize',
+        zIndex: 25,
+      }}
+    />
+  );
+}
 
 export function LeafNodeComponent({ node }: Props) {
   const [galleryOpen, setGalleryOpen] = useState(false);
@@ -73,6 +133,19 @@ export function LeafNodeComponent({ node }: Props) {
       {isWidgetEdit && (
         <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'rgba(42,32,16,0.95)', borderBottom: '1px solid #faad14' }}>
           <span style={{ fontSize: 11, color: '#faad14', fontWeight: 600 }}>⚙ Widget Edit</span>
+          {node.widget?.type === 'iframe' && (
+            <Input
+              size="small"
+              placeholder="iframe URL"
+              defaultValue={String(node.widget.config.url ?? '')}
+              style={{ width: 200 }}
+              onBlur={e => {
+                if (node.widget) {
+                  setWidget(node.id, { ...node.widget, config: { ...node.widget.config, url: e.target.value } });
+                }
+              }}
+            />
+          )}
           <div style={{ flex: 1 }} />
           <Button size="small" onClick={() => setGalleryOpen(true)}>Replace</Button>
           <Button size="small" type="primary" onClick={handleDone}>Done</Button>
@@ -93,6 +166,9 @@ export function LeafNodeComponent({ node }: Props) {
       {editMode && !isAnyWidgetEdit && (
         <LeafOverlay node={node} dragListeners={listeners} dragAttributes={attributes} />
       )}
+
+      {/* Widget bounds resize handle */}
+      {isWidgetEdit && node.widget && <ResizeHandle nodeId={node.id} />}
 
       {/* Widget gallery */}
       <WidgetGallery open={galleryOpen} onSelect={handleSelectWidget} onClose={() => setGalleryOpen(false)} />

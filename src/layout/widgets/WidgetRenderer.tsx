@@ -2,6 +2,7 @@
 import React, { CSSProperties } from 'react';
 import type { WidgetRef } from '../types';
 import { getWidget } from './widgetRegistry';
+import { useDragActive } from '../dnd/DragActiveContext';
 
 type Props = {
   widget: WidgetRef;
@@ -37,8 +38,9 @@ function getAlignStyle(widget: WidgetRef): CSSProperties {
   return map[align] ?? map['top-left'];
 }
 
-export function WidgetRenderer({ widget, isDragging }: Props) {
+export function WidgetRenderer({ widget }: Props) {
   const def = getWidget(widget.widgetId);
+  const isDragActive = useDragActive();
 
   const containerStyle: CSSProperties = {
     width: '100%',
@@ -59,7 +61,7 @@ export function WidgetRenderer({ widget, isDragging }: Props) {
         style={{
           ...innerStyle,
           border: 'none',
-          pointerEvents: isDragging ? 'none' : 'auto',
+          pointerEvents: isDragActive ? 'none' : 'auto',
         }}
         title={widget.widgetId}
       />

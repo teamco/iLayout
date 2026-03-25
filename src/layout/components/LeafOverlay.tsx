@@ -44,6 +44,7 @@ export function LeafOverlay({ node, dragListeners, dragAttributes }: Props) {
 
   if (!canEdit) return null;
 
+  const isRoot = findNode(root, node.id)?.parent === null;
   const showAddButton = hasAvailableDirection(node, root, maxDepth);
 
   function handleSelect(direction: SplitDirection) {
@@ -69,13 +70,15 @@ export function LeafOverlay({ node, dragListeners, dragAttributes }: Props) {
       )}
 
       {/* Remove button */}
-      <Button
-        size="small"
-        danger
-        icon={<CloseOutlined />}
-        style={{ position: 'absolute', top: 4, right: 4, zIndex: 10 }}
-        onClick={() => removePanel(node.id)}
-      />
+      {!isRoot && (
+        <Button
+          size="small"
+          danger
+          icon={<CloseOutlined />}
+          style={{ position: 'absolute', top: 4, right: 4, zIndex: 10 }}
+          onClick={() => removePanel(node.id)}
+        />
+      )}
 
       {/* Add button — hidden only when ALL directions are blocked */}
       {showAddButton && (

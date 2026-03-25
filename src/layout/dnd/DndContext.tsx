@@ -7,13 +7,14 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core';
 import { useLayoutStore } from '../store/layoutStore';
+import { DragActiveContext } from './DragActiveContext';
 import { findNode } from '../utils/treeUtils';
 import type { WidgetRef, LeafNode } from '../types';
 
 type Props = { children: React.ReactNode };
 
 export function LayoutDndContext({ children }: Props) {
-  const [, setActiveId] = useState<string | null>(null);
+  const [activeId, setActiveId] = useState<string | null>(null);
   const editMode = useLayoutStore(s => s.editMode);
   const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
   const swapWidgets = useLayoutStore(s => s.swapWidgets);
@@ -53,12 +54,14 @@ export function LayoutDndContext({ children }: Props) {
   }
 
   return (
-    <DndContext
-      collisionDetection={dndEnabled ? closestCenter : undefined}
-      onDragStart={dndEnabled ? onDragStart : undefined}
-      onDragEnd={dndEnabled ? onDragEnd : undefined}
-    >
-      {children}
-    </DndContext>
+    <DragActiveContext.Provider value={activeId !== null}>
+      <DndContext
+        collisionDetection={dndEnabled ? closestCenter : undefined}
+        onDragStart={dndEnabled ? onDragStart : undefined}
+        onDragEnd={dndEnabled ? onDragEnd : undefined}
+      >
+        {children}
+      </DndContext>
+    </DragActiveContext.Provider>
   );
 }

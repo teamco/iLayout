@@ -6,6 +6,7 @@ export type WidgetDefinition = {
   label: string;
   description?: string;
   defaultConfig: Record<string, unknown>;
+  defaultType?: 'component' | 'iframe' | 'embed';  // defaults to 'component' if omitted
   component?: React.ComponentType<{ config: Record<string, unknown> }>;
 };
 
