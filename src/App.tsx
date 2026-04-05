@@ -1,9 +1,10 @@
 // src/App.tsx
 import { useEffect } from 'react';
-import { Button, ConfigProvider, theme } from 'antd';
+import { Button, ConfigProvider, Tooltip, theme } from 'antd';
 import { AppstoreOutlined } from '@ant-design/icons';
 import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
 import { GridOverlay } from '@/layout/components/GridOverlay';
+import { GridProvider } from '@/layout/grid/GridContext';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 import { initAutoSave } from '@/layout/storage/autoSave';
 import { localStorageAdapter } from '@/layout/storage/localStorageAdapter';
@@ -50,17 +51,21 @@ export default function App() {
             {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
           </Button>
           {editMode && (
-            <Button
-              type={showGrid ? 'primary' : 'default'}
-              size="small"
-              icon={<AppstoreOutlined />}
-              onClick={toggleGrid}
-            />
+            <Tooltip title="Toggle grid (Ctrl+G)">
+              <Button
+                type={showGrid ? 'primary' : 'default'}
+                size="small"
+                icon={<AppstoreOutlined />}
+                onClick={toggleGrid}
+              />
+            </Tooltip>
           )}
         </div>
         <div className={styles.canvas}>
-          <LayoutRenderer />
-          {showGrid && <GridOverlay />}
+          <GridProvider>
+            <LayoutRenderer />
+            {showGrid && <GridOverlay />}
+          </GridProvider>
         </div>
       </div>
     </ConfigProvider>

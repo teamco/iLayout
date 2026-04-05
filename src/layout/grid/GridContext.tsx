@@ -47,7 +47,7 @@ export function GridProvider({ columns = 24, gutter = 16, children }: GridProvid
 
   return (
     <GridContext.Provider value={{ canvasWidth, canvasHeight, columns, gutter }}>
-      <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+      <div ref={containerRef} data-grid-canvas style={{ width: '100%', height: '100%', position: 'relative' }}>
         {children}
       </div>
     </GridContext.Provider>
