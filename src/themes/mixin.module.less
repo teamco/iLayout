@@ -1,0 +1,53 @@
+// ─── Design tokens ────────────────────────────────────────────────────────────
+@app-bg:          #0d0d0d;
+@border-dark:     #222;
+@border-dim:      #333;
+@color-blue:      #1890ff;
+@color-yellow:    #faad14;
+@color-green:     #52c41a;
+@color-white:     #fff;
+@color-muted:     #555;
+@color-dim:       #666;
+@drag-card-bg:    #1e2a3a;
+
+// ─── z-index scale ────────────────────────────────────────────────────────────
+@z-overlay:       10;
+@z-grid:          12;
+@z-toolbar:       20;
+@z-resize-handle: 25;
+
+// ─── Mixins ───────────────────────────────────────────────────────────────────
+.fill() {
+  width: 100%;
+  height: 100%;
+}
+
+.flex-row() {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.flex-center() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.absolute-fill() {
+  position: absolute;
+  inset: 0;
+}
+
+// ─── Shared exported classes ──────────────────────────────────────────────────
+.fillContainer {
+  .fill();
+}
+
+.flexCenter {
+  .flex-center();
+}
+
+.absoluteFill {
+  .absolute-fill();
+}
