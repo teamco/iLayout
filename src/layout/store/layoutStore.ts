@@ -10,6 +10,7 @@ export type LayoutState = {
   editMode: boolean;
   activeWidgetEditId: string | null;
   maxDepth: number;
+  showGrid: boolean;
 };
 
 export type LayoutActions = {
@@ -21,6 +22,7 @@ export type LayoutActions = {
   resize: (splitterId: string, sizes: number[]) => void;
   setEditMode: (on: boolean) => void;
   setActiveWidgetEdit: (id: string | null) => void;
+  toggleGrid: () => void;
 };
 
 export type LayoutStore = LayoutState & LayoutActions;
@@ -65,8 +67,16 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
     resize(splitterId, sizes) {
       set(state => { state.root = updateNode(state.root, splitterId, n => ({ ...n, sizes })); });
     },
-    setEditMode(on) { set(state => { state.editMode = on; }); },
+    setEditMode(on) {
+      set(state => {
+        state.editMode = on;
+        if (!on) state.showGrid = false;
+      });
+    },
     setActiveWidgetEdit(id) { set(state => { state.activeWidgetEditId = id; }); },
+    toggleGrid() {
+      set(state => { state.showGrid = !state.showGrid; });
+    },
   };
 }
 
@@ -78,6 +88,7 @@ export function createLayoutStore(initialRoot?: LayoutNode) {
       editMode: false,
       activeWidgetEditId: null,
       maxDepth: 5,
+      showGrid: false,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...makeActions(set as any),
     })),
@@ -91,6 +102,7 @@ export const useLayoutStore = create<LayoutStore>()(
     editMode: false,
     activeWidgetEditId: null,
     maxDepth: 5,
+    showGrid: false,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ...makeActions(set as any),
   })),
