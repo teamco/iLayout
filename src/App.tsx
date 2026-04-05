@@ -1,34 +1,47 @@
 // src/App.tsx
-import React, { useEffect } from 'react';
-import { ConfigProvider, Button, theme } from 'antd';
-import { LayoutRenderer } from './layout/components/LayoutRenderer';
-import { useLayoutStore } from './layout/store/layoutStore';
-import { initAutoSave } from './layout/storage/autoSave';
-import { localStorageAdapter } from './layout/storage/localStorageAdapter';
+import { useEffect } from 'react';
+import { Button, ConfigProvider, theme } from 'antd';
+import { AppstoreOutlined } from '@ant-design/icons';
+import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
+import { GridOverlay } from '@/layout/components/GridOverlay';
+import { useLayoutStore } from '@/layout/store/layoutStore';
+import { initAutoSave } from '@/layout/storage/autoSave';
+import { localStorageAdapter } from '@/layout/storage/localStorageAdapter';
+import styles from './App.module.less';
 
 const LAYOUT_ID = 'default';
 
 export default function App() {
   const editMode = useLayoutStore(s => s.editMode);
   const setEditMode = useLayoutStore(s => s.setEditMode);
+  const showGrid = useLayoutStore(s => s.showGrid);
+  const toggleGrid = useLayoutStore(s => s.toggleGrid);
 
   useEffect(() => {
-    // Load saved layout on mount
     localStorageAdapter.load(LAYOUT_ID).then(saved => {
       if (saved) useLayoutStore.setState({ root: saved });
     });
-    // Start auto-save (debounced 1s)
-    const unsub = initAutoSave(LAYOUT_ID, localStorageAdapter);
-    return unsub;
+    return initAutoSave(LAYOUT_ID, localStorageAdapter);
   }, []);
+
+  useEffect(() => {
+    if (!editMode) return;
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'g') {
+        e.preventDefault();
+        toggleGrid();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [editMode, toggleGrid]);
 
   return (
     <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
-      <div style={{ width: '100vw', height: '100vh', display: 'flex', flexDirection: 'column', background: '#0d0d0d' }}>
-        {/* Toolbar */}
-        <div style={{ height: 44, display: 'flex', alignItems: 'center', padding: '0 16px', gap: 12, borderBottom: '1px solid #222', flexShrink: 0 }}>
-          <span style={{ fontWeight: 600, color: '#fff', fontSize: 14 }}>Widgets</span>
-          <div style={{ flex: 1 }} />
+      <div className={styles.app}>
+        <div className={styles.toolbar}>
+          <span className={styles.toolbarTitle}>Widgets</span>
+          <div className={styles.toolbarSpacer} />
           <Button
             type={editMode ? 'primary' : 'default'}
             size="small"
@@ -36,11 +49,18 @@ export default function App() {
           >
             {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
           </Button>
+          {editMode && (
+            <Button
+              type={showGrid ? 'primary' : 'default'}
+              size="small"
+              icon={<AppstoreOutlined />}
+              onClick={toggleGrid}
+            />
+          )}
         </div>
-
-        {/* Layout canvas */}
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div className={styles.canvas}>
           <LayoutRenderer />
+          {showGrid && <GridOverlay />}
         </div>
       </div>
     </ConfigProvider>
