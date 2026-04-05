@@ -1,53 +1,35 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useId } from 'react';
+import { useGridContext } from '@/layout/grid/GridContext';
 import styles from './GridOverlay.module.less';
 
-const COLUMNS = 24;
-const GUTTER = 16;
 const FILL = 'rgba(24, 144, 255, 0.08)';
 
 export function GridOverlay() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
+  const patternId = useId();
+  const { canvasWidth, canvasHeight, columns, gutter } = useGridContext();
 
-  const measure = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    setWidth(el.clientWidth);
-    setHeight(el.clientHeight);
-  }, []);
+  if (canvasWidth <= 0) return null;
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [measure]);
-
-  const colWidth = width > 0 ? (width - (COLUMNS - 1) * GUTTER) / COLUMNS : 0;
-  const patternWidth = colWidth + GUTTER;
+  const colWidth = (canvasWidth - (columns - 1) * gutter) / columns;
+  const patternWidth = colWidth + gutter;
 
   return (
-    <div ref={containerRef} className={styles.overlay}>
-      {width > 0 && (
-        <svg width={width} height={height}>
-          <defs>
-            <pattern
-              id="grid-col"
-              x="0"
-              y="0"
-              width={patternWidth}
-              height={height}
-              patternUnits="userSpaceOnUse"
-            >
-              <rect x="0" y="0" width={colWidth} height={height} fill={FILL} />
-            </pattern>
-          </defs>
-          <rect width={width} height={height} fill="url(#grid-col)" />
-        </svg>
-      )}
+    <div className={styles.overlay}>
+      <svg width={canvasWidth} height={canvasHeight}>
+        <defs>
+          <pattern
+            id={patternId}
+            x="0"
+            y="0"
+            width={patternWidth}
+            height={canvasHeight}
+            patternUnits="userSpaceOnUse"
+          >
+            <rect x="0" y="0" width={colWidth} height={canvasHeight} fill={FILL} />
+          </pattern>
+        </defs>
+        <rect width={canvasWidth} height={canvasHeight} fill={`url(#${patternId})`} />
+      </svg>
     </div>
   );
 }
