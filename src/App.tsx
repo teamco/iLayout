@@ -1,5 +1,6 @@
 // src/App.tsx
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import md5 from 'blueimp-md5';
 import { Avatar, Button, Dropdown, Tooltip, Typography } from 'antd';
 import type { MenuProps } from 'antd';
@@ -7,8 +8,9 @@ import { AppstoreOutlined, CodeOutlined, LogoutOutlined, SaveOutlined, UserOutli
 import { useNavigate } from '@tanstack/react-router';
 import { useThemeStore } from '@/themes/themeStore';
 import { useAuth } from '@/auth/AuthContext';
-import { useAbility } from '@/auth/AbilityContext';
+import { Can } from '@/auth/Can';
 import { EAction, ESubject } from '@/auth/abilities';
+import { ERoutes } from '@/routes';
 import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
 import { GridOverlay } from '@/layout/components/GridOverlay';
 import { GridProvider } from '@/layout/grid/GridContext';
@@ -27,6 +29,7 @@ type AppProps = {
 };
 
 export default function App({ layoutId, onSave, saving }: AppProps) {
+  const { t } = useTranslation();
   const editMode = useLayoutStore(s => s.editMode);
   const setEditMode = useLayoutStore(s => s.setEditMode);
   const showGrid = useLayoutStore(s => s.showGrid);
@@ -37,8 +40,6 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
   const cycleTheme = useThemeStore(s => s.cycleTheme);
 
   const { user, signOut } = useAuth();
-  const ability = useAbility();
-  const canEdit = ability.can(EAction.EDIT, ESubject.LAYOUT);
   const navigate = useNavigate();
 
   const userName = user?.user_metadata?.full_name || user?.email || 'User';
@@ -63,20 +64,20 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
     },
     ...(lastSignIn ? [{
       key: 'lastLogin',
-      label: <Typography.Text type="secondary" style={{ fontSize: 12 }}>Last login: {lastSignIn}</Typography.Text>,
+      label: <Typography.Text type="secondary" style={{ fontSize: 12 }}>{t('profile.lastLogin') + ':'} {lastSignIn}</Typography.Text>,
       disabled: true,
     }] : []),
     { type: 'divider' as const },
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: 'Profile',
-      onClick: () => navigate({ to: '/profile' }),
+      label: t('profile.profile'),
+      onClick: () => navigate({ to: ERoutes.PROFILE }),
     },
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: 'Sign out',
+      label: t('common.signOut'),
       onClick: signOut,
     },
   ];
@@ -111,31 +112,31 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
       <div className={styles.toolbar}>
         <span className={styles.toolbarTitle}>Widgets</span>
         <div className={styles.toolbarSpacer} />
-        <Tooltip title={themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'}>
+        <Tooltip title={themeMode === 'light' ? t('theme.light') : themeMode === 'dark' ? t('theme.dark') : t('theme.system')}>
           <Button
             size="small"
             icon={themeMode === 'light' ? <SunOutlined /> : themeMode === 'dark' ? <MoonOutlined /> : <DesktopOutlined />}
             onClick={cycleTheme}
           />
         </Tooltip>
-        <Tooltip title="Layout JSON">
+        <Tooltip title={t('layout.layoutJson')}>
           <Button
             size="small"
             icon={<CodeOutlined />}
             onClick={() => setJsonModalOpen(true)}
           />
         </Tooltip>
-        {canEdit && (
+        <Can I={EAction.EDIT} a={ESubject.LAYOUT}>
           <Button
             type={editMode ? 'primary' : 'default'}
             size="small"
             onClick={() => setEditMode(!editMode)}
           >
-            {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
+            {editMode ? '✏️ ' + t('layout.editModeOn') : t('layout.editMode')}
           </Button>
-        )}
+        </Can>
         {editMode && onSave && (
-          <Tooltip title="Save (Ctrl+S)">
+          <Tooltip title={t('common.save') + ' (Ctrl+S)'}>
             <Button
               size="small"
               type="primary"
@@ -146,7 +147,7 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
           </Tooltip>
         )}
         {editMode && (
-          <Tooltip title="Toggle grid (Ctrl+G)">
+          <Tooltip title={t('layout.toggleGrid') + ' (Ctrl+G)'}>
             <Button
               type={showGrid ? 'primary' : 'default'}
               size="small"
