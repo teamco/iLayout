@@ -1,7 +1,10 @@
 // src/App.tsx
 import { useEffect, useState } from 'react';
-import { Button, Tooltip } from 'antd';
-import { AppstoreOutlined, CodeOutlined, LogoutOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
+import md5 from 'blueimp-md5';
+import { Avatar, Button, Dropdown, Tooltip, Typography } from 'antd';
+import type { MenuProps } from 'antd';
+import { AppstoreOutlined, CodeOutlined, LogoutOutlined, SaveOutlined, UserOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
+import { useNavigate } from '@tanstack/react-router';
 import { useThemeStore } from '@/themes/themeStore';
 import { useAuth } from '@/auth/AuthContext';
 import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
@@ -15,7 +18,13 @@ import styles from './App.module.less';
 
 const LAYOUT_ID = 'default';
 
-export default function App() {
+type AppProps = {
+  layoutId?: string;
+  onSave?: () => void;
+  saving?: boolean;
+};
+
+export default function App({ layoutId, onSave, saving }: AppProps) {
   const editMode = useLayoutStore(s => s.editMode);
   const setEditMode = useLayoutStore(s => s.setEditMode);
   const showGrid = useLayoutStore(s => s.showGrid);
@@ -25,14 +34,57 @@ export default function App() {
   const themeMode = useThemeStore(s => s.themeMode);
   const cycleTheme = useThemeStore(s => s.cycleTheme);
 
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
+  const userName = user?.user_metadata?.full_name || user?.email || 'User';
+  const providerAvatar = user?.user_metadata?.avatar_url;
+  const [avatarError, setAvatarError] = useState(false);
+
+  const gravatarUrl = user?.email
+    ? `https://www.gravatar.com/avatar/${md5(user.email.trim().toLowerCase())}?d=identicon&s=64`
+    : undefined;
+
+  const avatarSrc = avatarError ? gravatarUrl : providerAvatar;
+
+  const lastSignIn = user?.last_sign_in_at
+    ? new Date(user.last_sign_in_at).toLocaleString()
+    : undefined;
+
+  const userMenuItems: MenuProps['items'] = [
+    {
+      key: 'header',
+      type: 'group',
+      label: userName,
+    },
+    ...(lastSignIn ? [{
+      key: 'lastLogin',
+      label: <Typography.Text type="secondary" style={{ fontSize: 12 }}>Last login: {lastSignIn}</Typography.Text>,
+      disabled: true,
+    }] : []),
+    { type: 'divider' as const },
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: 'Profile',
+      onClick: () => navigate({ to: '/profile' }),
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined />,
+      label: 'Sign out',
+      onClick: signOut,
+    },
+  ];
+
+  // Only use localStorage auto-save when not in Supabase mode
   useEffect(() => {
+    if (layoutId) return;
     localStorageAdapter.load(LAYOUT_ID).then(saved => {
       if (saved) useLayoutStore.setState({ root: saved });
     });
     return initAutoSave(LAYOUT_ID, localStorageAdapter);
-  }, []);
+  }, [layoutId]);
 
   useEffect(() => {
     if (!editMode) return;
@@ -41,10 +93,14 @@ export default function App() {
         e.preventDefault();
         toggleGrid();
       }
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        onSave?.();
+      }
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [editMode, toggleGrid]);
+  }, [editMode, toggleGrid, onSave]);
 
   return (
     <div className={styles.app}>
@@ -72,6 +128,17 @@ export default function App() {
         >
           {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
         </Button>
+        {editMode && onSave && (
+          <Tooltip title="Save (Ctrl+S)">
+            <Button
+              size="small"
+              type="primary"
+              icon={<SaveOutlined />}
+              loading={saving}
+              onClick={onSave}
+            />
+          </Tooltip>
+        )}
         {editMode && (
           <Tooltip title="Toggle grid (Ctrl+G)">
             <Button
@@ -82,13 +149,14 @@ export default function App() {
             />
           </Tooltip>
         )}
-        <Tooltip title="Sign out">
-          <Button
+        <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+          <Avatar
             size="small"
-            icon={<LogoutOutlined />}
-            onClick={signOut}
+            src={avatarSrc ? <img src={avatarSrc} referrerPolicy="no-referrer" onError={() => setAvatarError(true)} /> : undefined}
+            icon={!avatarSrc ? <UserOutlined /> : undefined}
+            style={{ cursor: 'pointer' }}
           />
-        </Tooltip>
+        </Dropdown>
       </div>
       <div className={styles.canvas}>
         <GridProvider>
