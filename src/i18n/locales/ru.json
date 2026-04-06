@@ -1,0 +1,73 @@
+{
+  "common": {
+    "back": "Назад к приложению",
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "create": "Создать",
+    "loading": "Загрузка...",
+    "accessDenied": "Доступ запрещён",
+    "signIn": "Войти",
+    "signUp": "Регистрация",
+    "signOut": "Выйти",
+    "or": "или"
+  },
+  "theme": {
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "system": "Системная"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Пароль",
+    "sendMagicLink": "Отправить Magic Link",
+    "magicLinkSent": "Magic link отправлен! Проверьте почту.",
+    "checkEmail": "Проверьте почту для подтверждения аккаунта",
+    "continueWithGoogle": "Войти через Google",
+    "continueWithGithub": "Войти через GitHub"
+  },
+  "layout": {
+    "editMode": "Режим редактирования",
+    "editModeOn": "Режим редактирования ВКЛ",
+    "toggleGrid": "Переключить сетку",
+    "layoutJson": "JSON лейаута",
+    "newLayout": "Новый лейаут",
+    "layoutCreated": "Лейаут создан",
+    "layoutSaved": "Лейаут сохранён",
+    "publish": "Опубликовать",
+    "unpublish": "Снять публикацию",
+    "deleteConfirm": "Удалить этот лейаут?"
+  },
+  "profile": {
+    "profile": "Профиль",
+    "overview": "Обзор",
+    "layouts": "Лейауты",
+    "widgets": "Виджеты",
+    "provider": "Провайдер",
+    "userId": "ID пользователя",
+    "created": "Создан",
+    "lastSignIn": "Последний вход",
+    "username": "Имя пользователя",
+    "dashboardComingSoon": "Метрики дашборда скоро появятся.",
+    "widgetsComingSoon": "Библиотека виджетов и статистика скоро появятся.",
+    "lastLogin": "Последний вход"
+  },
+  "home": {
+    "title": "Виджеты",
+    "subtitle": "Дашборд лейаутов скоро появится.",
+    "createNewLayout": "Создать новый лейаут"
+  },
+  "jsonModal": {
+    "title": "JSON лейаута",
+    "view": "Просмотр",
+    "import": "Импорт",
+    "copy": "Копировать",
+    "export": "Экспорт",
+    "importBtn": "Импортировать",
+    "copiedToClipboard": "Скопировано в буфер обмена",
+    "invalidJson": "Некорректный JSON",
+    "invalidLayout": "Некорректный лейаут: отсутствует поле \"id\" или \"type\"",
+    "pastePlaceholder": "Вставьте JSON лейаута сюда..."
+  }
+}

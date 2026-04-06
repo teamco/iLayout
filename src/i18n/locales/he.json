@@ -1,0 +1,73 @@
+{
+  "common": {
+    "back": "חזרה לאפליקציה",
+    "save": "שמור",
+    "cancel": "ביטול",
+    "delete": "מחק",
+    "edit": "ערוך",
+    "create": "צור",
+    "loading": "טוען...",
+    "accessDenied": "הגישה נדחתה",
+    "signIn": "התחבר",
+    "signUp": "הרשמה",
+    "signOut": "התנתק",
+    "or": "או"
+  },
+  "theme": {
+    "light": "בהיר",
+    "dark": "כהה",
+    "system": "מערכת"
+  },
+  "auth": {
+    "email": "אימייל",
+    "password": "סיסמה",
+    "sendMagicLink": "שלח Magic Link",
+    "magicLinkSent": "!Magic link נשלח! בדוק את האימייל",
+    "checkEmail": "בדוק את האימייל שלך לאישור החשבון",
+    "continueWithGoogle": "המשך עם Google",
+    "continueWithGithub": "המשך עם GitHub"
+  },
+  "layout": {
+    "editMode": "מצב עריכה",
+    "editModeOn": "מצב עריכה פעיל",
+    "toggleGrid": "החלף רשת",
+    "layoutJson": "JSON של פריסה",
+    "newLayout": "פריסה חדשה",
+    "layoutCreated": "הפריסה נוצרה",
+    "layoutSaved": "הפריסה נשמרה",
+    "publish": "פרסם",
+    "unpublish": "בטל פרסום",
+    "deleteConfirm": "למחוק את הפריסה הזו?"
+  },
+  "profile": {
+    "profile": "פרופיל",
+    "overview": "סקירה",
+    "layouts": "פריסות",
+    "widgets": "ווידג׳טים",
+    "provider": "ספק",
+    "userId": "מזהה משתמש",
+    "created": "נוצר",
+    "lastSignIn": "כניסה אחרונה",
+    "username": "שם משתמש",
+    "dashboardComingSoon": "מדדי לוח המחוונים בקרוב.",
+    "widgetsComingSoon": "ספריית ווידג׳טים וסטטיסטיקה בקרוב.",
+    "lastLogin": "כניסה אחרונה"
+  },
+  "home": {
+    "title": "ווידג׳טים",
+    "subtitle": "לוח המחוונים של הפריסות בקרוב.",
+    "createNewLayout": "צור פריסה חדשה"
+  },
+  "jsonModal": {
+    "title": "JSON של פריסה",
+    "view": "צפייה",
+    "import": "ייבוא",
+    "copy": "העתק",
+    "export": "ייצוא",
+    "importBtn": "ייבא",
+    "copiedToClipboard": "הועתק ללוח",
+    "invalidJson": "JSON לא תקין",
+    "invalidLayout": "פריסה לא תקינה: חסר שדה \"id\" או \"type\"",
+    "pastePlaceholder": "הדבק JSON של פריסה כאן..."
+  }
+}

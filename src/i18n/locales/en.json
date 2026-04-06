@@ -1,0 +1,73 @@
+{
+  "common": {
+    "back": "Back to app",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading...",
+    "accessDenied": "Access Denied",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign out",
+    "or": "or"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "sendMagicLink": "Send Magic Link",
+    "magicLinkSent": "Magic link sent! Check your email.",
+    "checkEmail": "Check your email to confirm your account",
+    "continueWithGoogle": "Continue with Google",
+    "continueWithGithub": "Continue with GitHub"
+  },
+  "layout": {
+    "editMode": "Edit Mode",
+    "editModeOn": "Edit Mode ON",
+    "toggleGrid": "Toggle grid",
+    "layoutJson": "Layout JSON",
+    "newLayout": "New Layout",
+    "layoutCreated": "Layout created",
+    "layoutSaved": "Layout saved",
+    "publish": "Publish",
+    "unpublish": "Unpublish",
+    "deleteConfirm": "Delete this layout?"
+  },
+  "profile": {
+    "profile": "Profile",
+    "overview": "Overview",
+    "layouts": "Layouts",
+    "widgets": "Widgets",
+    "provider": "Provider",
+    "userId": "User ID",
+    "created": "Created",
+    "lastSignIn": "Last sign in",
+    "username": "Username",
+    "dashboardComingSoon": "Dashboard metrics coming soon.",
+    "widgetsComingSoon": "Widget library and usage stats coming soon.",
+    "lastLogin": "Last login"
+  },
+  "home": {
+    "title": "Widgets",
+    "subtitle": "Your layout dashboard is coming soon.",
+    "createNewLayout": "Create New Layout"
+  },
+  "jsonModal": {
+    "title": "Layout JSON",
+    "view": "View",
+    "import": "Import",
+    "copy": "Copy",
+    "export": "Export",
+    "importBtn": "Import",
+    "copiedToClipboard": "Copied to clipboard",
+    "invalidJson": "Invalid JSON",
+    "invalidLayout": "Invalid layout: missing \"id\" or \"type\" field",
+    "pastePlaceholder": "Paste layout JSON here..."
+  }
+}
