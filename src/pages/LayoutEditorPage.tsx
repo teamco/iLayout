@@ -1,18 +1,27 @@
 import { useEffect } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { Spin, message } from 'antd';
+import { App as AntApp, Spin } from 'antd';
+import { useTranslation } from 'react-i18next';
 import App from '@/App';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 import { useLayout, useCreateLayout, useSaveLayout } from '@/lib/hooks/useLayoutQueries';
+import { useErrorNotification } from '@/lib/hooks/useErrorNotification';
+import { ERoutes } from '@/routes';
 
 export function LayoutEditorPage() {
-  const { userId, layoutId } = useParams({ strict: false }) as { userId: string; layoutId: string };
+  const { layoutId } = useParams({ strict: false }) as { userId?: string; layoutId?: string };
   const navigate = useNavigate();
-  const isNew = layoutId === 'new';
+  const { message } = AntApp.useApp();
+  const { t } = useTranslation();
+  const isNew = !layoutId;
 
-  const { data: layout, isLoading } = useLayout(isNew ? undefined : layoutId);
+  const { data: layout, isLoading, error: loadError } = useLayout(isNew ? undefined : layoutId);
   const createMutation = useCreateLayout();
   const saveMutation = useSaveLayout();
+
+  useErrorNotification(loadError, 'Failed to load layout');
+  useErrorNotification(createMutation.error, 'Failed to create layout');
+  useErrorNotification(saveMutation.error, 'Failed to save layout');
 
   // Load layout data into Zustand store when fetched
   useEffect(() => {
@@ -34,29 +43,23 @@ export function LayoutEditorPage() {
 
     if (isNew) {
       createMutation.mutate(root, {
-        onSuccess: (created) => {
-          message.success('Layout created');
-          navigate({
-            to: '/users/$userId/layouts/$layoutId' as string,
-            params: { userId, layoutId: created.id },
+        onSuccess: async (created) => {
+          void message.success(t('layout.layoutCreated'));
+          await navigate({
+            to: ERoutes.LAYOUT_EDIT as string,
+            params: { layoutId: created.id },
           });
         },
-        onError: (err) => message.error(err.message),
       });
     } else {
       saveMutation.mutate({ id: layoutId, data: root }, {
-        onSuccess: () => message.success('Layout saved'),
-        onError: (err) => message.error(err.message),
+        onSuccess: () => void message.success(t('layout.layoutSaved')),
       });
     }
   }
 
   if (!isNew && isLoading) {
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100dvh' }}>
-        <Spin size="large" />
-      </div>
-    );
+    return <Spin size="large" fullscreen />;
   }
 
   return (
