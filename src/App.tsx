@@ -1,7 +1,7 @@
 // src/App.tsx
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, ConfigProvider, Tooltip, theme } from 'antd';
-import { AppstoreOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
+import { AppstoreOutlined, SunOutlined, MoonOutlined, DesktopOutlined, CodeOutlined } from '@ant-design/icons';
 import { useThemeStore, syncSystemTheme } from '@/themes/themeStore';
 import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
 import { GridOverlay } from '@/layout/components/GridOverlay';
@@ -9,6 +9,7 @@ import { GridProvider } from '@/layout/grid/GridContext';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 import { initAutoSave } from '@/layout/storage/autoSave';
 import { localStorageAdapter } from '@/layout/storage/localStorageAdapter';
+import { LayoutJsonModal } from '@/layout/components/LayoutJsonModal';
 import styles from './App.module.less';
 
 const LAYOUT_ID = 'default';
@@ -18,6 +19,8 @@ export default function App() {
   const setEditMode = useLayoutStore(s => s.setEditMode);
   const showGrid = useLayoutStore(s => s.showGrid);
   const toggleGrid = useLayoutStore(s => s.toggleGrid);
+
+  const [jsonModalOpen, setJsonModalOpen] = useState(false);
 
   const themeMode = useThemeStore(s => s.themeMode);
   const resolvedTheme = useThemeStore(s => s.resolvedTheme);
@@ -66,6 +69,13 @@ export default function App() {
               onClick={cycleTheme}
             />
           </Tooltip>
+          <Tooltip title="Layout JSON">
+            <Button
+              size="small"
+              icon={<CodeOutlined />}
+              onClick={() => setJsonModalOpen(true)}
+            />
+          </Tooltip>
           <Button
             type={editMode ? 'primary' : 'default'}
             size="small"
@@ -91,6 +101,7 @@ export default function App() {
           </GridProvider>
         </div>
       </div>
+      <LayoutJsonModal open={jsonModalOpen} onClose={() => setJsonModalOpen(false)} />
     </ConfigProvider>
   );
 }
