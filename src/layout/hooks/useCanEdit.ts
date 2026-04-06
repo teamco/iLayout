@@ -1,5 +1,7 @@
-// src/layout/hooks/useCanEdit.ts
-// Stub: always returns true. Replace with CASL ability check when auth is added.
+import { useAbility } from '@/auth/AbilityContext';
+import { EAction, ESubject } from '@/auth/abilities';
+
 export function useCanEdit(): boolean {
-  return true;
+  const ability = useAbility();
+  return ability.can(EAction.EDIT, ESubject.LAYOUT);
 }
