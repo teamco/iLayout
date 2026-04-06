@@ -10,7 +10,10 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from '@tanstack/react-router';
 import md5 from 'blueimp-md5';
+import { subject } from '@casl/ability';
 import { useAuth } from '@/auth/AuthContext';
+import { useAbility } from '@/auth/AbilityContext';
+import { EAction, ESubject } from '@/auth/abilities';
 import { useLayouts, useSetStatus } from '@/lib/hooks/useLayoutQueries';
 import { formatDate } from '@/lib/formatDate';
 import type { LayoutRecord } from '@/lib/types';
@@ -82,6 +85,7 @@ function LayoutsSection() {
   const navigate = useNavigate();
   const { data: layouts, isLoading } = useLayouts(user?.id);
   const setStatus = useSetStatus();
+  const ability = useAbility();
 
   const columns = [
     {
@@ -115,41 +119,48 @@ function LayoutsSection() {
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: unknown, record: LayoutRecord) => (
-        <span style={{ display: 'flex', gap: 8 }}>
-          <Button
-            size="small"
-            onClick={() => navigate({
-              to: '/users/$userId/layouts/$layoutId' as string,
-              params: { userId: user!.id, layoutId: record.id },
-            })}
-          >
-            Edit
-          </Button>
-          {record.status === 'draft' && (
-            <Button
-              size="small"
-              onClick={() => setStatus.mutate({ id: record.id, version: record.version, status: 'published' })}
-            >
-              Publish
-            </Button>
-          )}
-          {record.status === 'published' && (
-            <Button
-              size="small"
-              onClick={() => setStatus.mutate({ id: record.id, version: record.version, status: 'draft' })}
-            >
-              Unpublish
-            </Button>
-          )}
-          <Popconfirm
-            title="Delete this layout?"
-            onConfirm={() => setStatus.mutate({ id: record.id, version: record.version, status: 'deleted' })}
-          >
-            <Button size="small" danger>Delete</Button>
-          </Popconfirm>
-        </span>
-      ),
+      render: (_: unknown, record: LayoutRecord) => {
+        const layoutSubject = subject(ESubject.LAYOUT, { kind: ESubject.LAYOUT, user_id: record.user_id });
+        return (
+          <span style={{ display: 'flex', gap: 8 }}>
+            {ability.can(EAction.EDIT, layoutSubject) && (
+              <Button
+                size="small"
+                onClick={() => navigate({
+                  to: '/users/$userId/layouts/$layoutId' as string,
+                  params: { userId: user!.id, layoutId: record.id },
+                })}
+              >
+                Edit
+              </Button>
+            )}
+            {ability.can(EAction.PUBLISH, layoutSubject) && record.status === 'draft' && (
+              <Button
+                size="small"
+                onClick={() => setStatus.mutate({ id: record.id, version: record.version, status: 'published' })}
+              >
+                Publish
+              </Button>
+            )}
+            {ability.can(EAction.PUBLISH, layoutSubject) && record.status === 'published' && (
+              <Button
+                size="small"
+                onClick={() => setStatus.mutate({ id: record.id, version: record.version, status: 'draft' })}
+              >
+                Unpublish
+              </Button>
+            )}
+            {ability.can(EAction.DELETE, layoutSubject) && (
+              <Popconfirm
+                title="Delete this layout?"
+                onConfirm={() => setStatus.mutate({ id: record.id, version: record.version, status: 'deleted' })}
+              >
+                <Button size="small" danger>Delete</Button>
+              </Popconfirm>
+            )}
+          </span>
+        );
+      },
     },
   ];
 
@@ -157,16 +168,18 @@ function LayoutsSection() {
     <>
       <GridToolbar>
         <Title level={4} style={{ margin: 0 }}>Layouts</Title>
-        <Button
-          type="primary"
-          icon={<PlusOutlined />}
-          onClick={() => navigate({
-            to: '/users/$userId/layouts/new' as string,
-            params: { userId: user!.id },
-          })}
-        >
-          New Layout
-        </Button>
+        {ability.can(EAction.CREATE, ESubject.LAYOUT) && (
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => navigate({
+              to: '/users/$userId/layouts/new' as string,
+              params: { userId: user!.id },
+            })}
+          >
+            New Layout
+          </Button>
+        )}
       </GridToolbar>
       <Table
         dataSource={layouts ?? []}
