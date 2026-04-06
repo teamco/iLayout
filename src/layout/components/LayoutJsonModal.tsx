@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { Modal, Tabs, Input, Button, Typography, Space, message } from 'antd';
+import { App as AntApp, Modal, Tabs, Input, Button, Typography, Space } from 'antd';
 import { CopyOutlined, DownloadOutlined, ImportOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 
 type Props = {
@@ -37,21 +38,21 @@ function validateLayout(data: unknown): data is { id: string; type: string } {
 function ViewTab() {
   const root = useLayoutStore(s => s.root);
   const json = JSON.stringify(root, null, 2);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message } = AntApp.useApp();
+  const { t } = useTranslation();
 
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(json).then(() => {
-      messageApi.success('Copied to clipboard');
+      message.success(t('jsonModal.copiedToClipboard'));
     });
-  }, [json, messageApi]);
+  }, [json, message, t]);
 
   return (
     <>
-      {contextHolder}
       <pre style={{ maxHeight: 400, overflow: 'auto', fontSize: 12, margin: 0 }}>{json}</pre>
       <Space style={{ marginTop: 12 }}>
-        <Button icon={<CopyOutlined />} onClick={handleCopy}>Copy</Button>
-        <Button icon={<DownloadOutlined />} onClick={() => downloadJson(json)}>Export</Button>
+        <Button icon={<CopyOutlined />} onClick={handleCopy}>{t('jsonModal.copy')}</Button>
+        <Button icon={<DownloadOutlined />} onClick={() => downloadJson(json)}>{t('jsonModal.export')}</Button>
       </Space>
     </>
   );
@@ -60,6 +61,7 @@ function ViewTab() {
 function ImportTab({ onClose }: { onClose: () => void }) {
   const [text, setText] = useState('');
   const [error, setError] = useState('');
+  const { t } = useTranslation();
 
   const handleImport = useCallback(() => {
     setError('');
@@ -67,17 +69,17 @@ function ImportTab({ onClose }: { onClose: () => void }) {
     try {
       parsed = JSON.parse(text);
     } catch {
-      setError('Invalid JSON');
+      setError(t('jsonModal.invalidJson'));
       return;
     }
     if (!validateLayout(parsed)) {
-      setError('Invalid layout: missing "id" or "type" field');
+      setError(t('jsonModal.invalidLayout'));
       return;
     }
     useLayoutStore.setState({ root: parsed as ReturnType<typeof useLayoutStore.getState>['root'] });
     setText('');
     onClose();
-  }, [text, onClose]);
+  }, [text, onClose, t]);
 
   return (
     <>
@@ -85,7 +87,7 @@ function ImportTab({ onClose }: { onClose: () => void }) {
         rows={12}
         value={text}
         onChange={e => { setText(e.target.value); setError(''); }}
-        placeholder="Paste layout JSON here..."
+        placeholder={t('jsonModal.pastePlaceholder')}
         style={{ fontFamily: 'monospace', fontSize: 12 }}
       />
       {error && (
@@ -95,7 +97,7 @@ function ImportTab({ onClose }: { onClose: () => void }) {
       )}
       <Space style={{ marginTop: 12 }}>
         <Button type="primary" icon={<ImportOutlined />} onClick={handleImport} disabled={!text.trim()}>
-          Import
+          {t('jsonModal.importBtn')}
         </Button>
       </Space>
     </>
@@ -103,12 +105,13 @@ function ImportTab({ onClose }: { onClose: () => void }) {
 }
 
 export function LayoutJsonModal({ open, onClose }: Props) {
+  const { t } = useTranslation();
   return (
-    <Modal title="Layout JSON" open={open} onCancel={onClose} footer={null} width={640}>
+    <Modal title={t('jsonModal.title')} open={open} onCancel={onClose} footer={null} width={640}>
       <Tabs
         items={[
-          { key: 'view', label: 'View', children: <ViewTab /> },
-          { key: 'import', label: 'Import', children: <ImportTab onClose={onClose} /> },
+          { key: 'view', label: t('jsonModal.view'), children: <ViewTab /> },
+          { key: 'import', label: t('jsonModal.import'), children: <ImportTab onClose={onClose} /> },
         ]}
       />
     </Modal>
