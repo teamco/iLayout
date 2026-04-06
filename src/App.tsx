@@ -7,6 +7,8 @@ import { AppstoreOutlined, CodeOutlined, LogoutOutlined, SaveOutlined, UserOutli
 import { useNavigate } from '@tanstack/react-router';
 import { useThemeStore } from '@/themes/themeStore';
 import { useAuth } from '@/auth/AuthContext';
+import { useAbility } from '@/auth/AbilityContext';
+import { EAction, ESubject } from '@/auth/abilities';
 import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
 import { GridOverlay } from '@/layout/components/GridOverlay';
 import { GridProvider } from '@/layout/grid/GridContext';
@@ -35,6 +37,8 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
   const cycleTheme = useThemeStore(s => s.cycleTheme);
 
   const { user, signOut } = useAuth();
+  const ability = useAbility();
+  const canEdit = ability.can(EAction.EDIT, ESubject.LAYOUT);
   const navigate = useNavigate();
 
   const userName = user?.user_metadata?.full_name || user?.email || 'User';
@@ -121,13 +125,15 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
             onClick={() => setJsonModalOpen(true)}
           />
         </Tooltip>
-        <Button
-          type={editMode ? 'primary' : 'default'}
-          size="small"
-          onClick={() => setEditMode(!editMode)}
-        >
-          {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
-        </Button>
+        {canEdit && (
+          <Button
+            type={editMode ? 'primary' : 'default'}
+            size="small"
+            onClick={() => setEditMode(!editMode)}
+          >
+            {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
+          </Button>
+        )}
         {editMode && onSave && (
           <Tooltip title="Save (Ctrl+S)">
             <Button
