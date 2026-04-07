@@ -53,15 +53,15 @@ runs:
         done <<< "$COMMIT_LIST"
 
         # 2. Bump patch version immediately (Yarn 4 syntax)
-        yarn version patch --immediate
+        pnpm version patch --immediate
 
         # 3. Read the new version
         NEW_V=$(node -p "require('./package.json').version")
         TAG="v$NEW_V"
         echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-        # 4. Stage changes (yarn.lock instead of package-lock.json)
-        git add package.json yarn.lock
+        # 4. Stage changes
+        git add package.json
 
         # 5. Create commit message using the processed list
         printf "ci: version bump to %s [skip ci]\n\nChanges:\n\n%s\n" "$TAG" "$PROCESSED_COMMITS" > .commit_msg
