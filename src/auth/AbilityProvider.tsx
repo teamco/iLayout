@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { defineAbilityFor } from '@/auth/abilities';
 import { AbilityContext } from '@/auth/abilityContext';
 

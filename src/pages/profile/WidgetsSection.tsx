@@ -3,11 +3,15 @@ import { Button, Table } from 'antd';
 import { PlusOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { Can } from '@/auth/Can';
 import { EAction, ESubject } from '@/auth/abilities';
 import { ERoutes } from '@/routes';
-import { useWidgets, useUpdateWidget, useDeleteWidget } from '@/lib/hooks/useWidgetQueries';
+import {
+  useWidgets,
+  useUpdateWidget,
+  useDeleteWidget,
+} from '@/lib/hooks/useWidgetQueries';
 import type { WidgetRecord } from '@/lib/types';
 import { useTable } from '@/lib/hooks/useTable';
 import { useColumnsToggle } from '@/lib/hooks/useColumnsToggle';
@@ -33,21 +37,41 @@ export function WidgetsSection() {
     computedFilteredCount,
   } = useTable(widgets, widgets.length, { persistToUrl: true });
 
-  const columns = useMemo(() => getWidgetColumns({
-    t,
-    navigate,
-    onDelete: (id) => deleteWidget.mutate(id),
-    onUpdate: (id, data) => updateWidget.mutate({ id, data }),
-    entities: widgets,
-    filteredInfo,
-    sortedInfo,
-  }), [t, navigate, deleteWidget, updateWidget, widgets, filteredInfo, sortedInfo]);
+  const columns = useMemo(
+    () =>
+      getWidgetColumns({
+        t,
+        navigate,
+        onDelete: (id) => deleteWidget.mutate(id),
+        onUpdate: (id, data) => updateWidget.mutate({ id, data }),
+        entities: widgets,
+        filteredInfo,
+        sortedInfo,
+      }),
+    [
+      t,
+      navigate,
+      deleteWidget,
+      updateWidget,
+      widgets,
+      filteredInfo,
+      sortedInfo,
+    ],
+  );
 
-  const { filteredColumns, columnsList, selectedColumns, setSelectedColumns } = useColumnsToggle(columns, ['created_at']);
+  const { filteredColumns, columnsList, selectedColumns, setSelectedColumns } =
+    useColumnsToggle(columns, ['created_at']);
 
   return (
-    <PageLayout title={<PageTitle name={t('profile.widgets')} Icon={AppstoreOutlined} />} subject={ESubject.WIDGET}>
-      <GridToolbar onRefresh={() => void refetch()} exportData={widgets} exportFileName="widgets">
+    <PageLayout
+      title={<PageTitle name={t('profile.widgets')} Icon={AppstoreOutlined} />}
+      subject={ESubject.WIDGET}
+    >
+      <GridToolbar
+        onRefresh={() => void refetch()}
+        exportData={widgets}
+        exportFileName="widgets"
+      >
         <Can I={EAction.CREATE} a={ESubject.WIDGET}>
           <Button
             type="primary"
@@ -73,8 +97,17 @@ export function WidgetsSection() {
         pagination={tableParams.pagination}
         size="small"
         scroll={{ x: 800 }}
-        onChange={handleTableChange as Parameters<typeof Table<WidgetRecord>>['0']['onChange']}
-        footer={() => <TableFooter computedFilteredCount={computedFilteredCount} totalCount={widgets.length} />}
+        onChange={
+          handleTableChange as Parameters<
+            typeof Table<WidgetRecord>
+          >['0']['onChange']
+        }
+        footer={() => (
+          <TableFooter
+            computedFilteredCount={computedFilteredCount}
+            totalCount={widgets.length}
+          />
+        )}
       />
     </PageLayout>
   );

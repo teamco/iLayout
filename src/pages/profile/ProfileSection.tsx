@@ -2,7 +2,7 @@ import { Avatar, Descriptions, Typography } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import md5 from 'blueimp-md5';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { PageLayout, PageTitle } from '@/components/PageLayout';
 
 const { Title, Text } = Typography;
@@ -21,34 +21,63 @@ export function ProfileSection() {
     : undefined;
 
   const provider = user.app_metadata?.provider ?? 'email';
-  const createdAt = user.created_at ? new Date(user.created_at).toLocaleString() : '—';
-  const lastSignIn = user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : '—';
+  const createdAt = user.created_at
+    ? new Date(user.created_at).toLocaleString()
+    : '—';
+  const lastSignIn = user.last_sign_in_at
+    ? new Date(user.last_sign_in_at).toLocaleString()
+    : '—';
 
   return (
-    <PageLayout title={<PageTitle name={t('profile.profile')} Icon={UserOutlined} />}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+    <PageLayout
+      title={<PageTitle name={t('profile.profile')} Icon={UserOutlined} />}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16,
+          marginBottom: 24,
+        }}
+      >
         <Avatar
           size={64}
-          src={avatarUrl
-            ? <img src={avatarUrl} referrerPolicy="no-referrer" />
-            : gravatarUrl}
+          src={
+            avatarUrl ? (
+              <img src={avatarUrl} referrerPolicy="no-referrer" />
+            ) : (
+              gravatarUrl
+            )
+          }
           icon={!avatarUrl && !gravatarUrl ? <UserOutlined /> : undefined}
         />
         <div>
-          <Title level={4} style={{ margin: 0 }}>{name}</Title>
+          <Title level={4} style={{ margin: 0 }}>
+            {name}
+          </Title>
           <Text type="secondary">{email}</Text>
         </div>
       </div>
 
       <Descriptions column={1} size="small">
-        <Descriptions.Item label={t('profile.provider')}>{provider}</Descriptions.Item>
-        <Descriptions.Item label={t('profile.userId')}>
-          <Text copyable style={{ fontSize: 12 }}>{user.id}</Text>
+        <Descriptions.Item label={t('profile.provider')}>
+          {provider}
         </Descriptions.Item>
-        <Descriptions.Item label={t('profile.created')}>{createdAt}</Descriptions.Item>
-        <Descriptions.Item label={t('profile.lastSignIn')}>{lastSignIn}</Descriptions.Item>
+        <Descriptions.Item label={t('profile.userId')}>
+          <Text copyable style={{ fontSize: 12 }}>
+            {user.id}
+          </Text>
+        </Descriptions.Item>
+        <Descriptions.Item label={t('profile.created')}>
+          {createdAt}
+        </Descriptions.Item>
+        <Descriptions.Item label={t('profile.lastSignIn')}>
+          {lastSignIn}
+        </Descriptions.Item>
         {meta.preferred_username && (
-          <Descriptions.Item label={t('profile.username')}>{meta.preferred_username}</Descriptions.Item>
+          <Descriptions.Item label={t('profile.username')}>
+            {meta.preferred_username}
+          </Descriptions.Item>
         )}
       </Descriptions>
     </PageLayout>

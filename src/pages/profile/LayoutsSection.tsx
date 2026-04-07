@@ -3,7 +3,7 @@ import { Button, Dropdown, Space, Table } from 'antd';
 import { DownOutlined, PlusOutlined, LayoutOutlined } from '@ant-design/icons';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { Can } from '@/auth/Can';
 import { EAction, ESubject } from '@/auth/abilities';
 import { ERoutes } from '@/routes';
@@ -32,26 +32,40 @@ export function LayoutsSection() {
     computedFilteredCount,
   } = useTable(layouts, layouts.length, { persistToUrl: true });
 
-  const columns = useMemo(() => getLayoutColumns({
-    t,
-    navigate,
-    onSetStatus: (args) => setStatus.mutate(args),
-    entities: layouts,
-    filteredInfo,
-    sortedInfo,
-  }), [t, navigate, setStatus, layouts, filteredInfo, sortedInfo]);
+  const columns = useMemo(
+    () =>
+      getLayoutColumns({
+        t,
+        navigate,
+        onSetStatus: (args) => setStatus.mutate(args),
+        entities: layouts,
+        filteredInfo,
+        sortedInfo,
+      }),
+    [t, navigate, setStatus, layouts, filteredInfo, sortedInfo],
+  );
 
-  const { filteredColumns, columnsList, selectedColumns, setSelectedColumns } = useColumnsToggle(columns, ['created_at']);
+  const { filteredColumns, columnsList, selectedColumns, setSelectedColumns } =
+    useColumnsToggle(columns, ['created_at']);
 
   return (
-    <PageLayout title={<PageTitle name={t('profile.layouts')} Icon={LayoutOutlined} />} subject={ESubject.LAYOUT}>
-      <GridToolbar onRefresh={() => void refetch()} exportData={layouts} exportFileName="layouts">
+    <PageLayout
+      title={<PageTitle name={t('profile.layouts')} Icon={LayoutOutlined} />}
+      subject={ESubject.LAYOUT}
+    >
+      <GridToolbar
+        onRefresh={() => void refetch()}
+        exportData={layouts}
+        exportFileName="layouts"
+      >
         <Can I={EAction.CREATE} a={ESubject.LAYOUT}>
           <Space.Compact>
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => void navigate({ to: ERoutes.LAYOUT_NEW as string })}
+              onClick={() =>
+                void navigate({ to: ERoutes.LAYOUT_NEW as string })
+              }
             >
               {t('layout.newLayout')}
             </Button>
@@ -61,9 +75,10 @@ export function LayoutsSection() {
                   { key: 'viewport', label: 'Viewport' },
                   { key: 'scroll', label: 'Scroll' },
                 ],
-                onClick: ({ key }) => void navigate({
-                  to: `${ERoutes.LAYOUT_NEW}?mode=${key}` as string,
-                }),
+                onClick: ({ key }) =>
+                  void navigate({
+                    to: `${ERoutes.LAYOUT_NEW}?mode=${key}` as string,
+                  }),
               }}
             >
               <Button type="primary" icon={<DownOutlined />} />
@@ -86,8 +101,17 @@ export function LayoutsSection() {
         pagination={tableParams.pagination}
         size="small"
         scroll={{ x: 800 }}
-        onChange={handleTableChange as Parameters<typeof Table<LayoutRecord>>['0']['onChange']}
-        footer={() => <TableFooter computedFilteredCount={computedFilteredCount} totalCount={layouts.length} />}
+        onChange={
+          handleTableChange as Parameters<
+            typeof Table<LayoutRecord>
+          >['0']['onChange']
+        }
+        footer={() => (
+          <TableFooter
+            computedFilteredCount={computedFilteredCount}
+            totalCount={layouts.length}
+          />
+        )}
       />
     </PageLayout>
   );

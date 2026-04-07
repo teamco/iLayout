@@ -3,9 +3,13 @@ import { MoreOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { TeamOutlined } from '@ant-design/icons';
-import { useAuth } from '@/auth/AuthContext';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { ERoutes } from '@/routes';
-import { useProfiles, useBlockUser, useForceLogoutUser } from '@/lib/hooks/useProfileQueries';
+import {
+  useProfiles,
+  useBlockUser,
+  useForceLogoutUser,
+} from '@/lib/hooks/useProfileQueries';
 import { formatDate } from '@/lib/formatDate';
 import type { ProfileRecord } from '@/lib/types';
 import { GridToolbar } from '@/components/Table/GridToolbar';
@@ -30,15 +34,24 @@ export function UsersSection() {
         <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Avatar
             size="small"
-            src={record.avatar_url
-              ? <img src={record.avatar_url} referrerPolicy="no-referrer" />
-              : undefined}
+            src={
+              record.avatar_url ? (
+                <img src={record.avatar_url} referrerPolicy="no-referrer" />
+              ) : undefined
+            }
             icon={!record.avatar_url ? <UserOutlined /> : undefined}
           />
           <span>
-            <Typography.Text strong>{record.full_name || record.email}</Typography.Text>
+            <Typography.Text strong>
+              {record.full_name || record.email}
+            </Typography.Text>
             {record.full_name && (
-              <Typography.Text type="secondary" style={{ display: 'block', fontSize: 12 }}>{record.email}</Typography.Text>
+              <Typography.Text
+                type="secondary"
+                style={{ display: 'block', fontSize: 12 }}
+              >
+                {record.email}
+              </Typography.Text>
             )}
           </span>
         </span>
@@ -55,10 +68,13 @@ export function UsersSection() {
       key: 'status',
       width: 120,
       render: (_: unknown, record: ProfileRecord) => {
-        if (record.is_blocked) return <Tag color="red">{t('profile.blockUser')}</Tag>;
-        return record.is_online
-          ? <Tag color="green">{t('profile.online')}</Tag>
-          : <Tag>{t('profile.offline')}</Tag>;
+        if (record.is_blocked)
+          return <Tag color="red">{t('profile.blockUser')}</Tag>;
+        return record.is_online ? (
+          <Tag color="green">{t('profile.online')}</Tag>
+        ) : (
+          <Tag>{t('profile.offline')}</Tag>
+        );
       },
     },
     {
@@ -66,7 +82,7 @@ export function UsersSection() {
       dataIndex: 'last_sign_in_at',
       key: 'last_sign_in_at',
       width: 180,
-      render: (date: string | null) => date ? formatDate(date) : '—',
+      render: (date: string | null) => (date ? formatDate(date) : '—'),
     },
     {
       title: t('common.columnActions'),
@@ -80,10 +96,11 @@ export function UsersSection() {
           {
             key: 'profile',
             label: t('profile.viewProfile'),
-            onClick: () => void navigate({
-              to: ERoutes.USER_PROFILE as string,
-              params: { userId: record.id },
-            }),
+            onClick: () =>
+              void navigate({
+                to: ERoutes.USER_PROFILE as string,
+                params: { userId: record.id },
+              }),
           },
         ];
 
@@ -92,9 +109,15 @@ export function UsersSection() {
             { type: 'divider' },
             {
               key: 'block',
-              label: record.is_blocked ? t('profile.unblockUser') : t('profile.blockUser'),
+              label: record.is_blocked
+                ? t('profile.unblockUser')
+                : t('profile.blockUser'),
               danger: !record.is_blocked,
-              onClick: () => blockUser.mutate({ userId: record.id, blocked: !record.is_blocked }),
+              onClick: () =>
+                blockUser.mutate({
+                  userId: record.id,
+                  blocked: !record.is_blocked,
+                }),
             },
             {
               key: 'logout',
@@ -116,8 +139,14 @@ export function UsersSection() {
   ];
 
   return (
-    <PageLayout title={<PageTitle name={t('profile.users')} Icon={TeamOutlined} />}>
-      <GridToolbar onRefresh={() => void refetch()} exportData={users} exportFileName="users" />
+    <PageLayout
+      title={<PageTitle name={t('profile.users')} Icon={TeamOutlined} />}
+    >
+      <GridToolbar
+        onRefresh={() => void refetch()}
+        exportData={users}
+        exportFileName="users"
+      />
       <Table
         dataSource={users}
         columns={columns}
@@ -126,7 +155,12 @@ export function UsersSection() {
         pagination={false}
         size="small"
         scroll={{ x: 800 }}
-        footer={() => <TableFooter computedFilteredCount={users.length} totalCount={users.length} />}
+        footer={() => (
+          <TableFooter
+            computedFilteredCount={users.length}
+            totalCount={users.length}
+          />
+        )}
       />
     </PageLayout>
   );
