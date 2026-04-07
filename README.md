@@ -96,4 +96,4 @@ src/
 
 ## License
 
-Private
+[MIT](./LICENSE)
