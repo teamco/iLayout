@@ -2,7 +2,12 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tooltip } from 'antd';
-import { AppstoreOutlined, CodeOutlined, PlusOutlined, SaveOutlined } from '@ant-design/icons';
+import {
+  AppstoreOutlined,
+  CodeOutlined,
+  PlusOutlined,
+  SaveOutlined,
+} from '@ant-design/icons';
 import { Can } from '@/auth/Can';
 import { EAction, ESubject } from '@/auth/abilities';
 import { AppHeader } from '@/components/AppHeader';
@@ -22,15 +27,14 @@ type AppProps = {
 
 export default function App({ onSave, saving }: AppProps) {
   const { t } = useTranslation();
-  const editMode = useLayoutStore(s => s.editMode);
-  const setEditMode = useLayoutStore(s => s.setEditMode);
-  const showGrid = useLayoutStore(s => s.showGrid);
-  const toggleGrid = useLayoutStore(s => s.toggleGrid);
-  const layoutMode = useLayoutStore(s => s.layoutMode);
-  const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
+  const editMode = useLayoutStore((s) => s.editMode);
+  const setEditMode = useLayoutStore((s) => s.setEditMode);
+  const showGrid = useLayoutStore((s) => s.showGrid);
+  const toggleGrid = useLayoutStore((s) => s.toggleGrid);
+  const layoutMode = useLayoutStore((s) => s.layoutMode);
+  const activeWidgetEditId = useLayoutStore((s) => s.activeWidgetEditId);
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
   const [addSectionModalOpen, setAddSectionModalOpen] = useState(false);
-
 
   useEffect(() => {
     if (!editMode) return;
@@ -99,13 +103,19 @@ export default function App({ onSave, saving }: AppProps) {
           </Tooltip>
         )}
       </AppHeader>
-      <div className={styles.canvas} style={layoutMode === 'scroll' ? { overflowY: 'auto' } : undefined}>
+      <div
+        className={styles.canvas}
+        style={layoutMode === 'scroll' ? { overflowY: 'auto' } : undefined}
+      >
         <GridProvider>
           <LayoutRenderer />
           {showGrid && <GridOverlay />}
         </GridProvider>
       </div>
-      <LayoutJsonModal open={jsonModalOpen} onClose={() => setJsonModalOpen(false)} />
+      <LayoutJsonModal
+        open={jsonModalOpen}
+        onClose={() => setJsonModalOpen(false)}
+      />
       <AddPanelModal
         open={addSectionModalOpen}
         onCancel={() => setAddSectionModalOpen(false)}
@@ -124,7 +134,9 @@ export default function App({ onSave, saving }: AppProps) {
                 type: 'splitter' as const,
                 direction: 'horizontal' as const,
                 sizes: after ? [80, 20] : [20, 80],
-                children: after ? [currentRoot, newLeaf] : [newLeaf, currentRoot],
+                children: after
+                  ? [currentRoot, newLeaf]
+                  : [newLeaf, currentRoot],
               },
             });
           } else {
@@ -136,8 +148,14 @@ export default function App({ onSave, saving }: AppProps) {
             const root = useLayoutStore.getState().root;
             if (root.type === 'scroll') {
               const sr = root as unknown as import('@/layout/types').ScrollRoot;
-              const targetId = dir === 'top' ? sr.sections[0]?.id : sr.sections[sr.sections.length - 1]?.id;
-              if (targetId) useLayoutStore.getState().addSection(dir === 'top' ? 'before' : 'after', targetId);
+              const targetId =
+                dir === 'top'
+                  ? sr.sections[0]?.id
+                  : sr.sections[sr.sections.length - 1]?.id;
+              if (targetId)
+                useLayoutStore
+                  .getState()
+                  .addSection(dir === 'top' ? 'before' : 'after', targetId);
             }
           }
         }}

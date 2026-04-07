@@ -1,6 +1,6 @@
 {
   "language": "en",
-  "words": ["שמור"],
+  "words": ["שמור", "Appstore", "Clonable"],
   "ignorePaths": [
     "**/locales/**/*",
     "**/package.json",
