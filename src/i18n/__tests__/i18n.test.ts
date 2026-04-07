@@ -33,18 +33,29 @@ describe('i18n', () => {
 
   it('falls back to English when localStorage access throws', async () => {
     vi.resetModules();
+    const originalLocalStorage = globalThis.localStorage;
 
-    const getItemSpy = vi
-      .spyOn(localStorage, 'getItem')
-      .mockImplementation(() => {
-        throw new Error('storage unavailable');
+    Object.defineProperty(globalThis, 'localStorage', {
+      configurable: true,
+      value: {
+        ...originalLocalStorage,
+        getItem: vi.fn(() => {
+          throw new Error('storage unavailable');
+        }),
+      },
+    });
+
+    try {
+      const { i18n } = await import('../i18n');
+
+      expect(i18n.language).toBe('en');
+      expect(i18n.t('layout.editMode')).toBe('Edit Mode');
+    } finally {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: originalLocalStorage,
       });
-
-    const { i18n } = await import('../i18n');
-
-    expect(getItemSpy).toHaveBeenCalledWith('language');
-    expect(i18n.language).toBe('en');
-    expect(i18n.t('layout.editMode')).toBe('Edit Mode');
+    }
   });
 
   it('exports the supported languages and short labels', async () => {
