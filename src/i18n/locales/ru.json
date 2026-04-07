@@ -11,7 +11,15 @@
     "signIn": "Войти",
     "signUp": "Регистрация",
     "signOut": "Выйти",
-    "or": "или"
+    "or": "или",
+    "refresh": "Обновить",
+    "exportJson": "Экспорт JSON",
+    "columnId": "ID",
+    "columnCreated": "Создан",
+    "columnUpdated": "Обновлён",
+    "columnActions": "Действия",
+    "columnStatus": "Статус",
+    "notFound": "Страница, которую вы посетили, не существует."
   },
   "theme": {
     "light": "Светлая",
@@ -37,7 +45,37 @@
     "layoutSaved": "Лейаут сохранён",
     "publish": "Опубликовать",
     "unpublish": "Снять публикацию",
-    "deleteConfirm": "Удалить этот лейаут?"
+    "deleteConfirm": "Удалить этот лейаут?",
+    "columnStatus": "Статус",
+    "columnVersion": "Версия",
+    "columnPrivate": "Приватный",
+    "widgetConfig": "Настройки виджета",
+    "margins": "Отступы",
+    "align": "Выравнивание",
+    "private": "Приватный",
+    "public": "Публичный"
+  },
+  "widget": {
+    "newWidget": "Новый виджет",
+    "widgetCreated": "Виджет создан",
+    "widgetSaved": "Виджет сохранён",
+    "columnCategory": "Категория",
+    "columnResource": "Ресурс",
+    "columnPublic": "Публичный",
+    "name": "Название",
+    "description": "Описание",
+    "tags": "Теги",
+    "tabGeneral": "Основное",
+    "tabContent": "Контент",
+    "tabConfig": "Конфигурация",
+    "tabSettings": "Настройки",
+    "contentValue": "Значение контента",
+    "contentHelp": "URL для youtube/image, текст/код для остальных",
+    "thumbnail": "URL миниатюры",
+    "isEditable": "Редактируемый",
+    "isClonable": "Клонируемый",
+    "isPublic": "Публичный",
+    "publicHelp": "Когда публичный и опубликованный, другие пользователи могут использовать этот виджет"
   },
   "profile": {
     "profile": "Профиль",
@@ -51,7 +89,16 @@
     "username": "Имя пользователя",
     "dashboardComingSoon": "Метрики дашборда скоро появятся.",
     "widgetsComingSoon": "Библиотека виджетов и статистика скоро появятся.",
-    "lastLogin": "Последний вход"
+    "lastLogin": "Последний вход",
+    "users": "Пользователи",
+    "online": "Онлайн",
+    "offline": "Оффлайн",
+    "blockUser": "Заблокировать",
+    "unblockUser": "Разблокировать",
+    "logoutUser": "Принудительный выход",
+    "blockConfirm": "Заблокировать этого пользователя?",
+    "logoutConfirm": "Принудительно выйти из аккаунта?",
+    "viewProfile": "Профиль"
   },
   "home": {
     "title": "Виджеты",

@@ -11,7 +11,15 @@
     "signIn": "Sign In",
     "signUp": "Sign Up",
     "signOut": "Sign out",
-    "or": "or"
+    "or": "or",
+    "refresh": "Refresh",
+    "exportJson": "Export JSON",
+    "columnId": "ID",
+    "columnCreated": "Created",
+    "columnUpdated": "Updated",
+    "columnActions": "Actions",
+    "columnStatus": "Status",
+    "notFound": "Sorry, the page you visited does not exist."
   },
   "theme": {
     "light": "Light",
@@ -37,7 +45,37 @@
     "layoutSaved": "Layout saved",
     "publish": "Publish",
     "unpublish": "Unpublish",
-    "deleteConfirm": "Delete this layout?"
+    "deleteConfirm": "Delete this layout?",
+    "columnStatus": "Status",
+    "columnVersion": "Version",
+    "columnPrivate": "Private",
+    "widgetConfig": "Widget Config",
+    "margins": "Margins",
+    "align": "Align",
+    "private": "Private",
+    "public": "Public"
+  },
+  "widget": {
+    "newWidget": "New Widget",
+    "widgetCreated": "Widget created",
+    "widgetSaved": "Widget saved",
+    "columnCategory": "Category",
+    "columnResource": "Resource",
+    "columnPublic": "Public",
+    "name": "Name",
+    "description": "Description",
+    "tags": "Tags",
+    "tabGeneral": "General",
+    "tabContent": "Content",
+    "tabConfig": "Config",
+    "tabSettings": "Settings",
+    "contentValue": "Content Value",
+    "contentHelp": "URL for youtube/image, text/code for others",
+    "thumbnail": "Thumbnail URL",
+    "isEditable": "Editable",
+    "isClonable": "Clonable",
+    "isPublic": "Public",
+    "publicHelp": "When public and published, other users can use this widget"
   },
   "profile": {
     "profile": "Profile",
@@ -51,10 +89,19 @@
     "username": "Username",
     "dashboardComingSoon": "Dashboard metrics coming soon.",
     "widgetsComingSoon": "Widget library and usage stats coming soon.",
-    "lastLogin": "Last login"
+    "lastLogin": "Last login",
+    "users": "Users",
+    "online": "Online",
+    "offline": "Offline",
+    "blockUser": "Block",
+    "unblockUser": "Unblock",
+    "logoutUser": "Force logout",
+    "blockConfirm": "Block this user?",
+    "logoutConfirm": "Force logout this user?",
+    "viewProfile": "View profile"
   },
   "home": {
-    "title": "Widgets",
+    "title": "Anthill Layouts",
     "subtitle": "Your layout dashboard is coming soon.",
     "createNewLayout": "Create New Layout"
   },

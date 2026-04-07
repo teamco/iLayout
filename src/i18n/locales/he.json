@@ -11,7 +11,15 @@
     "signIn": "התחבר",
     "signUp": "הרשמה",
     "signOut": "התנתק",
-    "or": "או"
+    "or": "או",
+    "refresh": "רענן",
+    "exportJson": "ייצוא JSON",
+    "columnId": "מזהה",
+    "columnCreated": "נוצר",
+    "columnUpdated": "עודכן",
+    "columnActions": "פעולות",
+    "columnStatus": "סטטוס",
+    "notFound": "הדף שביקרת בו אינו קיים."
   },
   "theme": {
     "light": "בהיר",
@@ -37,7 +45,37 @@
     "layoutSaved": "הפריסה נשמרה",
     "publish": "פרסם",
     "unpublish": "בטל פרסום",
-    "deleteConfirm": "למחוק את הפריסה הזו?"
+    "deleteConfirm": "למחוק את הפריסה הזו?",
+    "columnStatus": "סטטוס",
+    "columnVersion": "גרסה",
+    "columnPrivate": "פרטי",
+    "widgetConfig": "הגדרות ווידג׳ט",
+    "margins": "שוליים",
+    "align": "יישור",
+    "private": "פרטי",
+    "public": "ציבורי"
+  },
+  "widget": {
+    "newWidget": "ווידג׳ט חדש",
+    "widgetCreated": "הווידג׳ט נוצר",
+    "widgetSaved": "הווידג׳ט נשמר",
+    "columnCategory": "קטגוריה",
+    "columnResource": "משאב",
+    "columnPublic": "ציבורי",
+    "name": "שם",
+    "description": "תיאור",
+    "tags": "תגיות",
+    "tabGeneral": "כללי",
+    "tabContent": "תוכן",
+    "tabConfig": "הגדרות",
+    "tabSettings": "אפשרויות",
+    "contentValue": "ערך תוכן",
+    "contentHelp": "URL עבור youtube/image, טקסט/קוד עבור אחרים",
+    "thumbnail": "URL תמונה ממוזערת",
+    "isEditable": "ניתן לעריכה",
+    "isClonable": "ניתן לשכפול",
+    "isPublic": "ציבורי",
+    "publicHelp": "כשציבורי ומפורסם, משתמשים אחרים יכולים להשתמש בווידג׳ט זה"
   },
   "profile": {
     "profile": "פרופיל",
@@ -51,7 +89,16 @@
     "username": "שם משתמש",
     "dashboardComingSoon": "מדדי לוח המחוונים בקרוב.",
     "widgetsComingSoon": "ספריית ווידג׳טים וסטטיסטיקה בקרוב.",
-    "lastLogin": "כניסה אחרונה"
+    "lastLogin": "כניסה אחרונה",
+    "users": "משתמשים",
+    "online": "מחובר",
+    "offline": "לא מחובר",
+    "blockUser": "חסום",
+    "unblockUser": "בטל חסימה",
+    "logoutUser": "התנתקות כפויה",
+    "blockConfirm": "לחסום משתמש זה?",
+    "logoutConfirm": "להתנתק בכפייה ממשתמש זה?",
+    "viewProfile": "צפייה בפרופיל"
   },
   "home": {
     "title": "ווידג׳טים",
