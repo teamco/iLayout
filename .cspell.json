@@ -7,11 +7,22 @@
     "blueimp",
     "supabase",
     "SUPABASE",
+    "youtu",
+    "unstub",
+    "vite",
+    "labelledby",
+    "iconify",
+    "xlink",
+    "hoverable",
+    "Popconfirm",
+    "PGRST",
     "apikey"
   ],
   "ignorePaths": [
     "**/locales/**/*",
     "**/package.json",
+    "**/*.yaml",
+    "**/*.svg",
     "**/tsconfig**.json",
     "**/**.md"
   ]
