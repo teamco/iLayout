@@ -1,0 +1,18 @@
+import type { EWidgetResource } from '@/lib/types';
+import type { WidgetDefinition } from './types';
+
+const registry = new Map<EWidgetResource, WidgetDefinition>();
+
+export function registerWidget(def: WidgetDefinition) {
+  registry.set(def.resource, def);
+}
+
+export function getWidgetDef(resource: EWidgetResource): WidgetDefinition | undefined {
+  return registry.get(resource);
+}
+
+export function getAllWidgetDefs(): WidgetDefinition[] {
+  return Array.from(registry.values());
+}
+
+// Built-in widget imports will be added after widget modules are created
