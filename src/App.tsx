@@ -29,6 +29,7 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
   const setEditMode = useLayoutStore(s => s.setEditMode);
   const showGrid = useLayoutStore(s => s.showGrid);
   const toggleGrid = useLayoutStore(s => s.toggleGrid);
+  const layoutMode = useLayoutStore(s => s.layoutMode);
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
 
   // Only use localStorage auto-save when not in Supabase mode
@@ -97,7 +98,7 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
           </Tooltip>
         )}
       </AppHeader>
-      <div className={styles.canvas}>
+      <div className={styles.canvas} style={layoutMode === 'scroll' ? { overflowY: 'auto' } : undefined}>
         <GridProvider>
           <LayoutRenderer />
           {showGrid && <GridOverlay />}
