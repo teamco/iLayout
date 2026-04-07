@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from '@tanstack/react-router';
 import type { TableProps } from 'antd';
-import type { TablePaginationConfig, TablePaginationPlacement } from 'antd/es/table/interface';
+import type {
+  TablePaginationConfig,
+  TablePaginationPlacement,
+} from 'antd/es/table/interface';
 
 import type { EAntSort, ITableParams } from '@/components/Table/types';
 import {
@@ -24,7 +27,11 @@ function getByPath(obj: unknown, path: string): unknown {
 // --- URL serialization ---
 
 function serializeTableState(
-  state: { pagination: { current: number; pageSize: number }; filters: TFilters; sorts: TSorts },
+  state: {
+    pagination: { current: number; pageSize: number };
+    filters: TFilters;
+    sorts: TSorts;
+  },
   prefix: string,
 ): Record<string, string> {
   const p = prefix ? `${prefix}.` : '';
@@ -51,18 +58,23 @@ function serializeTableState(
 function deserializeTableState(
   searchParams: URLSearchParams,
   prefix: string,
-): { pagination?: { current: number; pageSize: number }; filters: TFilters; sorts: TSorts } {
+): {
+  pagination?: { current: number; pageSize: number };
+  filters: TFilters;
+  sorts: TSorts;
+} {
   const p = prefix ? `${prefix}.` : '';
   const page = searchParams.get(`${p}page`);
   const pageSize = searchParams.get(`${p}pageSize`);
   const sort = searchParams.get(`${p}sort`);
 
-  const pagination = (page || pageSize)
-    ? {
-        current: page ? Number(page) : DEFAULT_CURRENT_PAGE,
-        pageSize: pageSize ? Number(pageSize) : DEFAULT_PAGE_SIZE,
-      }
-    : undefined;
+  const pagination =
+    page || pageSize
+      ? {
+          current: page ? Number(page) : DEFAULT_CURRENT_PAGE,
+          pageSize: pageSize ? Number(pageSize) : DEFAULT_PAGE_SIZE,
+        }
+      : undefined;
 
   let sorts: TSorts = { order: undefined, columnKey: undefined };
   if (sort) {
@@ -132,8 +144,18 @@ export type TUseTable = {
   resetTableState: () => void;
 };
 
-export const useTable = <T>(entities: T[], total: number, options?: TUseTableOptions): TUseTable => {
-  const { tableId = '', persistToUrl = true, urlSyncDelay = 300, serverSidePagination = false, ...defaults } = options || {};
+export const useTable = <T>(
+  entities: T[],
+  total: number,
+  options?: TUseTableOptions,
+): TUseTable => {
+  const {
+    tableId = '',
+    persistToUrl = true,
+    urlSyncDelay = 300,
+    serverSidePagination = false,
+    ...defaults
+  } = options || {};
 
   const location = useLocation();
   const [amount, setAmount] = useState<number>(total);
@@ -153,9 +175,15 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const currentPage = initialUrlState?.pagination?.current || defaults?.current || DEFAULT_CURRENT_PAGE;
+  const currentPage =
+    initialUrlState?.pagination?.current ||
+    defaults?.current ||
+    DEFAULT_CURRENT_PAGE;
   const defaultCurrentPage = defaults?.defaultCurrent || currentPage;
-  const pageSize = initialUrlState?.pagination?.pageSize || defaults?.pageSize || DEFAULT_PAGE_SIZE;
+  const pageSize =
+    initialUrlState?.pagination?.pageSize ||
+    defaults?.pageSize ||
+    DEFAULT_PAGE_SIZE;
   const sizeChanger = defaults?.sizeChanger || DEFAULT_SIZE_CHANGER;
 
   const DEFAULT_PAGINATION = useMemo(
@@ -163,9 +191,13 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
       defaultCurrent: defaultCurrentPage,
       placement: ['bottomEnd'] as TablePaginationPlacement[],
       showSizeChanger:
-        typeof defaults?.showSizeChanger === 'boolean' ? defaults.showSizeChanger : entities.length > sizeChanger,
+        typeof defaults?.showSizeChanger === 'boolean'
+          ? defaults.showSizeChanger
+          : entities.length > sizeChanger,
       showQuickJumper:
-        typeof defaults?.showQuickJumper === 'boolean' ? defaults.showQuickJumper : entities.length > pageSize,
+        typeof defaults?.showQuickJumper === 'boolean'
+          ? defaults.showQuickJumper
+          : entities.length > pageSize,
       hideOnSinglePage: true,
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -179,7 +211,9 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
     ...DEFAULT_PAGINATION,
   } as TPagination);
 
-  const [filteredInfo, setFilteredInfo] = useState<TFilters>(initialUrlState?.filters || {});
+  const [filteredInfo, setFilteredInfo] = useState<TFilters>(
+    initialUrlState?.filters || {},
+  );
   const [sortedInfo, setSortedInfo] = useState<TSorts>(
     initialUrlState?.sorts || { order: undefined, columnKey: undefined },
   );
@@ -194,7 +228,12 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
 
     return entities.filter((entity) => {
       return Object.entries(filteredInfo).every(([key, filterValues]) => {
-        if (!filterValues || !Array.isArray(filterValues) || filterValues.length === 0) return true;
+        if (
+          !filterValues ||
+          !Array.isArray(filterValues) ||
+          filterValues.length === 0
+        )
+          return true;
         const entityValue = getByPath(entity, key);
         return (filterValues as unknown[]).includes(entityValue);
       });
@@ -202,14 +241,25 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
   }, [entities, filteredInfo]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleTableChange: TOnChange = (_pagination, filters, sorter: any, extra: any) => {
+  const handleTableChange: TOnChange = (
+    _pagination,
+    filters,
+    sorter: any,
+    extra: any,
+  ) => {
     const newDataLength = (extra.currentDataSource as unknown[]).length;
     if (!serverSidePagination) setAmount(newDataLength);
 
-    const filtersChanged = JSON.stringify(filters) !== JSON.stringify(filteredInfo);
+    const filtersChanged =
+      JSON.stringify(filters) !== JSON.stringify(filteredInfo);
 
     let newPagination = _pagination as TPagination;
-    if (!serverSidePagination && filtersChanged && _pagination.current && _pagination.pageSize) {
+    if (
+      !serverSidePagination &&
+      filtersChanged &&
+      _pagination.current &&
+      _pagination.pageSize
+    ) {
       const maxPage = Math.ceil(newDataLength / _pagination.pageSize) || 1;
       if (_pagination.current > maxPage) {
         newPagination = { ..._pagination, current: 1 } as TPagination;
@@ -218,7 +268,10 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
 
     setPagination(newPagination);
     setFilteredInfo(filters);
-    setSortedInfo({ order: sorter.order, columnKey: sorter.columnKey } as TSorts);
+    setSortedInfo({
+      order: sorter.order,
+      columnKey: sorter.columnKey,
+    } as TSorts);
   };
 
   const resetTableState = useCallback(() => {
@@ -229,14 +282,17 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
     }));
     setFilteredInfo({});
     setSortedInfo({ order: undefined, columnKey: undefined } as TSorts);
-  }, [defaults?.current, defaults?.pageSize]);
+  }, [defaults]);
 
   // --- Sync state to URL (debounced) ---
   const syncToUrl = useCallback(() => {
     if (!persistToUrl) return;
 
     const state = {
-      pagination: { current: pagination.current, pageSize: pagination.pageSize },
+      pagination: {
+        current: pagination.current,
+        pageSize: pagination.pageSize,
+      },
       filters: filteredInfo,
       sorts: sortedInfo,
     };
@@ -263,9 +319,19 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
     });
 
     const search = newParams.toString();
-    const newUrl = search ? `${location.pathname}?${search}` : location.pathname;
+    const newUrl = search
+      ? `${location.pathname}?${search}`
+      : location.pathname;
     window.history.replaceState(null, '', newUrl);
-  }, [persistToUrl, pagination, filteredInfo, sortedInfo, tableId, location.search, location.pathname]);
+  }, [
+    persistToUrl,
+    pagination,
+    filteredInfo,
+    sortedInfo,
+    tableId,
+    location.search,
+    location.pathname,
+  ]);
 
   useEffect(() => {
     if (!persistToUrl) return;
@@ -293,7 +359,14 @@ export const useTable = <T>(entities: T[], total: number, options?: TUseTableOpt
     return () => {
       if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
     };
-  }, [persistToUrl, pagination, filteredInfo, sortedInfo, urlSyncDelay, syncToUrl]);
+  }, [
+    persistToUrl,
+    pagination,
+    filteredInfo,
+    sortedInfo,
+    urlSyncDelay,
+    syncToUrl,
+  ]);
 
   const tableParams = useMemo(
     () => ({
