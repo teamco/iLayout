@@ -6,6 +6,17 @@ inputs:
     description: 'GitHub PAT to push changes and trigger workflows'
     required: true
 
+outputs:
+  tag:
+    description: 'Created version tag'
+    value: ${{ steps.version-bump.outputs.tag }}
+  bump_type:
+    description: 'Detected semantic version bump type'
+    value: ${{ steps.version-bump.outputs.bump_type }}
+  release_body:
+    description: 'Markdown body for the GitHub Release'
+    value: ${{ steps.version-bump.outputs.release_body }}
+
 runs:
   using: 'composite'
   steps:
@@ -23,14 +34,20 @@ runs:
         LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
         if [ -z "$LAST_TAG" ]; then
           COMMITS=$(git log --pretty=format:"* %s" -n 10)
+          RAW_COMMITS=$(git log --format="%s%n%b%n---COMMIT-END---" -n 10)
         else
           COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"* %s")
+          RAW_COMMITS=$(git log ${LAST_TAG}..HEAD --format="%s%n%b%n---COMMIT-END---")
         fi
         if [ -z "$COMMITS" ] || [ "$COMMITS" = " " ]; then
           COMMITS="* maintenance: minor updates"
+          RAW_COMMITS=$'maintenance: minor updates\n---COMMIT-END---'
         fi
         echo "list<<EOF" >> $GITHUB_OUTPUT
         echo "$COMMITS" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        echo "raw<<EOF" >> $GITHUB_OUTPUT
+        echo "$RAW_COMMITS" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
 
     - name: 'Bump version & Tag'
@@ -38,6 +55,7 @@ runs:
       shell: bash
       env:
         COMMIT_LIST: ${{ steps.commits.outputs.list }}
+        RAW_COMMIT_LOG: ${{ steps.commits.outputs.raw }}
         ACTOR: ${{ github.actor }}
       run: |
         # 1. Process commit list: append actor to every line except merge commits
@@ -52,28 +70,44 @@ runs:
           fi
         done <<< "$COMMIT_LIST"
 
-        # 2. Bump patch version immediately (Yarn 4 syntax)
-        pnpm version patch --immediate
+        # 2. Detect the highest semantic version bump required by the commit range
+        BUMP_TYPE="patch"
 
-        # 3. Read the new version
+        if printf "%s\n" "$RAW_COMMIT_LOG" | grep -Eq '(^[^[:space:]]+(\([^)]+\))?!:)|(BREAKING CHANGE:)'; then
+          BUMP_TYPE="major"
+        elif printf "%s\n" "$RAW_COMMIT_LOG" | grep -Eq '^feat(\([^)]+\))?:'; then
+          BUMP_TYPE="minor"
+        fi
+
+        echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
+
+        # 3. Bump the detected version immediately
+        pnpm version "$BUMP_TYPE" --immediate
+
+        # 4. Read the new version
         NEW_V=$(node -p "require('./package.json').version")
         TAG="v$NEW_V"
         echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-        # 4. Stage changes
+        # 5. Stage changes
         git add package.json
 
-        # 5. Create commit message using the processed list
-        printf "ci: version bump to %s [skip ci]\n\nChanges:\n\n%s\n" "$TAG" "$PROCESSED_COMMITS" > .commit_msg
+        # 6. Create commit message using the processed list
+        printf "ci: %s version bump to %s [skip ci]\n\nChanges:\n\n%s\n" "$BUMP_TYPE" "$TAG" "$PROCESSED_COMMITS" > .commit_msg
+        {
+          echo "release_body<<EOF"
+          printf "## Changes\n\n%s\n" "$PROCESSED_COMMITS"
+          echo "EOF"
+        } >> $GITHUB_OUTPUT
 
-        # 6. Commit and tag
+        # 7. Commit and tag
         git commit -F .commit_msg
         git tag -a "$TAG" -F .commit_msg
 
     - name: 'Push changes & tag'
       shell: bash
       run: |
-        # 7. Push using PAT to trigger other workflows
+        # 8. Push using PAT to trigger other workflows
         TAG=${{ steps.version-bump.outputs.tag }}
         git remote set-url origin https://x-access-token:${{ inputs.token }}@github.com/${{ github.repository }}.git
         git push origin "${{ github.ref_name }}"
