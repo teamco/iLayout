@@ -1,9 +1,10 @@
 // src/layout/widgets/WidgetGallery.tsx
-import React from 'react';
-import { Drawer, Card } from 'antd';
+import clsx from 'clsx';
+import { Drawer, Card, Typography } from 'antd';
 import { useDraggable } from '@dnd-kit/core';
 import { getAllWidgets, type WidgetDefinition } from './widgetRegistry';
-import type { WidgetRef } from '../types';
+import type { WidgetRef } from '@/layout/types';
+import styles from './WidgetGallery.module.less';
 
 type Props = {
   open: boolean;
@@ -14,7 +15,8 @@ type Props = {
 function DraggableWidgetCard({ def, onSelect }: { def: WidgetDefinition; onSelect: (w: WidgetRef) => void }) {
   const widgetRef: WidgetRef = {
     widgetId: def.widgetId,
-    type: def.defaultType ?? 'component',
+    resource: def.defaultType ?? 'component',
+    content: { value: '' },
     config: def.defaultConfig,
   };
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
@@ -23,13 +25,19 @@ function DraggableWidgetCard({ def, onSelect }: { def: WidgetDefinition; onSelec
   });
 
   return (
-    <div ref={setNodeRef} {...listeners} {...attributes} style={{ opacity: isDragging ? 0.5 : 1, cursor: 'grab' }}>
-      <Card
-        size="small"
-        hoverable
-        onClick={() => onSelect(widgetRef)}
-      >
-        <Card.Meta title={def.label} description={def.description} />
+    <div
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
+      className={clsx(styles.cardWrapper, { [styles.dragging]: isDragging })}
+    >
+      <Card size="small" hoverable onClick={() => onSelect(widgetRef)}>
+        <Typography.Text strong>{def.label}</Typography.Text>
+        {def.description && (
+          <Typography.Text type="secondary" className={styles.cardDescription}>
+            {def.description}
+          </Typography.Text>
+        )}
       </Card>
     </div>
   );
@@ -37,10 +45,9 @@ function DraggableWidgetCard({ def, onSelect }: { def: WidgetDefinition; onSelec
 
 export function WidgetGallery({ open, onSelect, onClose }: Props) {
   const widgets = getAllWidgets();
-
   return (
-    <Drawer title="Widget Gallery" open={open} onClose={onClose} width={340}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+    <Drawer title="Widget Gallery" open={open} onClose={onClose} size="default">
+      <div className={styles.list}>
         {widgets.map(def => (
           <DraggableWidgetCard key={def.widgetId} def={def} onSelect={onSelect} />
         ))}

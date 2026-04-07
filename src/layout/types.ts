@@ -1,12 +1,13 @@
 // src/layout/types.ts
 
+/** CSS value with unit, e.g. "10px", "5%" */
+export type CssValue = string;
+
 export type WidgetBounds = {
-  width?: number | string;
-  height?: number | string;
-  minWidth?: number;
-  minHeight?: number;
-  maxWidth?: number;
-  maxHeight?: number;
+  marginTop?: CssValue;
+  marginRight?: CssValue;
+  marginBottom?: CssValue;
+  marginLeft?: CssValue;
   align?:
     | 'top-left' | 'top-center' | 'top-right'
     | 'center-left' | 'center' | 'center-right'
@@ -15,7 +16,8 @@ export type WidgetBounds = {
 
 export type WidgetRef = {
   widgetId: string;
-  type: 'iframe' | 'component' | 'embed';
+  resource: string;
+  content: { value: string };
   config: Record<string, unknown>;
   bounds?: WidgetBounds;
 };

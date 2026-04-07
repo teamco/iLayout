@@ -26,7 +26,7 @@ describe('layoutStore', () => {
   it('sets a widget on a leaf', () => {
     const store = createLayoutStore();
     const rootId = store.getState().root.id;
-    act(() => store.getState().setWidget(rootId, { widgetId: 'w1', type: 'component', config: {} }));
+    act(() => store.getState().setWidget(rootId, { widgetId: 'w1', resource: 'component', content: { value: '' }, config: {} }));
     const root = store.getState().root as LeafNode;
     expect(root.widget?.widgetId).toBe('w1');
   });
@@ -36,8 +36,8 @@ describe('layoutStore', () => {
     const rootId = store.getState().root.id;
     act(() => store.getState().addPanel(rootId, 'right'));
     const { children } = store.getState().root as SplitterNode;
-    act(() => store.getState().setWidget(children[0].id, { widgetId: 'A', type: 'component', config: {} }));
-    act(() => store.getState().setWidget(children[1].id, { widgetId: 'B', type: 'component', config: {} }));
+    act(() => store.getState().setWidget(children[0].id, { widgetId: 'A', resource: 'component', content: { value: '' }, config: {} }));
+    act(() => store.getState().setWidget(children[1].id, { widgetId: 'B', resource: 'component', content: { value: '' }, config: {} }));
     act(() => store.getState().swapWidgets(children[0].id, children[1].id));
     const updated = store.getState().root as SplitterNode;
     expect((updated.children[0] as LeafNode).widget?.widgetId).toBe('B');
@@ -46,6 +46,7 @@ describe('layoutStore', () => {
 
   it('toggles showGrid', () => {
     const store = createLayoutStore();
+    act(() => store.getState().setEditMode(true));
     expect(store.getState().showGrid).toBe(false);
     act(() => store.getState().toggleGrid());
     expect(store.getState().showGrid).toBe(true);
@@ -59,6 +60,13 @@ describe('layoutStore', () => {
     act(() => store.getState().toggleGrid());
     expect(store.getState().showGrid).toBe(true);
     act(() => store.getState().setEditMode(false));
+    expect(store.getState().showGrid).toBe(false);
+  });
+
+  it('does not toggle showGrid when editMode is off', () => {
+    const store = createLayoutStore();
+    expect(store.getState().editMode).toBe(false);
+    act(() => store.getState().toggleGrid());
     expect(store.getState().showGrid).toBe(false);
   });
 });

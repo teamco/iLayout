@@ -1,78 +1,23 @@
 // src/layout/components/LeafNode.tsx
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Button, Input } from 'antd';
-import type { LeafNode } from '../types';
-import type { WidgetRef } from '../types';
-import { useLayoutStore } from '../store/layoutStore';
-import { WidgetRenderer } from '../widgets/WidgetRenderer';
-import { WidgetGallery } from '../widgets/WidgetGallery';
+import { SettingOutlined } from '@ant-design/icons';
+import clsx from 'clsx';
+import type { LeafNode } from '@/layout/types';
+import type { WidgetRef } from '@/layout/types';
+import { useLayoutStore } from '@/layout/store/layoutStore';
+import { WidgetRenderer } from '@/layout/widgets/WidgetRenderer';
+import { WidgetGallery } from '@/layout/widgets/WidgetGallery';
+import { WidgetConfigModal } from '@/layout/widgets/WidgetConfigModal';
 import { LeafOverlay } from './LeafOverlay';
-import { usePanelDnd } from '../dnd/usePanelDnd';
-import { findNode } from '../utils/treeUtils';
+import { usePanelDnd } from '@/layout/dnd/usePanelDnd';
+import styles from './LeafNode.module.less';
 
 type Props = { node: LeafNode };
 
-function ResizeHandle({ nodeId }: { nodeId: string }) {
-  const setWidget = useLayoutStore(s => s.setWidget);
-  const root = useLayoutStore(s => s.root);
-  const startPos = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
-  const containerRef = useRef<Element | null>(null);
-
-  const onMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const found = findNode(root, nodeId);
-    if (!found) return;
-    const node = found.node as LeafNode;
-    if (!node.widget) return;
-    const container = (e.currentTarget as HTMLElement).parentElement?.parentElement;
-    if (!container) return;
-    containerRef.current = container;
-    const rect = container.getBoundingClientRect();
-    startPos.current = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height };
-
-    function onMouseMove(ev: MouseEvent) {
-      if (!startPos.current || !containerRef.current) return;
-      const dx = ev.clientX - startPos.current.x;
-      const dy = ev.clientY - startPos.current.y;
-      const newW = Math.max(50, startPos.current.w + dx);
-      const newH = Math.max(50, startPos.current.h + dy);
-      setWidget(nodeId, {
-        ...node.widget!,
-        bounds: { ...(node.widget!.bounds ?? {}), width: newW, height: newH },
-      });
-    }
-
-    function onMouseUp() {
-      startPos.current = null;
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-    }
-
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
-  }, [root, nodeId, setWidget]);
-
-  return (
-    <div
-      onMouseDown={onMouseDown}
-      style={{
-        position: 'absolute',
-        bottom: 4,
-        right: 4,
-        width: 12,
-        height: 12,
-        borderRight: '2px solid #faad14',
-        borderBottom: '2px solid #faad14',
-        cursor: 'se-resize',
-        zIndex: 25,
-      }}
-    />
-  );
-}
-
 export function LeafNodeComponent({ node }: Props) {
   const [galleryOpen, setGalleryOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
   const editMode = useLayoutStore(s => s.editMode);
   const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
   const setActiveWidgetEdit = useLayoutStore(s => s.setActiveWidgetEdit);
@@ -103,7 +48,6 @@ export function LeafNodeComponent({ node }: Props) {
     setActiveWidgetEdit(null);
   }
 
-  // ESC exits widget edit mode
   React.useEffect(() => {
     if (!isWidgetEdit) return;
     function onKey(e: KeyboardEvent) {
@@ -117,28 +61,22 @@ export function LeafNodeComponent({ node }: Props) {
     <div
       ref={(el) => { setDragRef(el); setDropRef(el); }}
       onDoubleClick={handleDoubleClick}
-      style={{
-        width: '100%',
-        height: '100%',
-        position: 'relative',
-        opacity: dimmed ? 0.35 : isDragging ? 0.5 : 1,
-        pointerEvents: dimmed ? 'none' : 'auto',
-        border: isWidgetEdit ? '2px solid #faad14' : isOver ? '2px solid #52c41a' : undefined,
-        background: isOver ? 'rgba(82,196,26,0.15)' : undefined,
-        boxSizing: 'border-box',
-        transition: 'opacity 0.15s',
-      }}
+      className={clsx(styles.panel, {
+        [styles.dimmed]:     dimmed,
+        [styles.dragging]:   isDragging,
+        [styles.widgetEdit]: isWidgetEdit,
+        [styles.dropTarget]: isOver,
+      })}
     >
-      {/* Widget edit toolbar */}
       {isWidgetEdit && (
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20, display: 'flex', alignItems: 'center', gap: 6, padding: '4px 8px', background: 'rgba(42,32,16,0.95)', borderBottom: '1px solid #faad14' }}>
-          <span style={{ fontSize: 11, color: '#faad14', fontWeight: 600 }}>⚙ Widget Edit</span>
-          {node.widget?.type === 'iframe' && (
+        <div className={styles.editToolbar}>
+          <span className={styles.editLabel}>⚙ Widget Edit</span>
+          {node.widget?.resource === 'iframe' && (
             <Input
               size="small"
               placeholder="iframe URL"
               defaultValue={String(node.widget.config.url ?? '')}
-              style={{ width: 200 }}
+              className={styles.iframeInput}
               onBlur={e => {
                 if (node.widget) {
                   setWidget(node.id, { ...node.widget, config: { ...node.widget.config, url: e.target.value } });
@@ -146,32 +84,32 @@ export function LeafNodeComponent({ node }: Props) {
               }}
             />
           )}
-          <div style={{ flex: 1 }} />
+          <div className={styles.editSpacer} />
+          <Button size="small" icon={<SettingOutlined />} onClick={() => setConfigOpen(true)}>Config</Button>
           <Button size="small" onClick={() => setGalleryOpen(true)}>Replace</Button>
           <Button size="small" type="primary" onClick={handleDone}>Done</Button>
         </div>
       )}
 
-      {/* Widget content or empty placeholder */}
       {node.widget
         ? <WidgetRenderer widget={node.widget} />
-        : (
-          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#555', fontSize: 12 }}>
-            {editMode ? 'Double-click to add widget' : 'Empty'}
-          </div>
-        )
+        : <div className={styles.emptyPlaceholder}>{editMode ? 'Double-click to add widget' : 'Empty'}</div>
       }
 
-      {/* Layout edit overlay — shown in layout edit mode when no widget edit is active */}
       {editMode && !isAnyWidgetEdit && (
         <LeafOverlay node={node} dragListeners={listeners} dragAttributes={attributes} />
       )}
 
-      {/* Widget bounds resize handle */}
-      {isWidgetEdit && node.widget && <ResizeHandle nodeId={node.id} />}
-
-      {/* Widget gallery */}
       <WidgetGallery open={galleryOpen} onSelect={handleSelectWidget} onClose={() => setGalleryOpen(false)} />
+
+      {node.widget && (
+        <WidgetConfigModal
+          open={configOpen}
+          widget={node.widget}
+          onClose={() => setConfigOpen(false)}
+          onChange={(updated) => setWidget(node.id, updated)}
+        />
+      )}
     </div>
   );
 }
