@@ -131,6 +131,7 @@ if [ "${#STAGED_SPELL_FILES[@]}" -gt 0 ]; then
 fi
 
 declare -a PROJECT_TEST_COMMANDS=(
+  "pnpm lint"
   "pnpm test"
 )
 
