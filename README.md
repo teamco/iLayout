@@ -45,6 +45,10 @@ pnpm preview      # Preview production build
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture.
 
+## Testing
+
+See [TESTING.md](./TESTING.md) for testing patterns and standards.
+
 ## Project Structure
 
 ```
@@ -75,6 +79,8 @@ src/
 - [Widget DB + API](./docs/superpowers/specs/2026-04-07-widget-db-api-design.md)
 - [Widget Table + Editor](./docs/superpowers/specs/2026-04-07-widget-table-editor-design.md)
 - [Widget Directory + Renderer](./docs/superpowers/specs/2026-04-07-widget-directory-renderer-design.md)
+- [Layout Modes](./docs/superpowers/specs/2026-04-07-layout-modes-design.md)
+- [Scroll Layout UI](./docs/superpowers/specs/2026-04-07-scroll-layout-ui-design.md)
 
 ### Implementation Plans
 
@@ -89,6 +95,9 @@ src/
 - [Widget DB + API](./docs/superpowers/plans/2026-04-07-widget-db-api.md)
 - [Widget Table + Editor](./docs/superpowers/plans/2026-04-07-widget-table-editor.md)
 - [Widget Directory + Renderer](./docs/superpowers/plans/2026-04-07-widget-directory-renderer.md)
+- [Layout Modes — Types + Store](./docs/superpowers/plans/2026-04-07-layout-modes-types-store.md)
+- [Horizontal Grid](./docs/superpowers/plans/2026-04-07-horizontal-grid.md)
+- [Scroll Layout UI](./docs/superpowers/plans/2026-04-07-scroll-layout-ui.md)
 
 ### Session Notes
 

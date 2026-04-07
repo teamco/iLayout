@@ -15,7 +15,7 @@ export function ScrollLayout({ root }: Props) {
 
   return (
     <>
-      <div style={{ overflowY: 'auto', height: '100%', width: '100%' }}>
+      <div style={{ overflowY: 'auto', overflowX: 'hidden', height: '100%', width: '100%' }}>
         {root.sections.map((section) => (
           <div key={section.id}>
             <SectionNodeComponent

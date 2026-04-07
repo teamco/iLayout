@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Tooltip } from 'antd';
-import { SettingOutlined, PlusOutlined } from '@ant-design/icons';
+import { SettingOutlined } from '@ant-design/icons';
 import clsx from 'clsx';
 import type { SectionNode } from '@/layout/types';
 import { useLayoutStore } from '@/layout/store/layoutStore';
@@ -26,31 +26,18 @@ function getSectionStyle(section: SectionNode): React.CSSProperties {
 
 export function SectionNodeComponent({ section, onConfig }: Props) {
   const editMode = useLayoutStore(s => s.editMode);
-  const addSection = useLayoutStore(s => s.addSection);
 
   return (
-    <>
+    <div
+      className={clsx(styles.section, { [styles.sectionEdit]: editMode })}
+      style={getSectionStyle(section)}
+    >
       {editMode && (
-        <div className={styles.addBtn} onClick={() => addSection('before', section.id)}>
-          <PlusOutlined />
-        </div>
+        <Tooltip title="Section config">
+          <Button size="small" icon={<SettingOutlined />} className={styles.configBtn} onClick={() => onConfig(section.id)} />
+        </Tooltip>
       )}
-      <div
-        className={clsx(styles.section, { [styles.sectionEdit]: editMode })}
-        style={getSectionStyle(section)}
-      >
-        {editMode && (
-          <Tooltip title="Section config">
-            <Button size="small" icon={<SettingOutlined />} className={styles.configBtn} onClick={() => onConfig(section.id)} />
-          </Tooltip>
-        )}
-        {renderNode(section.child)}
-      </div>
-      {editMode && (
-        <div className={styles.addBtn} onClick={() => addSection('after', section.id)}>
-          <PlusOutlined />
-        </div>
-      )}
-    </>
+      {renderNode(section.child)}
+    </div>
   );
 }

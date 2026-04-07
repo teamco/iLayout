@@ -48,6 +48,7 @@
     "deleteConfirm": "Delete this layout?",
     "columnStatus": "Status",
     "columnVersion": "Version",
+    "columnMode": "Mode",
     "columnPrivate": "Private",
     "widgetConfig": "Widget Config",
     "margins": "Margins",

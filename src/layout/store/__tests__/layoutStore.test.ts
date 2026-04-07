@@ -3,7 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { act } from '@testing-library/react';
 import { createLayoutStore } from '../layoutStore';
 import type { SplitterNode, LeafNode } from '../../types';
-import type { ScrollRoot, SectionNode } from '../../types';
+import type { ScrollRoot } from '../../types';
 
 describe('layoutStore', () => {
   it('adds a panel by splitting right', () => {

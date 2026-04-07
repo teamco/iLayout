@@ -144,10 +144,21 @@ Each save creates a new row with `version + 1`. Same `id`, different `version`. 
 
 ## Layout Builder
 
+### Layout Modes
+
+Two modes, chosen at layout creation (immutable after):
+
+- **`viewport`** — everything fits in screen, splitter divides space (dashboards)
+- **`scroll`** — sections-based, vertical scroll, pushable (landing pages)
+
+Mode stored in `LayoutRecord.mode` and `layoutStore.layoutMode`.
+
 ### Data Model
 
 ```
-LayoutNode = LeafNode | SplitterNode
+LayoutMode = 'viewport' | 'scroll'
+
+LayoutNode = LeafNode | SplitterNode | SectionNode | ScrollRoot
 
 LeafNode {
   id: string
@@ -163,32 +174,65 @@ SplitterNode {
   children: LayoutNode[]
 }
 
+SectionNode {
+  id: string
+  type: 'section'
+  height: SectionHeight   // auto | fixed | min
+  child: LayoutNode       // section content
+  overlap?: string        // negative margin-top for overlapping
+  zIndex?: number
+}
+
+ScrollRoot {
+  id: string
+  type: 'scroll'
+  sections: SectionNode[]
+}
+
 WidgetRef {
   widgetId: string
   resource: EWidgetResource
   content: { value: string }
   config: Record<string, unknown>
-  bounds?: WidgetBounds   // CSS margins + align
+  bounds?: WidgetBounds   // CSS margins + align via inset
 }
 ```
+
+### Global Panel Adding (Scroll Mode)
+
+- **Top/Bottom** from toolbar "+" → `addSection` (page grows, scrollable)
+- **Left/Right** from toolbar "+" → wraps entire root in horizontal splitter (global column)
+- **Left/Right** from panel "+" → splitter within section (local column)
 
 ### State Management
 
 ```
 Zustand layoutStore
-  root: LayoutNode          # layout tree
-  editMode: boolean         # global edit toggle
-  showGrid: boolean         # 24-col grid overlay
+  root: LayoutNode            # layout tree (SplitterNode or ScrollRoot)
+  editMode: boolean           # global edit toggle
+  showGrid: boolean           # 24-col + 24-row grid overlay
+  layoutMode: LayoutMode      # viewport or scroll
   activeWidgetEditId: string | null  # per-widget config mode
-  + actions (addPanel, removePanel, setWidget, swapWidgets, resize, etc.)
+  galleryTargetId: string | null     # panel awaiting widget from gallery
+  + actions (addPanel, removePanel, setWidget, resize, setLayoutMode,
+             addSection, removeSection, resizeSection, etc.)
 ```
 
 ### Grid System
 
-- 24-column grid overlay (SVG pattern)
-- Splitter resize snaps to grid on drag end (`onResizeEnd`)
-- `GridContext` provides canvas dimensions via ResizeObserver
-- `snapToGrid` pure utility for boundary calculation
+- **Vertical:** 24-column grid overlay (SVG pattern) — always visible
+- **Horizontal:** 24-row grid overlay — visible only in scroll mode
+- Splitter resize snaps to vertical grid on drag end (`onResizeEnd`)
+- Section height snaps to horizontal grid via `snapToNearestEdge`
+- `GridContext` provides canvas dimensions (width, height, columns, rows, gutters) via ResizeObserver
+- `snapToGrid` / `getHorizontalGridEdges` / `snapToNearestEdge` pure utilities
+
+### Scroll Mode Components
+
+- `ScrollLayout` — scrollable container rendering sections + handles
+- `SectionNodeComponent` — individual section with configurable height/overlap/z-index
+- `SectionHandle` — drag handle between sections for height resize
+- `SectionConfig` — modal for section settings (height type, value, overlap, z-index)
 
 ### Widget Bounds (CSS)
 

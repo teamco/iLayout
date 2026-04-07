@@ -7,8 +7,25 @@ import { AddPanelModal } from './AddPanelModal';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 import { useCanEdit } from '@/layout/hooks/useCanEdit';
 import { getDepth, findNode } from '@/layout/utils/treeUtils';
-import type { LayoutNode, LeafNode, SplitDirection, SplitterNode } from '@/layout/types';
+import type { LayoutNode, LeafNode, SplitDirection, SplitterNode, ScrollRoot } from '@/layout/types';
 import styles from './LeafOverlay.module.less';
+
+/** Find which section contains a given node id */
+function findSectionForNode(root: LayoutNode, nodeId: string): string | null {
+  if (root.type !== 'scroll') return null;
+  const scrollRoot = root as unknown as ScrollRoot;
+  for (const section of scrollRoot.sections) {
+    if (containsNode(section.child, nodeId)) return section.id;
+  }
+  return null;
+}
+
+function containsNode(node: LayoutNode, targetId: string): boolean {
+  if (node.id === targetId) return true;
+  if (node.type === 'splitter') return node.children.some(c => containsNode(c, targetId));
+  if (node.type === 'section') return containsNode(node.child, targetId);
+  return false;
+}
 
 function hasAvailableDirection(node: LeafNode, root: LayoutNode, maxDepth: number): boolean {
   if (maxDepth === 0) return true;
@@ -38,9 +55,11 @@ export function LeafOverlay({ node, dragListeners, dragAttributes }: Props) {
   const [modalOpen, setModalOpen] = useState(false);
   const canEdit = useCanEdit();
   const addPanel = useLayoutStore(s => s.addPanel);
+  const addSection = useLayoutStore(s => s.addSection);
   const removePanel = useLayoutStore(s => s.removePanel);
   const root = useLayoutStore(s => s.root);
   const maxDepth = useLayoutStore(s => s.maxDepth);
+  const layoutMode = useLayoutStore(s => s.layoutMode);
 
   if (!canEdit) return null;
 
@@ -50,6 +69,16 @@ export function LeafOverlay({ node, dragListeners, dragAttributes }: Props) {
   function handleSelect(direction: SplitDirection) {
     if (!isDirectionAllowed(direction, node, root, maxDepth)) return;
     setModalOpen(false);
+
+    // In scroll mode, top/bottom create new sections instead of splitting
+    if (layoutMode === 'scroll' && (direction === 'top' || direction === 'bottom')) {
+      const sectionId = findSectionForNode(root, node.id);
+      if (sectionId) {
+        addSection(direction === 'top' ? 'before' : 'after', sectionId);
+        return;
+      }
+    }
+
     addPanel(node.id, direction);
   }
 

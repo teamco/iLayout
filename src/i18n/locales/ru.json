@@ -48,6 +48,7 @@
     "deleteConfirm": "Удалить этот лейаут?",
     "columnStatus": "Статус",
     "columnVersion": "Версия",
+    "columnMode": "Режим",
     "columnPrivate": "Приватный",
     "widgetConfig": "Настройки виджета",
     "margins": "Отступы",

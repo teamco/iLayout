@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { Button, Table } from 'antd';
-import { PlusOutlined, LayoutOutlined } from '@ant-design/icons';
+import { Button, Dropdown, Space, Table } from 'antd';
+import { DownOutlined, PlusOutlined, LayoutOutlined } from '@ant-design/icons';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/auth/AuthContext';
@@ -47,15 +47,28 @@ export function LayoutsSection() {
     <PageLayout title={<PageTitle name={t('profile.layouts')} Icon={LayoutOutlined} />} subject={ESubject.LAYOUT}>
       <GridToolbar onRefresh={() => void refetch()} exportData={layouts} exportFileName="layouts">
         <Can I={EAction.CREATE} a={ESubject.LAYOUT}>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => void navigate({
-              to: ERoutes.LAYOUT_NEW as string,
-            })}
-          >
-            {t('layout.newLayout')}
-          </Button>
+          <Space.Compact>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => void navigate({ to: ERoutes.LAYOUT_NEW as string })}
+            >
+              {t('layout.newLayout')}
+            </Button>
+            <Dropdown
+              menu={{
+                items: [
+                  { key: 'viewport', label: 'Viewport' },
+                  { key: 'scroll', label: 'Scroll' },
+                ],
+                onClick: ({ key }) => void navigate({
+                  to: `${ERoutes.LAYOUT_NEW}?mode=${key}` as string,
+                }),
+              }}
+            >
+              <Button type="primary" icon={<DownOutlined />} />
+            </Dropdown>
+          </Space.Compact>
         </Can>
         {columnsList.length > 0 && (
           <HideColumns

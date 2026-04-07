@@ -9,6 +9,7 @@ export type LayoutState = {
   root: LayoutNode;
   editMode: boolean;
   activeWidgetEditId: string | null;
+  galleryTargetId: string | null;
   maxDepth: number;
   showGrid: boolean;
   layoutMode: LayoutMode;
@@ -23,6 +24,7 @@ export type LayoutActions = {
   resize: (splitterId: string, sizes: number[]) => void;
   setEditMode: (on: boolean) => void;
   setActiveWidgetEdit: (id: string | null) => void;
+  setGalleryTarget: (id: string | null) => void;
   toggleGrid: () => void;
   setLayoutMode: (mode: LayoutMode) => void;
   addSection: (position: 'before' | 'after', targetSectionId: string) => void;
@@ -77,10 +79,15 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
     setEditMode(on) {
       set(state => {
         state.editMode = on;
-        if (!on) state.showGrid = false;
+        if (!on) {
+          state.showGrid = false;
+          state.activeWidgetEditId = null;
+          state.galleryTargetId = null;
+        }
       });
     },
     setActiveWidgetEdit(id) { set(state => { state.activeWidgetEditId = id; }); },
+    setGalleryTarget(id) { set(state => { state.galleryTargetId = id; }); },
     toggleGrid() {
       set(state => {
         if (!state.editMode) return;
@@ -90,7 +97,6 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
 
     setLayoutMode(mode) {
       set(state => {
-        if (state.layoutMode === mode) return;
         if (mode === 'scroll' && state.root.type !== 'scroll') {
           const section: SectionNode = {
             id: nanoid(),
@@ -120,7 +126,7 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
         const newSection: SectionNode = {
           id: nanoid(),
           type: 'section',
-          height: { type: 'auto' },
+          height: { type: 'min', value: '200px' },
           child: { id: nanoid(), type: 'leaf' },
         };
         const insertAt = position === 'before' ? idx : idx + 1;
@@ -175,6 +181,7 @@ export function createLayoutStore(initialRoot?: LayoutNode) {
       root: initialRoot ?? makeInitialRoot(),
       editMode: false,
       activeWidgetEditId: null,
+      galleryTargetId: null,
       maxDepth: 5,
       showGrid: false,
       layoutMode: 'viewport',
@@ -190,6 +197,7 @@ export const useLayoutStore = create<LayoutStore>()(
     root: makeInitialRoot(),
     editMode: false,
     activeWidgetEditId: null,
+    galleryTargetId: null,
     maxDepth: 5,
     showGrid: false,
     layoutMode: 'viewport',

@@ -18,14 +18,16 @@ import styles from './LeafNode.module.less';
 type Props = { node: LeafNode };
 
 export function LeafNodeComponent({ node }: Props) {
-  const [galleryOpen, setGalleryOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
   const editMode = useLayoutStore(s => s.editMode);
   const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
   const setActiveWidgetEdit = useLayoutStore(s => s.setActiveWidgetEdit);
+  const galleryTargetId = useLayoutStore(s => s.galleryTargetId);
+  const setGalleryTarget = useLayoutStore(s => s.setGalleryTarget);
   const setWidget = useLayoutStore(s => s.setWidget);
 
   const isWidgetEdit = activeWidgetEditId === node.id;
+  const isGalleryTarget = galleryTargetId === node.id;
   const isAnyWidgetEdit = activeWidgetEditId !== null;
   const dimmed = isAnyWidgetEdit && !isWidgetEdit;
 
@@ -36,20 +38,22 @@ export function LeafNodeComponent({ node }: Props) {
     e.stopPropagation();
     if (!editMode) return;
     if (!node.widget) {
-      setGalleryOpen(true);
+      setGalleryTarget(node.id);
     } else {
       setActiveWidgetEdit(isWidgetEdit ? null : node.id);
     }
   }
 
   function handleSelectWidget(widget: WidgetRef) {
-    setWidget(node.id, widget);
-    setGalleryOpen(false);
-    // Auto-open config if widget has an editor (e.g. YouTube needs URL)
-    const def = getWidgetDef(widget.resource as EWidgetResource);
-    if (def?.editor) {
-      setActiveWidgetEdit(node.id);
-      setConfigOpen(true);
+    if (galleryTargetId) {
+      setWidget(galleryTargetId, widget);
+      setGalleryTarget(null);
+      // Auto-open config if widget has an editor
+      const def = getWidgetDef(widget.resource as EWidgetResource);
+      if (def?.editor) {
+        setActiveWidgetEdit(galleryTargetId);
+        setConfigOpen(true);
+      }
     }
   }
 
@@ -95,7 +99,7 @@ export function LeafNodeComponent({ node }: Props) {
           )}
           <div className={styles.editSpacer} />
           <Button size="small" icon={<SettingOutlined />} onClick={() => setConfigOpen(true)}>Config</Button>
-          <Button size="small" onClick={() => setGalleryOpen(true)}>Replace</Button>
+          <Button size="small" onClick={() => setGalleryTarget(node.id)}>Replace</Button>
           <Button size="small" type="primary" onClick={handleDone}>Done</Button>
         </div>
       )}
@@ -109,7 +113,12 @@ export function LeafNodeComponent({ node }: Props) {
         <LeafOverlay node={node} dragListeners={listeners} dragAttributes={attributes} />
       )}
 
-      <WidgetGallery open={galleryOpen} onSelect={handleSelectWidget} onClose={() => setGalleryOpen(false)} />
+      {/* Gallery: only render on the target leaf */}
+      <WidgetGallery
+        open={isGalleryTarget}
+        onSelect={handleSelectWidget}
+        onClose={() => setGalleryTarget(null)}
+      />
 
       {node.widget && (
         <WidgetConfigModal

@@ -1,4 +1,5 @@
-import { Typography, Button } from 'antd';
+import { Typography, Button, Dropdown, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { useNavigate } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/auth/AuthContext';
@@ -19,9 +20,27 @@ export function HomePage() {
         <Title level={2}>{t('home.title')}</Title>
         <Text type="secondary">{t('home.subtitle')}</Text>
         {user && (
-          <Button type="primary" onClick={() => void navigate({ to: ERoutes.LAYOUT_NEW })}>
-            {t('home.createNewLayout')}
-          </Button>
+          <Space.Compact>
+            <Button
+              type="primary"
+              onClick={() => void navigate({ to: ERoutes.LAYOUT_NEW })}
+            >
+              {t('home.createNewLayout')}
+            </Button>
+            <Dropdown
+              menu={{
+                items: [
+                  { key: 'viewport', label: 'Viewport' },
+                  { key: 'scroll', label: 'Scroll' },
+                ],
+                onClick: ({ key }) => void navigate({
+                  to: `${ERoutes.LAYOUT_NEW}?mode=${key}` as string,
+                }),
+              }}
+            >
+              <Button type="primary" icon={<DownOutlined />} />
+            </Dropdown>
+          </Space.Compact>
         )}
       </div>
     </div>

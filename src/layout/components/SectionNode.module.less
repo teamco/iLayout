@@ -4,10 +4,18 @@
   width: 100%;
   position: relative;
   overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.section > * {
+  flex: 1;
 }
 
 .sectionEdit {
-  border: 1px dashed @color-blue;
+  outline: 1px dashed @color-blue;
+  outline-offset: -1px;
 }
 
 .configBtn {
@@ -17,18 +25,4 @@
   z-index: @z-toolbar;
   opacity: 0.6;
   &:hover { opacity: 1; }
-}
-
-.addBtn {
-  width: 100%;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.15s;
-  cursor: pointer;
-  color: @color-blue;
-  font-size: 16px;
-  &:hover { opacity: 1; background: rgba(24, 144, 255, 0.05); }
 }

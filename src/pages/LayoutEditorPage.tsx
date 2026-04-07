@@ -27,13 +27,21 @@ export function LayoutEditorPage() {
   useEffect(() => {
     if (layout?.data) {
       useLayoutStore.setState({ root: layout.data });
+      // Sync layoutMode from loaded layout
+      const mode = (layout as unknown as Record<string, unknown>).mode as 'viewport' | 'scroll' | undefined;
+      useLayoutStore.setState({ layoutMode: mode ?? 'viewport' });
     }
   }, [layout]);
 
   // Reset store for new layouts
   useEffect(() => {
     if (isNew) {
-      useLayoutStore.setState({ root: { id: crypto.randomUUID(), type: 'leaf' } });
+      const searchParams = new URLSearchParams(window.location.search);
+      const mode = (searchParams.get('mode') as 'viewport' | 'scroll') || 'viewport';
+      useLayoutStore.getState().setLayoutMode(mode);
+      if (mode !== 'scroll') {
+        useLayoutStore.setState({ root: { id: crypto.randomUUID(), type: 'leaf' } });
+      }
       useLayoutStore.getState().setEditMode(true);
     }
   }, [isNew]);
@@ -64,7 +72,6 @@ export function LayoutEditorPage() {
 
   return (
     <App
-      layoutId={isNew ? undefined : layoutId}
       onSave={handleSave}
       saving={createMutation.isPending || saveMutation.isPending}
     />

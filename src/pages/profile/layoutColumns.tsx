@@ -55,6 +55,18 @@ export function getLayoutColumns({ t, navigate, onSetStatus, entities, filteredI
       },
     },
     {
+      title: t('layout.columnMode', 'Mode'),
+      dataIndex: 'mode',
+      key: 'mode',
+      width: 100,
+      concealable: true,
+      ...(columnFilter(filteredInfo, entities, 'mode') as TColumnFilter<LayoutRecord>),
+      render: (mode: string) => {
+        const color = mode === 'scroll' ? 'purple' : 'cyan';
+        return <Tag color={color}>{mode}</Tag>;
+      },
+    },
+    {
       title: t('layout.columnVersion'),
       dataIndex: 'version',
       key: 'version',
