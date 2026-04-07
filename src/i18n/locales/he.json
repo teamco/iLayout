@@ -53,7 +53,12 @@
     "margins": "שוליים",
     "align": "יישור",
     "private": "פרטי",
-    "public": "ציבורי"
+    "public": "ציבורי",
+    "sectionConfig": "הגדרות מקטע",
+    "heightType": "גובה",
+    "heightValue": "ערך",
+    "overlap": "חפיפה (px)",
+    "addSection": "הוסף מקטע"
   },
   "widget": {
     "newWidget": "ווידג׳ט חדש",

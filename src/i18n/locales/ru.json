@@ -53,7 +53,12 @@
     "margins": "Отступы",
     "align": "Выравнивание",
     "private": "Приватный",
-    "public": "Публичный"
+    "public": "Публичный",
+    "sectionConfig": "Настройки секции",
+    "heightType": "Высота",
+    "heightValue": "Значение",
+    "overlap": "Перекрытие (px)",
+    "addSection": "Добавить секцию"
   },
   "widget": {
     "newWidget": "Новый виджет",

@@ -53,7 +53,12 @@
     "margins": "Margins",
     "align": "Align",
     "private": "Private",
-    "public": "Public"
+    "public": "Public",
+    "sectionConfig": "Section Config",
+    "heightType": "Height",
+    "heightValue": "Value",
+    "overlap": "Overlap (px)",
+    "addSection": "Add section"
   },
   "widget": {
     "newWidget": "New Widget",
