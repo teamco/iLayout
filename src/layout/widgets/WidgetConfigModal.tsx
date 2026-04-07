@@ -1,9 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Modal, Tabs, Form, Input, InputNumber, Select, Button, Space, Typography } from 'antd';
+import {
+  Modal,
+  Tabs,
+  Form,
+  Input,
+  InputNumber,
+  Select,
+  Button,
+  Space,
+  Typography,
+} from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { WidgetRef, WidgetBounds, CssValue } from '@/layout/types';
 import type { EWidgetResource } from '@/lib/types';
 import { getWidgetDef } from '@/widgets/registry';
+import type { WidgetDefinition, WidgetEditorProps } from '@/widgets/types';
 
 const { Text } = Typography;
 const { TextArea } = Input;
@@ -16,9 +27,15 @@ type Props = {
 };
 
 const ALIGN_OPTIONS = [
-  'top-left', 'top-center', 'top-right',
-  'center-left', 'center', 'center-right',
-  'bottom-left', 'bottom-center', 'bottom-right',
+  'top-left',
+  'top-center',
+  'top-right',
+  'center-left',
+  'center',
+  'center-right',
+  'bottom-left',
+  'bottom-center',
+  'bottom-right',
 ] as const;
 
 const UNIT_OPTIONS = [
@@ -51,6 +68,42 @@ function CssValueField({ name }: { name: string }) {
   );
 }
 
+type ContentTabProps = {
+  initialValue: string;
+  editor?: WidgetDefinition['editor'];
+  placeholder: string;
+  onValueChange: (value: string) => void;
+};
+
+function ContentTab({
+  initialValue,
+  editor: Editor,
+  placeholder,
+  onValueChange,
+}: ContentTabProps) {
+  const [contentValue, setContentValue] = useState(initialValue);
+
+  useEffect(() => {
+    onValueChange(contentValue);
+  }, [contentValue, onValueChange]);
+
+  return Editor ? (
+    <Editor
+      content={{ value: contentValue }}
+      onChange={(content: WidgetEditorProps['content']) =>
+        setContentValue(content.value)
+      }
+    />
+  ) : (
+    <TextArea
+      rows={4}
+      value={contentValue}
+      onChange={(e) => setContentValue(e.target.value)}
+      placeholder={placeholder}
+    />
+  );
+}
+
 export function WidgetConfigModal({ open, widget, onClose, onChange }: Props) {
   const { t } = useTranslation();
   const [form] = Form.useForm();
@@ -66,23 +119,38 @@ export function WidgetConfigModal({ open, widget, onClose, onChange }: Props) {
       const ml = parseCssValue(widget.bounds?.marginLeft);
       const mr = parseCssValue(widget.bounds?.marginRight);
       form.setFieldsValue({
-        marginTopNum: mt.num, marginTopUnit: mt.unit,
-        marginBottomNum: mb.num, marginBottomUnit: mb.unit,
-        marginLeftNum: ml.num, marginLeftUnit: ml.unit,
-        marginRightNum: mr.num, marginRightUnit: mr.unit,
+        marginTopNum: mt.num,
+        marginTopUnit: mt.unit,
+        marginBottomNum: mb.num,
+        marginBottomUnit: mb.unit,
+        marginLeftNum: ml.num,
+        marginLeftUnit: ml.unit,
+        marginRightNum: mr.num,
+        marginRightUnit: mr.unit,
         align: widget.bounds?.align ?? 'top-left',
       });
-      setContentValue(widget.content?.value ?? '');
     }
   }, [open, widget, form]);
 
   function handleSave() {
     const values = form.getFieldsValue();
     const bounds: WidgetBounds = {
-      marginTop: toCssValue(values.marginTopNum ?? 0, values.marginTopUnit ?? 'px'),
-      marginBottom: toCssValue(values.marginBottomNum ?? 0, values.marginBottomUnit ?? 'px'),
-      marginLeft: toCssValue(values.marginLeftNum ?? 0, values.marginLeftUnit ?? 'px'),
-      marginRight: toCssValue(values.marginRightNum ?? 0, values.marginRightUnit ?? 'px'),
+      marginTop: toCssValue(
+        values.marginTopNum ?? 0,
+        values.marginTopUnit ?? 'px',
+      ),
+      marginBottom: toCssValue(
+        values.marginBottomNum ?? 0,
+        values.marginBottomUnit ?? 'px',
+      ),
+      marginLeft: toCssValue(
+        values.marginLeftNum ?? 0,
+        values.marginLeftUnit ?? 'px',
+      ),
+      marginRight: toCssValue(
+        values.marginRightNum ?? 0,
+        values.marginRightUnit ?? 'px',
+      ),
       align: values.align,
     };
     onChange({
@@ -99,17 +167,13 @@ export function WidgetConfigModal({ open, widget, onClose, onChange }: Props) {
   tabs.push({
     key: 'content',
     label: t('widget.tabContent', 'Content'),
-    children: Editor ? (
-      <Editor
-        content={{ value: contentValue }}
-        onChange={(c) => setContentValue(c.value)}
-      />
-    ) : (
-      <TextArea
-        rows={4}
-        value={contentValue}
-        onChange={(e) => setContentValue(e.target.value)}
+    children: (
+      <ContentTab
+        key={`${widget.widgetId}:${open ? 'open' : 'closed'}:${widget.content?.value ?? ''}`}
+        initialValue={widget.content?.value ?? ''}
+        editor={Editor}
         placeholder={t('widget.contentHelp', 'Content value')}
+        onValueChange={setContentValue}
       />
     ),
   });
@@ -121,7 +185,14 @@ export function WidgetConfigModal({ open, widget, onClose, onChange }: Props) {
     children: (
       <>
         <Text strong>{t('layout.margins')}</Text>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 8 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 12,
+            marginTop: 8,
+          }}
+        >
           <Form.Item label="Top" style={{ marginBottom: 8 }}>
             <CssValueField name="marginTop" />
           </Form.Item>
@@ -136,7 +207,9 @@ export function WidgetConfigModal({ open, widget, onClose, onChange }: Props) {
           </Form.Item>
         </div>
         <Form.Item label={t('layout.align')} name="align">
-          <Select options={ALIGN_OPTIONS.map((a) => ({ value: a, label: a }))} />
+          <Select
+            options={ALIGN_OPTIONS.map((a) => ({ value: a, label: a }))}
+          />
         </Form.Item>
       </>
     ),
@@ -152,7 +225,9 @@ export function WidgetConfigModal({ open, widget, onClose, onChange }: Props) {
       footer={
         <Space>
           <Button onClick={onClose}>{t('common.cancel')}</Button>
-          <Button type="primary" onClick={handleSave}>{t('common.save')}</Button>
+          <Button type="primary" onClick={handleSave}>
+            {t('common.save')}
+          </Button>
         </Space>
       }
       width={500}
