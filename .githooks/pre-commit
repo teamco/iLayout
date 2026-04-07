@@ -1,0 +1,148 @@
+#!/bin/bash
+
+export NODE_OPTIONS="--max-old-space-size=8192"
+
+MAX_FILES=50
+DASHES="--------------------------------------------------------"
+
+echo_print() {
+  local message="$1"
+  local color=${2:-\033[0m}
+  printf "%s\n" "$DASHES"
+  printf "%b\n" "${color}${message}\033[0m"
+  printf "%s\n" "$DASHES"
+}
+
+check_command() {
+  local command="$1"
+  local success_message="$2"
+  local failure_message="$3"
+
+  if eval "$command"; then
+    echo_print "✅ $success_message" "\033[32m"
+  else
+    echo_print "❌ $failure_message" "\033[31m"
+    exit 1
+  fi
+}
+
+run_prettier() {
+  if pnpm exec prettier --check "$@"; then
+    echo_print "✅ Prettier check passed." "\033[32m"
+    return 0
+  fi
+
+  echo_print "Prettier found formatting issues. Applying fixes to staged files." "\033[33m"
+
+  if pnpm exec prettier --write "$@" && git add -- "$@"; then
+    echo_print "✅ Prettier formatted and re-staged the affected files." "\033[32m"
+    return 0
+  fi
+
+  echo_print "❌ Prettier failed. Please fix the formatting issues before committing." "\033[31m"
+  exit 1
+}
+
+join_quoted_args() {
+  local quoted=""
+  local item
+
+  for item in "$@"; do
+    quoted+=" $(printf '%q' "$item")"
+  done
+
+  printf "%s" "${quoted# }"
+}
+
+STAGED_FILES=()
+while IFS= read -r file; do
+  STAGED_FILES+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+FILES_CHANGED=${#STAGED_FILES[@]}
+
+if [ "$FILES_CHANGED" -eq 0 ]; then
+  echo_print "No staged files detected. Skipping pre-commit checks." "\033[34m"
+  exit 0
+fi
+
+NON_MD_FILES=0
+for file in "${STAGED_FILES[@]}"; do
+  if [[ ! "$file" =~ \.md$ ]]; then
+    NON_MD_FILES=$((NON_MD_FILES + 1))
+  fi
+done
+
+if [ "$NON_MD_FILES" -eq 0 ]; then
+  echo_print "📝 Only Markdown files staged. Skipping tests." "\033[34m"
+  exit 0
+fi
+
+if [ "$FILES_CHANGED" -gt "$MAX_FILES" ]; then
+  printf "%s\n" "$DASHES"
+  printf "🔹 Limit files amount to commit is: %s\n" "$MAX_FILES"
+  printf "❌ Error: You are trying to commit more than %s files!\n" "$MAX_FILES"
+  printf "%s\n" "$DASHES"
+  exit 1
+else
+  echo_print "✅ Files changed to commit: $FILES_CHANGED" "\033[32m"
+fi
+
+STAGED_SOURCE_FILES=()
+STAGED_SPELL_FILES=()
+STAGED_FORMAT_FILES=()
+
+for file in "${STAGED_FILES[@]}"; do
+  case "$file" in
+    *.ts|*.tsx|*.js|*.jsx)
+      STAGED_SOURCE_FILES+=("$file")
+      STAGED_FORMAT_FILES+=("$file")
+      ;;
+    *.json|*.css|*.less|*.scss|*.html|*.yml|*.yaml)
+      STAGED_FORMAT_FILES+=("$file")
+      ;;
+  esac
+
+  case "$file" in
+    *.ts|*.tsx|*.json)
+      STAGED_SPELL_FILES+=("$file")
+      ;;
+  esac
+done
+
+if [ "${#STAGED_FORMAT_FILES[@]}" -gt 0 ]; then
+  run_prettier "${STAGED_FORMAT_FILES[@]}"
+fi
+
+if [ "${#STAGED_SOURCE_FILES[@]}" -gt 0 ]; then
+  STAGED_SOURCE_ARGS=$(join_quoted_args "${STAGED_SOURCE_FILES[@]}")
+  check_command \
+    "pnpm exec eslint --max-warnings=0 $STAGED_SOURCE_ARGS" \
+    "ESLint passed." \
+    "ESLint failed. Please fix the issues before committing."
+fi
+
+if [ "${#STAGED_SPELL_FILES[@]}" -gt 0 ]; then
+  STAGED_SPELL_ARGS=$(join_quoted_args "${STAGED_SPELL_FILES[@]}")
+  check_command \
+    "pnpm exec cspell --no-progress --no-summary --show-suggestions $STAGED_SPELL_ARGS" \
+    "Spell check passed." \
+    "Spell check failed. Please fix the spelling errors before committing."
+fi
+
+declare -a PROJECT_TEST_COMMANDS=(
+  "pnpm test"
+)
+
+for cmd in "${PROJECT_TEST_COMMANDS[@]}"; do
+  command_name=$(printf "%s" "$cmd" | awk '{print $2}')
+  success_msg="Command '$cmd' passed."
+  failure_msg="Command '$cmd' failed. Please fix the issues before committing."
+
+  if [ -n "$command_name" ]; then
+    success_msg="Checks for '$command_name' passed."
+    failure_msg="Checks for '$command_name' failed. Please fix the issues before committing."
+  fi
+
+  check_command "$cmd" "$success_msg" "$failure_msg"
+done

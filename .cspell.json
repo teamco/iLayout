@@ -1,0 +1,10 @@
+{
+  "language": "en",
+  "words": ["שמור"],
+  "ignorePaths": [
+    "**/locales/**/*",
+    "**/package.json",
+    "**/tsconfig**.json",
+    "**/**.md"
+  ]
+}
