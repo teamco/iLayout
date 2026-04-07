@@ -1,55 +1,31 @@
-import { useEffect } from 'react';
 import {
   createRouter,
   createRoute,
   createRootRoute,
-  Outlet,
   redirect,
 } from '@tanstack/react-router';
-import { App as AntApp, ConfigProvider, theme } from 'antd';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from '@/auth/AuthContext';
-import { AbilityProvider } from '@/auth/AbilityContext';
-import { useThemeStore, syncSystemTheme } from '@/themes/themeStore';
 import { supabase } from '@/lib/supabase';
-import { LoginPage } from '@/auth/LoginPage';
+import { LoginPage } from '@/pages/LoginPage';
 import { AuthCallback } from '@/auth/AuthCallback';
-import { ProfilePage } from '@/auth/ProfilePage';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { ProfileSection } from '@/pages/profile/ProfileSection';
+import { OverviewSection } from '@/pages/profile/OverviewSection';
+import { LayoutsSection } from '@/pages/profile/LayoutsSection';
+import { WidgetsSection } from '@/pages/profile/WidgetsSection';
+import { UsersSection } from '@/pages/profile/UsersSection';
+import { UserProfilePage } from '@/pages/UserProfilePage';
 import { HomePage } from '@/pages/HomePage';
 import { LayoutEditorPage } from '@/pages/LayoutEditorPage';
+import { WidgetEditorPage } from '@/pages/WidgetEditorPage';
+import { RootComponent } from '@/pages/RootComponent';
+import { NotFound } from '@/pages/NotFound';
+import { ERoutes } from '@/routes';
 
-const queryClient = new QueryClient();
-
-function RootComponent() {
-  const resolvedTheme = useThemeStore(s => s.resolvedTheme);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = resolvedTheme;
-  }, [resolvedTheme]);
-
-  useEffect(() => {
-    const mql = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = () => syncSystemTheme();
-    mql.addEventListener('change', handler);
-    return () => mql.removeEventListener('change', handler);
-  }, []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AbilityProvider>
-          <ConfigProvider theme={{
-            algorithm: resolvedTheme === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
-            token: resolvedTheme === 'dark' ? { colorLink: '#4da6ff', colorPrimary: '#4da6ff' } : undefined,
-          }}>
-            <AntApp>
-              <Outlet />
-            </AntApp>
-          </ConfigProvider>
-        </AbilityProvider>
-      </AuthProvider>
-    </QueryClientProvider>
-  );
+async function requireAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) {
+    throw redirect({ to: ERoutes.LOGIN });
+  }
 }
 
 const rootRoute = createRootRoute({
@@ -58,73 +34,129 @@ const rootRoute = createRootRoute({
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
-  async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      throw redirect({ to: '/login' });
-    }
-  },
+  path: ERoutes.HOME,
+  beforeLoad: requireAuth,
   component: HomePage,
 });
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/login',
+  path: ERoutes.LOGIN,
   async beforeLoad() {
     const { data: { session } } = await supabase.auth.getSession();
     if (session) {
-      throw redirect({ to: '/' });
+      throw redirect({ to: ERoutes.HOME });
     }
   },
   component: LoginPage,
 });
 
+// Profile layout route with nested children
 const profileRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/profile',
-  async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      throw redirect({ to: '/login' });
-    }
-  },
+  path: ERoutes.PROFILE,
+  beforeLoad: requireAuth,
   component: ProfilePage,
+});
+
+const profileIndexRoute = createRoute({
+  getParentRoute: () => profileRoute,
+  path: '/',
+  component: ProfileSection,
+});
+
+const profileOverviewRoute = createRoute({
+  getParentRoute: () => profileRoute,
+  path: '/overview',
+  component: OverviewSection,
+});
+
+const profileLayoutsRoute = createRoute({
+  getParentRoute: () => profileRoute,
+  path: '/layouts',
+  component: LayoutsSection,
+});
+
+const profileWidgetsRoute = createRoute({
+  getParentRoute: () => profileRoute,
+  path: '/widgets',
+  component: WidgetsSection,
+});
+
+const profileUsersRoute = createRoute({
+  getParentRoute: () => profileRoute,
+  path: '/users',
+  component: UsersSection,
+});
+
+const userProfileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: ERoutes.USER_PROFILE,
+  beforeLoad: requireAuth,
+  component: UserProfilePage,
 });
 
 const layoutNewRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/users/$userId/layouts/new',
-  async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      throw redirect({ to: '/login' });
-    }
-  },
+  path: ERoutes.LAYOUT_NEW,
+  beforeLoad: requireAuth,
   component: LayoutEditorPage,
 });
 
 const layoutEditRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/users/$userId/layouts/$layoutId',
-  async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      throw redirect({ to: '/login' });
-    }
-  },
+  path: ERoutes.LAYOUT_EDIT,
+  beforeLoad: requireAuth,
   component: LayoutEditorPage,
+});
+
+const userLayoutEditRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: ERoutes.USER_LAYOUT_EDIT,
+  beforeLoad: requireAuth,
+  component: LayoutEditorPage,
+});
+
+const widgetNewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: ERoutes.WIDGET_NEW,
+  beforeLoad: requireAuth,
+  component: WidgetEditorPage,
+});
+
+const widgetEditRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: ERoutes.WIDGET_EDIT,
+  beforeLoad: requireAuth,
+  component: WidgetEditorPage,
 });
 
 const callbackRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/auth/callback',
+  path: ERoutes.AUTH_CALLBACK,
   component: AuthCallback,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute, profileRoute, layoutNewRoute, layoutEditRoute, callbackRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  loginRoute,
+  profileRoute.addChildren([
+    profileIndexRoute,
+    profileOverviewRoute,
+    profileLayoutsRoute,
+    profileWidgetsRoute,
+    profileUsersRoute,
+  ]),
+  userProfileRoute,
+  layoutNewRoute,
+  layoutEditRoute,
+  userLayoutEditRoute,
+  widgetNewRoute,
+  widgetEditRoute,
+  callbackRoute,
+]);
 
-export const router = createRouter({ routeTree });
+export const router = createRouter({ routeTree, defaultNotFoundComponent: NotFound });
 
 declare module '@tanstack/react-router' {
   interface Register {
