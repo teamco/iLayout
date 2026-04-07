@@ -19,12 +19,12 @@ type Props = { node: LeafNode };
 
 export function LeafNodeComponent({ node }: Props) {
   const [configOpen, setConfigOpen] = useState(false);
-  const editMode = useLayoutStore(s => s.editMode);
-  const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
-  const setActiveWidgetEdit = useLayoutStore(s => s.setActiveWidgetEdit);
-  const galleryTargetId = useLayoutStore(s => s.galleryTargetId);
-  const setGalleryTarget = useLayoutStore(s => s.setGalleryTarget);
-  const setWidget = useLayoutStore(s => s.setWidget);
+  const editMode = useLayoutStore((s) => s.editMode);
+  const activeWidgetEditId = useLayoutStore((s) => s.activeWidgetEditId);
+  const setActiveWidgetEdit = useLayoutStore((s) => s.setActiveWidgetEdit);
+  const galleryTargetId = useLayoutStore((s) => s.galleryTargetId);
+  const setGalleryTarget = useLayoutStore((s) => s.setGalleryTarget);
+  const setWidget = useLayoutStore((s) => s.setWidget);
 
   const isWidgetEdit = activeWidgetEditId === node.id;
   const isGalleryTarget = galleryTargetId === node.id;
@@ -32,7 +32,8 @@ export function LeafNodeComponent({ node }: Props) {
   const dimmed = isAnyWidgetEdit && !isWidgetEdit;
 
   const dndDisabled = !editMode || activeWidgetEditId !== null;
-  const { attributes, listeners, setDragRef, setDropRef, isDragging, isOver } = usePanelDnd(node, dndDisabled);
+  const { attributes, listeners, setDragRef, setDropRef, isDragging, isOver } =
+    usePanelDnd(node, dndDisabled);
 
   function handleDoubleClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -72,11 +73,14 @@ export function LeafNodeComponent({ node }: Props) {
 
   return (
     <div
-      ref={(el) => { setDragRef(el); setDropRef(el); }}
+      ref={(el) => {
+        setDragRef(el);
+        setDropRef(el);
+      }}
       onDoubleClick={handleDoubleClick}
       className={clsx(styles.panel, {
-        [styles.dimmed]:     dimmed,
-        [styles.dragging]:   isDragging,
+        [styles.dimmed]: dimmed,
+        [styles.dragging]: isDragging,
         [styles.widgetEdit]: isWidgetEdit,
         [styles.dropTarget]: isOver,
       })}
@@ -90,27 +94,47 @@ export function LeafNodeComponent({ node }: Props) {
               placeholder="iframe URL"
               defaultValue={String(node.widget.config.url ?? '')}
               className={styles.iframeInput}
-              onBlur={e => {
+              onBlur={(e) => {
                 if (node.widget) {
-                  setWidget(node.id, { ...node.widget, config: { ...node.widget.config, url: e.target.value } });
+                  setWidget(node.id, {
+                    ...node.widget,
+                    config: { ...node.widget.config, url: e.target.value },
+                  });
                 }
               }}
             />
           )}
           <div className={styles.editSpacer} />
-          <Button size="small" icon={<SettingOutlined />} onClick={() => setConfigOpen(true)}>Config</Button>
-          <Button size="small" onClick={() => setGalleryTarget(node.id)}>Replace</Button>
-          <Button size="small" type="primary" onClick={handleDone}>Done</Button>
+          <Button
+            size="small"
+            icon={<SettingOutlined />}
+            onClick={() => setConfigOpen(true)}
+          >
+            Config
+          </Button>
+          <Button size="small" onClick={() => setGalleryTarget(node.id)}>
+            Replace
+          </Button>
+          <Button size="small" type="primary" onClick={handleDone}>
+            Done
+          </Button>
         </div>
       )}
 
-      {node.widget
-        ? <WidgetRenderer widget={node.widget} />
-        : <div className={styles.emptyPlaceholder}>{editMode ? 'Double-click to add widget' : 'Empty'}</div>
-      }
+      {node.widget ? (
+        <WidgetRenderer editMode={editMode} widget={node.widget} />
+      ) : (
+        <div className={styles.emptyPlaceholder}>
+          {editMode ? 'Double-click to add widget' : 'Empty'}
+        </div>
+      )}
 
       {editMode && !isAnyWidgetEdit && (
-        <LeafOverlay node={node} dragListeners={listeners} dragAttributes={attributes} />
+        <LeafOverlay
+          node={node}
+          dragListeners={listeners}
+          dragAttributes={attributes}
+        />
       )}
 
       {/* Gallery: only render on the target leaf */}

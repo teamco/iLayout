@@ -8,18 +8,62 @@
   display: flex;
   overflow: hidden;
   background: var(--bg);
+
+  &.editMode {
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.1);
+    }
+  }
 }
 
 // ─── Alignment variants ───────────────────────────────────────────────────────
-.alignTopLeft      { justify-content: flex-start; align-items: flex-start; }
-.alignTopCenter    { justify-content: center;      align-items: flex-start; }
-.alignTopRight     { justify-content: flex-end;    align-items: flex-start; }
-.alignCenterLeft   { justify-content: flex-start;  align-items: center; }
-.alignCenter       { justify-content: center;      align-items: center; }
-.alignCenterRight  { justify-content: flex-end;    align-items: center; }
-.alignBottomLeft   { justify-content: flex-start;  align-items: flex-end; }
-.alignBottomCenter { justify-content: center;      align-items: flex-end; }
-.alignBottomRight  { justify-content: flex-end;    align-items: flex-end; }
+.alignTopLeft {
+  justify-content: flex-start;
+  align-items: flex-start;
+}
+
+.alignTopCenter {
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.alignTopRight {
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.alignCenterLeft {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.alignCenter {
+  justify-content: center;
+  align-items: center;
+}
+
+.alignCenterRight {
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.alignBottomLeft {
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+
+.alignBottomCenter {
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.alignBottomRight {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
 
 // ─── Content wrappers ─────────────────────────────────────────────────────────
 .iframe {
