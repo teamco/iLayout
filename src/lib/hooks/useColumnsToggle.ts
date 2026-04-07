@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type { ISelectItemProps, TColumn, TColumns } from '@/components/Table/types';
-import { filterOutColumns, getColumnEffectiveKey, getColumnLabel } from '@/components/Table/columnUtils';
+import type {
+  ISelectItemProps,
+  TColumn,
+  TColumns,
+} from '@/components/Table/types';
+import {
+  filterOutColumns,
+  getColumnEffectiveKey,
+  getColumnLabel,
+} from '@/components/Table/columnUtils';
 
 /**
  * Custom hook to manage and filter columns in a table.
@@ -10,11 +18,8 @@ import { filterOutColumns, getColumnEffectiveKey, getColumnLabel } from '@/compo
  */
 export function useColumnsToggle<T extends object>(
   columns: TColumns<T>,
-  hiddenByDefault: Array<TColumn['key']> = [],
+  hiddenByDefault: Array<TColumn<T>['key']> = [],
 ) {
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const initializedRef = useRef(false);
-
   const columnsList = useMemo<ISelectItemProps[]>(() => {
     return columns
       .filter((col: TColumn<T>) => col.concealable)
@@ -24,31 +29,28 @@ export function useColumnsToggle<T extends object>(
       }));
   }, [columns]);
 
-  // Initialize only once
-  useEffect(() => {
-    if (!initializedRef.current && columnsList.length > 0) {
-      const hidden = new Set(hiddenByDefault.map(String));
-      const concealable = columnsList.map((c) => c.value);
-      setSelectedColumns(concealable.filter((c) => !hidden.has(c)));
-      initializedRef.current = true;
-    }
-  }, [columnsList, hiddenByDefault]);
+  const concealableKeys = useMemo<string[]>(
+    () => columnsList.map((c) => c.value),
+    [columnsList],
+  );
+  const [selectedColumns, setSelectedColumns] = useState<string[]>(() => {
+    const hidden = new Set(hiddenByDefault.map(String));
+    return concealableKeys.filter((key) => !hidden.has(key));
+  });
 
-  const concealableKeys = useMemo<string[]>(() => columnsList.map((c) => c.value), [columnsList]);
-
-  const prevKeysRef = useRef<string[]>([]);
+  const prevKeysRef = useRef<string[]>(concealableKeys);
 
   // Handle dynamic column changes (columns being added/removed)
   useEffect(() => {
-    if (!initializedRef.current) return;
-
     const prev = prevKeysRef.current;
     const keys = concealableKeys;
     const prevSet = new Set(prev);
     const keysSet = new Set(keys);
 
     const changed =
-      prev.length !== keys.length || keys.some((k) => !prevSet.has(k)) || prev.some((k) => !keysSet.has(k));
+      prev.length !== keys.length ||
+      keys.some((k) => !prevSet.has(k)) ||
+      prev.some((k) => !keysSet.has(k));
 
     if (changed) {
       const addedKeys = keys.filter((k) => !prevSet.has(k));
