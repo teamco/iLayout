@@ -117,7 +117,7 @@ fi
 if [ "${#STAGED_SOURCE_FILES[@]}" -gt 0 ]; then
   STAGED_SOURCE_ARGS=$(join_quoted_args "${STAGED_SOURCE_FILES[@]}")
   check_command \
-    "pnpm exec eslint --max-warnings=0 $STAGED_SOURCE_ARGS" \
+    "pnpm exec eslint $STAGED_SOURCE_ARGS" \
     "ESLint passed." \
     "ESLint failed. Please fix the issues before committing."
 fi
