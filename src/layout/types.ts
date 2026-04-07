@@ -37,6 +37,30 @@ export type SplitterNode = {
   children: LayoutNode[];
 };
 
-export type LayoutNode = LeafNode | SplitterNode;
+// ─── Layout modes ─────────────────────────────────────────────────────────────
+
+export type LayoutMode = 'viewport' | 'scroll';
+
+export type SectionHeight =
+  | { type: 'auto' }
+  | { type: 'fixed'; value: string }
+  | { type: 'min'; value: string };
+
+export type SectionNode = {
+  id: string;
+  type: 'section';
+  height: SectionHeight;
+  child: LayoutNode;
+  overlap?: string;
+  zIndex?: number;
+};
+
+export type ScrollRoot = {
+  id: string;
+  type: 'scroll';
+  sections: SectionNode[];
+};
+
+export type LayoutNode = LeafNode | SplitterNode | SectionNode | ScrollRoot;
 
 export type SplitDirection = 'left' | 'right' | 'top' | 'bottom';
