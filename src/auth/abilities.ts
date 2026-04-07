@@ -1,5 +1,6 @@
 import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
 import type { User } from '@supabase/supabase-js';
+import type {IUser} from "@/lib/types.ts";
 
 export const EAction = {
   VIEW: 'view',
@@ -9,17 +10,22 @@ export const EAction = {
   PUBLISH: 'publish',
   MANAGE: 'manage',
 } as const;
+
 export type EAction = (typeof EAction)[keyof typeof EAction];
 
 export const ESubject = {
+  LOGIN: 'login',
   LAYOUT: 'layout',
+  WIDGET: 'widget',
   ALL: 'all',
 } as const;
+
 export type ESubject = (typeof ESubject)[keyof typeof ESubject];
 
-export type LayoutSubject = { kind: 'layout'; user_id: string };
+export type LayoutSubject = { kind: 'layout'; user_id: IUser['id'] };
+export type WidgetSubject = { kind: 'widget'; user_id: string };
 
-export type AppAbility = MongoAbility<[EAction, LayoutSubject | ESubject | string]>;
+export type AppAbility = MongoAbility<[EAction, LayoutSubject | WidgetSubject | ESubject | string]>;
 
 function isAdmin(email?: string): boolean {
   if (!email) return false;
@@ -28,7 +34,7 @@ function isAdmin(email?: string): boolean {
 }
 
 export function defineAbilityFor(user: User | null): AppAbility {
-  const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
+  const { can, cannot, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
 
   if (user && isAdmin(user.email)) {
     can(EAction.MANAGE, ESubject.ALL);
@@ -38,8 +44,18 @@ export function defineAbilityFor(user: User | null): AppAbility {
     can(EAction.EDIT, ESubject.LAYOUT, { user_id: { $eq: user.id } });
     can(EAction.DELETE, ESubject.LAYOUT, { user_id: { $eq: user.id } });
     can(EAction.PUBLISH, ESubject.LAYOUT, { user_id: { $eq: user.id } });
+
+    can(EAction.VIEW, ESubject.WIDGET);
+    can(EAction.CREATE, ESubject.WIDGET);
+    can(EAction.EDIT, ESubject.WIDGET, { user_id: { $eq: user.id } });
+    can(EAction.DELETE, ESubject.WIDGET, { user_id: { $eq: user.id } });
+    can(EAction.PUBLISH, ESubject.WIDGET, { user_id: { $eq: user.id } });
+
+    cannot(EAction.VIEW, ESubject.LOGIN);
   } else {
     can(EAction.VIEW, ESubject.LAYOUT);
+    can(EAction.VIEW, ESubject.WIDGET);
+    can(EAction.VIEW, ESubject.LOGIN);
   }
 
   return build();
