@@ -1,6 +1,14 @@
 {
   "language": "en",
-  "words": ["שמור", "Appstore", "Clonable"],
+  "words": [
+    "שמור",
+    "Appstore",
+    "Clonable",
+    "blueimp",
+    "supabase",
+    "SUPABASE",
+    "apikey"
+  ],
   "ignorePaths": [
     "**/locales/**/*",
     "**/package.json",
