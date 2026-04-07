@@ -125,7 +125,7 @@ fi
 if [ "${#STAGED_SPELL_FILES[@]}" -gt 0 ]; then
   STAGED_SPELL_ARGS=$(join_quoted_args "${STAGED_SPELL_FILES[@]}")
   check_command \
-    "pnpm exec cspell --no-progress --no-summary --show-suggestions $STAGED_SPELL_ARGS" \
+    "pnpm exec cspell --no-progress --no-summary --show-suggestions --no-must-find-files $STAGED_SPELL_ARGS" \
     "Spell check passed." \
     "Spell check failed. Please fix the spelling errors before committing."
 fi
