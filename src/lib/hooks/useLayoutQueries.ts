@@ -1,19 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { LayoutNode } from '@/layout/types';
-import type { LayoutStatus } from '@/lib/types';
-import * as api from '@/lib/layoutApi';
+import type { IUser, LayoutStatus } from '@/lib/types';
+import * as api from '@/lib/queries/layoutApi';
 
 const KEYS = {
-  myLayouts: ['layouts', 'my'] as const,
-  layout: (id: string) => ['layouts', id] as const,
+  layouts: (userId: string) => ['layouts', userId] as const,
+  layout: (id: string) => ['layouts', 'detail', id] as const,
   published: (userId: string) => ['layouts', 'published', userId] as const,
   history: (id: string) => ['layouts', 'history', id] as const,
 };
 
-export function useMyLayouts() {
+export function useLayouts(userId: IUser['id'] | undefined) {
   return useQuery({
-    queryKey: KEYS.myLayouts,
-    queryFn: api.getMyLayouts,
+    queryKey: KEYS.layouts(userId!),
+    queryFn: () => api.getLayouts(userId!),
+    enabled: !!userId,
   });
 }
 
@@ -25,7 +26,7 @@ export function useLayout(id: string | undefined) {
   });
 }
 
-export function usePublishedLayout(userId: string | undefined) {
+export function usePublishedLayout(userId: IUser['id'] | undefined) {
   return useQuery({
     queryKey: KEYS.published(userId!),
     queryFn: () => api.getPublishedLayout(userId!),
@@ -45,8 +46,9 @@ export function useCreateLayout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: LayoutNode) => api.createLayout(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: KEYS.myLayouts });
+    onSuccess: (created) => {
+      queryClient.setQueryData(KEYS.layout(created.id), created);
+      queryClient.invalidateQueries({ queryKey: KEYS.layouts(created.user_id) });
     },
   });
 }
@@ -55,9 +57,9 @@ export function useSaveLayout() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: LayoutNode }) => api.saveLayout(id, data),
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: KEYS.myLayouts });
-      queryClient.invalidateQueries({ queryKey: KEYS.layout(variables.id) });
+    onSuccess: (saved, variables) => {
+      queryClient.setQueryData(KEYS.layout(variables.id), saved);
+      queryClient.invalidateQueries({ queryKey: KEYS.layouts(saved.user_id) });
       queryClient.invalidateQueries({ queryKey: KEYS.history(variables.id) });
     },
   });
@@ -68,10 +70,8 @@ export function useSetStatus() {
   return useMutation({
     mutationFn: ({ id, version, status }: { id: string; version: number; status: LayoutStatus }) =>
       api.setStatus(id, version, status),
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({ queryKey: KEYS.myLayouts });
-      queryClient.invalidateQueries({ queryKey: KEYS.layout(variables.id) });
-      queryClient.invalidateQueries({ queryKey: KEYS.history(variables.id) });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['layouts'] });
     },
   });
 }

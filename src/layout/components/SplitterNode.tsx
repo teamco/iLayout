@@ -19,30 +19,42 @@ export function SplitterNodeComponent({ node }: Props) {
 
   const resizingDisabled = !editMode || activeWidgetEditId !== null;
 
-  function handleResize(pixelSizes: number[]) {
+  function toPercentages(pixelSizes: number[], total: number) {
+    const percentages = pixelSizes.map(px => (px / total) * 100);
+    const sum = percentages.reduce((a, b) => a + b, 0);
+    return percentages.map(p => (p / sum) * 100);
+  }
+
+  function getTotal() {
     const container = containerRef.current;
-    if (!container) return;
-    const total = node.direction === 'horizontal'
+    if (!container) return 0;
+    return node.direction === 'horizontal'
       ? container.offsetWidth
       : container.offsetHeight;
+  }
+
+  function handleResize(pixelSizes: number[]) {
+    const total = getTotal();
+    if (total === 0) return;
+    resize(node.id, toPercentages(pixelSizes, total));
+  }
+
+  function handleResizeEnd(pixelSizes: number[]) {
+    if (!editMode) return;
+    const container = containerRef.current;
+    if (!container) return;
+    const total = getTotal();
     if (total === 0) return;
 
-    let sizes = pixelSizes;
-    if (editMode) {
-      const canvasSize = node.direction === 'horizontal' ? canvasWidth : canvasHeight;
-      const rect = container.getBoundingClientRect();
-      const canvasEl = container.closest('[data-grid-canvas]') as HTMLElement | null;
-      const canvasRect = canvasEl?.getBoundingClientRect();
-      const containerOffset = canvasRect
-        ? (node.direction === 'horizontal' ? rect.left - canvasRect.left : rect.top - canvasRect.top)
-        : 0;
-      sizes = snapToGrid(pixelSizes, containerOffset, canvasSize, columns, gutter);
-    }
-
-    const percentages = sizes.map(px => (px / total) * 100);
-    const sum = percentages.reduce((a, b) => a + b, 0);
-    const normalized = percentages.map(p => (p / sum) * 100);
-    resize(node.id, normalized);
+    const canvasSize = node.direction === 'horizontal' ? canvasWidth : canvasHeight;
+    const rect = container.getBoundingClientRect();
+    const canvasEl = container.closest('[data-grid-canvas]') as HTMLElement | null;
+    const canvasRect = canvasEl?.getBoundingClientRect();
+    const containerOffset = canvasRect
+      ? (node.direction === 'horizontal' ? rect.left - canvasRect.left : rect.top - canvasRect.top)
+      : 0;
+    const snapped = snapToGrid(pixelSizes, containerOffset, canvasSize, columns, gutter);
+    resize(node.id, toPercentages(snapped, total));
   }
 
   return (
@@ -50,6 +62,7 @@ export function SplitterNodeComponent({ node }: Props) {
       <Splitter
         orientation={node.direction === 'horizontal' ? 'horizontal' : 'vertical'}
         onResize={handleResize}
+        onResizeEnd={handleResizeEnd}
       >
         {node.children.map((child, i) => (
           <Splitter.Panel

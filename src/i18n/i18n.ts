@@ -27,4 +27,13 @@ i18n.use(initReactI18next).init({
   },
 });
 
+export const LANGUAGES = ['en', 'ru', 'he'] as const;
+export type Language = (typeof LANGUAGES)[number];
+
+export const LANGUAGE_LABELS: Record<Language, string> = {
+  en: 'EN',
+  ru: 'RU',
+  he: 'HE',
+};
+
 export { i18n, STORAGE_KEY };

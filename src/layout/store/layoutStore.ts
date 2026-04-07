@@ -75,7 +75,10 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
     },
     setActiveWidgetEdit(id) { set(state => { state.activeWidgetEditId = id; }); },
     toggleGrid() {
-      set(state => { state.showGrid = !state.showGrid; });
+      set(state => {
+        if (!state.editMode) return;
+        state.showGrid = !state.showGrid;
+      });
     },
   };
 }

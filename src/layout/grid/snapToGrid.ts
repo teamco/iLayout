@@ -1,12 +1,13 @@
 /**
- * Returns absolute pixel positions of grid column left edges (including 0 and canvasSize).
- * For 24 columns there are 25 edges: [0, col1_start, col2_start, ..., canvasSize].
+ * Returns absolute pixel positions of all grid column edges (both sides of each gutter).
+ * Includes 0 and canvasSize. Sorted and deduplicated.
  */
 export function getGridEdges(canvasSize: number, columns: number, gutter: number): number[] {
   const colWidth = (canvasSize - (columns - 1) * gutter) / columns;
   const edges: number[] = [0];
   for (let i = 1; i < columns; i++) {
-    edges.push(i * (colWidth + gutter));
+    edges.push(i * (colWidth + gutter) - gutter); // right edge of column i
+    edges.push(i * (colWidth + gutter));           // left edge of column i+1
   }
   edges.push(canvasSize);
   return edges;
@@ -69,17 +70,26 @@ export function snapToGrid(
   }
   result.push(totalSize - prev);
 
-  // Clamp: ensure no panel smaller than one column width
-  for (let i = 0; i < result.length; i++) {
-    if (result[i] < minColWidth) {
-      const deficit = minColWidth - result[i];
-      result[i] = minColWidth;
-      const neighbor = i > 0 ? i - 1 : i + 1;
-      if (neighbor < result.length) {
-        result[neighbor] -= deficit;
+  // Clamp: ensure no panel smaller than one column width (iterate until stable)
+  const MAX_CLAMP_PASSES = result.length;
+  for (let pass = 0; pass < MAX_CLAMP_PASSES; pass++) {
+    let changed = false;
+    for (let i = 0; i < result.length; i++) {
+      if (result[i] < minColWidth) {
+        const deficit = minColWidth - result[i];
+        result[i] = minColWidth;
+        const neighbor = i > 0 ? i - 1 : i + 1;
+        if (neighbor < result.length) {
+          result[neighbor] -= deficit;
+          changed = true;
+        }
       }
     }
+    if (!changed) break;
   }
+
+  // If clamping produced invalid state, fall back to original sizes
+  if (result.some(s => s < 0)) return pixelSizes;
 
   // Normalize to preserve exact total
   const currentSum = result.reduce((a, b) => a + b, 0);

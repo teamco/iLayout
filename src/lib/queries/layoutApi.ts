@@ -1,5 +1,5 @@
 import type { LayoutNode } from '@/layout/types';
-import type { LayoutRecord, LayoutStatus } from '@/lib/types';
+import type { IUser, LayoutRecord, LayoutStatus } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 async function currentUserId(): Promise<string> {
@@ -8,8 +8,7 @@ async function currentUserId(): Promise<string> {
   return user.id;
 }
 
-export async function getMyLayouts(): Promise<LayoutRecord[]> {
-  const userId = await currentUserId();
+export async function getLayouts(userId: IUser['id']): Promise<LayoutRecord[]> {
   const { data, error } = await supabase
     .from('layouts')
     .select('*')
@@ -59,7 +58,7 @@ export async function getLayoutVersion(id: string, version: number): Promise<Lay
   return data as LayoutRecord;
 }
 
-export async function getPublishedLayout(userId: string): Promise<LayoutRecord | null> {
+export async function getPublishedLayout(userId: IUser['id']): Promise<LayoutRecord | null> {
   const { data, error } = await supabase
     .from('layouts')
     .select('*')
@@ -129,11 +128,12 @@ export async function saveLayout(id: string, data: LayoutNode): Promise<LayoutRe
 export async function setStatus(id: string, version: number, status: LayoutStatus): Promise<void> {
   const userId = await currentUserId();
 
+  // Only 1 published layout per user — unpublish all user's layouts first
   if (status === 'published') {
     await supabase
       .from('layouts')
       .update({ status: 'draft', updated_by: userId, updated_at: new Date().toISOString() })
-      .eq('id', id)
+      .eq('user_id', userId)
       .eq('status', 'published');
   }
 

@@ -3,26 +3,12 @@ import { App as AntApp, Modal, Tabs, Input, Button, Typography, Space } from 'an
 import { CopyOutlined, DownloadOutlined, ImportOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutStore } from '@/layout/store/layoutStore';
+import { exportJson } from '@/lib/exportJson';
 
 type Props = {
   open: boolean;
   onClose: () => void;
 };
-
-function formatDate() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-}
-
-function downloadJson(json: string) {
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `layout-${formatDate()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 function validateLayout(data: unknown): data is { id: string; type: string } {
   return (
@@ -52,7 +38,7 @@ function ViewTab() {
       <pre style={{ maxHeight: 400, overflow: 'auto', fontSize: 12, margin: 0 }}>{json}</pre>
       <Space style={{ marginTop: 12 }}>
         <Button icon={<CopyOutlined />} onClick={handleCopy}>{t('jsonModal.copy')}</Button>
-        <Button icon={<DownloadOutlined />} onClick={() => downloadJson(json)}>{t('jsonModal.export')}</Button>
+        <Button icon={<DownloadOutlined />} onClick={() => exportJson(json, 'layout')}>{t('jsonModal.export')}</Button>
       </Space>
     </>
   );

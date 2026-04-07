@@ -59,6 +59,11 @@ export function createThemeStore(initialMode?: ThemeMode) {
   }));
 }
 
+// Set data-theme before first render to avoid flash
+if (typeof document !== 'undefined') {
+  document.documentElement.dataset.theme = resolveTheme(loadMode());
+}
+
 /** Singleton store for app use */
 export const useThemeStore = create<ThemeState>()((set) => ({
   ...makeStore(),

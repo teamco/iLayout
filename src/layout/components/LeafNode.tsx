@@ -9,6 +9,8 @@ import { useLayoutStore } from '@/layout/store/layoutStore';
 import { WidgetRenderer } from '@/layout/widgets/WidgetRenderer';
 import { WidgetGallery } from '@/layout/widgets/WidgetGallery';
 import { WidgetConfigModal } from '@/layout/widgets/WidgetConfigModal';
+import { getWidgetDef } from '@/widgets/registry';
+import type { EWidgetResource } from '@/lib/types';
 import { LeafOverlay } from './LeafOverlay';
 import { usePanelDnd } from '@/layout/dnd/usePanelDnd';
 import styles from './LeafNode.module.less';
@@ -30,7 +32,8 @@ export function LeafNodeComponent({ node }: Props) {
   const dndDisabled = !editMode || activeWidgetEditId !== null;
   const { attributes, listeners, setDragRef, setDropRef, isDragging, isOver } = usePanelDnd(node, dndDisabled);
 
-  function handleDoubleClick() {
+  function handleDoubleClick(e: React.MouseEvent) {
+    e.stopPropagation();
     if (!editMode) return;
     if (!node.widget) {
       setGalleryOpen(true);
@@ -42,6 +45,12 @@ export function LeafNodeComponent({ node }: Props) {
   function handleSelectWidget(widget: WidgetRef) {
     setWidget(node.id, widget);
     setGalleryOpen(false);
+    // Auto-open config if widget has an editor (e.g. YouTube needs URL)
+    const def = getWidgetDef(widget.resource as EWidgetResource);
+    if (def?.editor) {
+      setActiveWidgetEdit(node.id);
+      setConfigOpen(true);
+    }
   }
 
   function handleDone() {

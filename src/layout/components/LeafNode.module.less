@@ -1,0 +1,64 @@
+@import '@/themes/mixin.module.less';
+
+.panel {
+  .fill();
+  position: relative;
+  box-sizing: border-box;
+  transition: opacity 0.15s;
+  opacity: 1;
+  background: var(--border-dim);
+}
+
+.panel.dimmed {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.panel.dragging {
+  opacity: 0.5;
+}
+
+.panel.widgetEdit {
+  border: 2px solid @color-yellow;
+}
+
+.panel.dropTarget {
+  border: 2px solid @color-green;
+  background: rgba(82, 196, 26, 0.15);
+}
+
+// ─── Widget edit toolbar ──────────────────────────────────────────────────────
+.editToolbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: @z-toolbar;
+  .flex-row();
+  gap: 6px;
+  padding: 4px 8px;
+  background: rgba(42, 32, 16, 0.95);
+  border-bottom: 1px solid @color-yellow;
+}
+
+.editLabel {
+  font-size: 11px;
+  color: @color-yellow;
+  font-weight: 600;
+}
+
+.editSpacer {
+  flex: 1;
+}
+
+.iframeInput {
+  width: 200px;
+}
+
+// ─── Empty placeholder ────────────────────────────────────────────────────────
+.emptyPlaceholder {
+  .fill();
+  .flex-center();
+  color: @color-muted;
+  font-size: 12px;
+}

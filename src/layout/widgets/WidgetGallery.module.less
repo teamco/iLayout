@@ -1,0 +1,20 @@
+@import '@/themes/mixin.module.less';
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.cardWrapper {
+  cursor: grab;
+
+  &.dragging {
+    opacity: 0.5;
+  }
+}
+
+.cardDescription {
+  display: block;
+  font-size: 12px;
+}

@@ -1,0 +1,32 @@
+@import '@/themes/mixin.module.less';
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 48px);
+  grid-template-rows: repeat(3, 48px);
+  gap: 4px;
+  margin: 16px auto;
+  width: fit-content;
+}
+
+.arrowBtn {
+  width: 48px;
+  height: 48px;
+  font-size: 20px;
+  padding: 0;
+}
+
+.arrowTop    { grid-column: 2; grid-row: 1; }
+.arrowLeft   { grid-column: 1; grid-row: 2; }
+.arrowRight  { grid-column: 3; grid-row: 2; }
+.arrowBottom { grid-column: 2; grid-row: 3; }
+
+.hereCell {
+  grid-column: 2;
+  grid-row: 2;
+  .flex-center();
+  background: #1a1a2e;
+  border-radius: 6px;
+  font-size: 10px;
+  color: @color-dim;
+}

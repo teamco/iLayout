@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { findNode, getDepth, splitNode, removeNode, updateNode } from './treeUtils';
-import type { LayoutNode, SplitterNode } from '../types';
+import { findNode, getDepth, splitNode, removeNode, updateNode } from '../treeUtils';
+import type { LayoutNode, SplitterNode } from '../../types';
 
 const leaf = (id: string): LayoutNode => ({ id, type: 'leaf' });
 

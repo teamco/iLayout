@@ -12,15 +12,13 @@ export function initAutoSave(layoutId: string, storage: LayoutStorage): () => vo
   currentLayoutId = layoutId;
   currentStorage = storage;
 
-  return useLayoutStore.subscribe(
-    state => state.root,
-    root => {
-      if (timer) clearTimeout(timer);
-      const id = currentLayoutId;
-      const s = currentStorage;
-      timer = setTimeout(() => {
-        if (id && s) s.save(id, root);
-      }, 1000);
-    },
-  );
+  return useLayoutStore.subscribe(state => {
+    const root = state.root;
+    if (timer) clearTimeout(timer);
+    const id = currentLayoutId;
+    const s = currentStorage;
+    timer = setTimeout(() => {
+      if (id && s) s.save(id, root);
+    }, 1000);
+  });
 }

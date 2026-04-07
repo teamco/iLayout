@@ -5,12 +5,16 @@ const COLUMNS = 24;
 const GUTTER = 16;
 
 describe('getGridEdges', () => {
-  it('returns correct edges for a 1000px canvas', () => {
+  it('returns both sides of each gutter', () => {
     const edges = getGridEdges(1000, COLUMNS, GUTTER);
-    expect(edges.length).toBe(COLUMNS + 1);
+    // 24 columns → 23 gutters → 23*2 inner edges + 0 + canvasSize = 48
+    expect(edges.length).toBe(2 * (COLUMNS - 1) + 2);
     expect(edges[0]).toBeCloseTo(0);
-    expect(edges[1]).toBeCloseTo(26.333 + GUTTER);
-    expect(edges[COLUMNS]).toBeCloseTo(1000);
+    const colWidth = (1000 - 23 * GUTTER) / COLUMNS; // ≈ 26.333
+    // First inner edges: right edge of col 1, left edge of col 2
+    expect(edges[1]).toBeCloseTo(colWidth);            // ≈ 26.333
+    expect(edges[2]).toBeCloseTo(colWidth + GUTTER);   // ≈ 42.333
+    expect(edges[edges.length - 1]).toBeCloseTo(1000);
   });
 });
 
@@ -61,5 +65,13 @@ describe('snapToGrid', () => {
     const result = snapToGrid(sizes, 0, 1000, COLUMNS, GUTTER);
     expect(result[0]).toBeGreaterThanOrEqual(colWidth - 0.5);
     expect(result[0] + result[1]).toBeCloseTo(1000);
+  });
+
+  it('handles multi-panel clamping without negative sizes', () => {
+    // Three panels, two very small — clamping should not produce negatives
+    const sizes = [5, 5, 990];
+    const result = snapToGrid(sizes, 0, 1000, COLUMNS, GUTTER);
+    expect(result.every(s => s >= 0)).toBe(true);
+    expect(result.reduce((a, b) => a + b, 0)).toBeCloseTo(1000);
   });
 });

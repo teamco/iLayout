@@ -1,0 +1,35 @@
+@import '@/themes/mixin.module.less';
+
+.border {
+  .absolute-fill();
+  border: 2px solid @color-blue;
+  border-radius: 4px;
+  background: rgba(24, 144, 255, 0.06);
+  pointer-events: none;
+}
+
+.dragHandle {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: @z-overlay;
+  cursor: grab;
+  color: @color-blue;
+  padding: 2px;
+  font-size: 14px;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  z-index: @z-overlay;
+}
+
+.addBtn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: @z-overlay;
+}

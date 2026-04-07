@@ -15,4 +15,3 @@ export function getAllWidgetDefs(): WidgetDefinition[] {
   return Array.from(registry.values());
 }
 
-// Built-in widget imports will be added after widget modules are created

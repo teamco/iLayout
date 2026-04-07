@@ -1,16 +1,11 @@
 // src/App.tsx
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import md5 from 'blueimp-md5';
-import { Avatar, Button, Dropdown, Tooltip, Typography } from 'antd';
-import type { MenuProps } from 'antd';
-import { AppstoreOutlined, CodeOutlined, LogoutOutlined, SaveOutlined, UserOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
-import { useNavigate } from '@tanstack/react-router';
-import { useThemeStore } from '@/themes/themeStore';
-import { useAuth } from '@/auth/AuthContext';
+import { Button, Tooltip } from 'antd';
+import { AppstoreOutlined, CodeOutlined, SaveOutlined } from '@ant-design/icons';
 import { Can } from '@/auth/Can';
 import { EAction, ESubject } from '@/auth/abilities';
-import { ERoutes } from '@/routes';
+import { AppHeader } from '@/components/AppHeader';
 import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
 import { GridOverlay } from '@/layout/components/GridOverlay';
 import { GridProvider } from '@/layout/grid/GridContext';
@@ -35,52 +30,6 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
   const showGrid = useLayoutStore(s => s.showGrid);
   const toggleGrid = useLayoutStore(s => s.toggleGrid);
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
-
-  const themeMode = useThemeStore(s => s.themeMode);
-  const cycleTheme = useThemeStore(s => s.cycleTheme);
-
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-
-  const userName = user?.user_metadata?.full_name || user?.email || 'User';
-  const providerAvatar = user?.user_metadata?.avatar_url;
-  const [avatarError, setAvatarError] = useState(false);
-
-  const gravatarUrl = user?.email
-    ? `https://www.gravatar.com/avatar/${md5(user.email.trim().toLowerCase())}?d=identicon&s=64`
-    : undefined;
-
-  const avatarSrc = avatarError ? gravatarUrl : providerAvatar;
-
-  const lastSignIn = user?.last_sign_in_at
-    ? new Date(user.last_sign_in_at).toLocaleString()
-    : undefined;
-
-  const userMenuItems: MenuProps['items'] = [
-    {
-      key: 'header',
-      type: 'group',
-      label: userName,
-    },
-    ...(lastSignIn ? [{
-      key: 'lastLogin',
-      label: <Typography.Text type="secondary" style={{ fontSize: 12 }}>{t('profile.lastLogin') + ':'} {lastSignIn}</Typography.Text>,
-      disabled: true,
-    }] : []),
-    { type: 'divider' as const },
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: t('profile.profile'),
-      onClick: () => navigate({ to: ERoutes.PROFILE }),
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: t('common.signOut'),
-      onClick: signOut,
-    },
-  ];
 
   // Only use localStorage auto-save when not in Supabase mode
   useEffect(() => {
@@ -109,16 +58,7 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
 
   return (
     <div className={styles.app}>
-      <div className={styles.toolbar}>
-        <span className={styles.toolbarTitle}>Widgets</span>
-        <div className={styles.toolbarSpacer} />
-        <Tooltip title={themeMode === 'light' ? t('theme.light') : themeMode === 'dark' ? t('theme.dark') : t('theme.system')}>
-          <Button
-            size="small"
-            icon={themeMode === 'light' ? <SunOutlined /> : themeMode === 'dark' ? <MoonOutlined /> : <DesktopOutlined />}
-            onClick={cycleTheme}
-          />
-        </Tooltip>
+      <AppHeader>
         <Tooltip title={t('layout.layoutJson')}>
           <Button
             size="small"
@@ -156,15 +96,7 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
             />
           </Tooltip>
         )}
-        <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-          <Avatar
-            size="small"
-            src={avatarSrc ? <img src={avatarSrc} referrerPolicy="no-referrer" onError={() => setAvatarError(true)} /> : undefined}
-            icon={!avatarSrc ? <UserOutlined /> : undefined}
-            style={{ cursor: 'pointer' }}
-          />
-        </Dropdown>
-      </div>
+      </AppHeader>
       <div className={styles.canvas}>
         <GridProvider>
           <LayoutRenderer />

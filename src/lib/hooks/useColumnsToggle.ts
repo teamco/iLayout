@@ -1,0 +1,82 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ISelectItemProps, TColumn, TColumns } from '@/components/Table/types';
+import { filterOutColumns, getColumnEffectiveKey, getColumnLabel } from '@/components/Table/columnUtils';
+
+/**
+ * Custom hook to manage and filter columns in a table.
+ *
+ * @param columns - Array of column objects to be processed.
+ * @param hiddenByDefault - Array of column keys to hide by default.
+ */
+export function useColumnsToggle<T extends object>(
+  columns: TColumns<T>,
+  hiddenByDefault: Array<TColumn['key']> = [],
+) {
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const initializedRef = useRef(false);
+
+  const columnsList = useMemo<ISelectItemProps[]>(() => {
+    return columns
+      .filter((col: TColumn<T>) => col.concealable)
+      .map((col: TColumn<T>) => ({
+        label: getColumnLabel<T>(col),
+        value: getColumnEffectiveKey<T>(col),
+      }));
+  }, [columns]);
+
+  // Initialize only once
+  useEffect(() => {
+    if (!initializedRef.current && columnsList.length > 0) {
+      const hidden = new Set(hiddenByDefault.map(String));
+      const concealable = columnsList.map((c) => c.value);
+      setSelectedColumns(concealable.filter((c) => !hidden.has(c)));
+      initializedRef.current = true;
+    }
+  }, [columnsList, hiddenByDefault]);
+
+  const concealableKeys = useMemo<string[]>(() => columnsList.map((c) => c.value), [columnsList]);
+
+  const prevKeysRef = useRef<string[]>([]);
+
+  // Handle dynamic column changes (columns being added/removed)
+  useEffect(() => {
+    if (!initializedRef.current) return;
+
+    const prev = prevKeysRef.current;
+    const keys = concealableKeys;
+    const prevSet = new Set(prev);
+    const keysSet = new Set(keys);
+
+    const changed =
+      prev.length !== keys.length || keys.some((k) => !prevSet.has(k)) || prev.some((k) => !keysSet.has(k));
+
+    if (changed) {
+      const addedKeys = keys.filter((k) => !prevSet.has(k));
+
+      setSelectedColumns((sel) => {
+        const next = sel.filter((v) => keysSet.has(String(v)));
+
+        for (const k of addedKeys) {
+          const isHiddenByDefault = hiddenByDefault.map(String).includes(k);
+          if (!isHiddenByDefault && !next.includes(k)) {
+            next.push(k);
+          }
+        }
+        return next;
+      });
+
+      prevKeysRef.current = keys;
+    }
+  }, [concealableKeys, hiddenByDefault]);
+
+  const filteredColumns = useMemo<TColumns<T>>(() => {
+    return filterOutColumns(columns, selectedColumns) as TColumns<T>;
+  }, [columns, selectedColumns]);
+
+  return {
+    columnsList,
+    selectedColumns,
+    setSelectedColumns,
+    filteredColumns,
+  };
+}

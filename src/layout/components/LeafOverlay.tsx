@@ -1,14 +1,15 @@
 // src/layout/components/LeafOverlay.tsx
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from 'antd';
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import type { DraggableAttributes } from '@dnd-kit/core';
 import { AddPanelModal } from './AddPanelModal';
-import { useLayoutStore } from '../store/layoutStore';
-import { useCanEdit } from '../hooks/useCanEdit';
-import { getDepth, findNode } from '../utils/treeUtils';
-import type { LayoutNode, LeafNode, SplitDirection, SplitterNode } from '../types';
+import { useLayoutStore } from '@/layout/store/layoutStore';
+import { useCanEdit } from '@/layout/hooks/useCanEdit';
+import { getDepth, findNode } from '@/layout/utils/treeUtils';
+import type { LayoutNode, LeafNode, SplitDirection, SplitterNode } from '@/layout/types';
+import styles from './LeafOverlay.module.less';
 
-/** Returns true if at least one direction is available. */
 function hasAvailableDirection(node: LeafNode, root: LayoutNode, maxDepth: number): boolean {
   if (maxDepth === 0) return true;
   const depth = getDepth(node, root);
@@ -17,7 +18,6 @@ function hasAvailableDirection(node: LeafNode, root: LayoutNode, maxDepth: numbe
   return parent !== null;
 }
 
-/** Returns true for directions allowed at current depth. */
 function isDirectionAllowed(dir: SplitDirection, node: LeafNode, root: LayoutNode, maxDepth: number): boolean {
   if (maxDepth === 0) return true;
   const depth = getDepth(node, root);
@@ -31,7 +31,7 @@ function isDirectionAllowed(dir: SplitDirection, node: LeafNode, root: LayoutNod
 type Props = {
   node: LeafNode;
   dragListeners?: Record<string, unknown>;
-  dragAttributes?: Record<string, unknown>;
+  dragAttributes?: DraggableAttributes;
 };
 
 export function LeafOverlay({ node, dragListeners, dragAttributes }: Props) {
@@ -55,38 +55,34 @@ export function LeafOverlay({ node, dragListeners, dragAttributes }: Props) {
 
   return (
     <>
-      {/* Blue edit overlay border */}
-      <div style={{ position: 'absolute', inset: 0, border: '2px solid #1890ff', borderRadius: 4, background: 'rgba(24,144,255,0.06)', pointerEvents: 'none' }} />
+      <div className={styles.border} />
 
-      {/* Drag handle (shown when DnD listeners are provided) */}
       {dragListeners && (
         <div
           {...dragListeners}
           {...dragAttributes}
-          style={{ position: 'absolute', top: 4, left: 4, zIndex: 10, cursor: 'grab', color: '#1890ff', padding: 2, fontSize: 14 }}
+          className={styles.dragHandle}
         >
           ⠿
         </div>
       )}
 
-      {/* Remove button */}
       {!isRoot && (
         <Button
           size="small"
           danger
           icon={<CloseOutlined />}
-          style={{ position: 'absolute', top: 4, right: 4, zIndex: 10 }}
+          className={styles.removeBtn}
           onClick={() => removePanel(node.id)}
         />
       )}
 
-      {/* Add button — hidden only when ALL directions are blocked */}
       {showAddButton && (
         <Button
           type="primary"
           shape="circle"
           icon={<PlusOutlined />}
-          style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 10 }}
+          className={styles.addBtn}
           onClick={() => setModalOpen(true)}
         />
       )}

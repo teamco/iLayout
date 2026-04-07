@@ -122,3 +122,12 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* Fix Chrome autofill white background in dark mode */
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover,
+[data-theme="dark"] input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #141414 inset;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.85);
+  transition: background-color 5000s ease-in-out 0s;
+}

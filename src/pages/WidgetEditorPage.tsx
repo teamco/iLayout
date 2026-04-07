@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import type { ComponentType } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { App as AntApp, Button, Form, Input, Select, Spin, Switch, Tabs, Typography, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +9,8 @@ import { ERoutes } from '@/routes';
 import { useWidget, useCreateWidget, useUpdateWidget } from '@/lib/hooks/useWidgetQueries';
 import { useErrorNotification } from '@/lib/hooks/useErrorNotification';
 import { EWidgetCategory, EWidgetResource } from '@/lib/types';
+import type { WidgetEditorProps } from '@/widgets/types';
+import { getWidgetDef } from '@/widgets/registry';
 
 const { TextArea } = Input;
 const { Text } = Typography;
@@ -27,6 +30,40 @@ type FormValues = {
   isClonable: boolean;
   isPublic: boolean;
 };
+
+function ContentEditorWrapper({ form, Editor }: { form: any; Editor: ComponentType<WidgetEditorProps> }) {
+  const value = Form.useWatch('contentValue', form) ?? '';
+  return (
+    <Editor
+      content={{ value }}
+      onChange={(c) => form.setFieldValue('contentValue', c.value)}
+    />
+  );
+}
+
+function ContentTab({ form }: { form: any }) {
+  const { t } = useTranslation();
+  const resource = Form.useWatch('resource', form);
+  const def = resource ? getWidgetDef(resource as EWidgetResource) : undefined;
+  const Editor = def?.editor;
+
+  return (
+    <>
+      {Editor ? (
+        <Form.Item label={t('widget.contentValue')}>
+          <ContentEditorWrapper form={form} Editor={Editor} />
+        </Form.Item>
+      ) : (
+        <Form.Item label={t('widget.contentValue')} name="contentValue" extra={t('widget.contentHelp')}>
+          <TextArea rows={6} />
+        </Form.Item>
+      )}
+      <Form.Item label={t('widget.thumbnail')} name="thumbnail">
+        <Input />
+      </Form.Item>
+    </>
+  );
+}
 
 export function WidgetEditorPage() {
   const { widgetId } = useParams({ strict: false }) as { widgetId?: string };
@@ -158,16 +195,7 @@ export function WidgetEditorPage() {
             {
               key: 'content',
               label: t('widget.tabContent'),
-              children: (
-                <>
-                  <Form.Item label={t('widget.contentValue')} name="contentValue" extra={t('widget.contentHelp')}>
-                    <TextArea rows={6} />
-                  </Form.Item>
-                  <Form.Item label={t('widget.thumbnail')} name="thumbnail">
-                    <Input />
-                  </Form.Item>
-                </>
-              ),
+              children: <ContentTab form={form} />,
             },
             {
               key: 'config',
