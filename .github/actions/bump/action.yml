@@ -81,16 +81,16 @@ runs:
 
         echo "bump_type=$BUMP_TYPE" >> $GITHUB_OUTPUT
 
-        # 3. Bump the detected version immediately
-        pnpm version "$BUMP_TYPE" --immediate
+        # 3. Bump the detected version without creating git commit/tag automatically
+        pnpm version "$BUMP_TYPE" --no-git-tag-version
 
         # 4. Read the new version
         NEW_V=$(node -p "require('./package.json').version")
         TAG="v$NEW_V"
         echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-        # 5. Stage changes
-        git add package.json
+        # 5. Stage versioned files
+        git add package.json pnpm-lock.yaml 2>/dev/null || git add package.json
 
         # 6. Create commit message using the processed list
         printf "ci: %s version bump to %s [skip ci]\n\nChanges:\n\n%s\n" "$BUMP_TYPE" "$TAG" "$PROCESSED_COMMITS" > .commit_msg
