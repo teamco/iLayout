@@ -32,13 +32,15 @@ describe('i18n', () => {
   });
 
   it('falls back to English when localStorage access throws', async () => {
+    vi.resetModules();
+
     const getItemSpy = vi
       .spyOn(localStorage, 'getItem')
       .mockImplementation(() => {
         throw new Error('storage unavailable');
       });
 
-    const { i18n } = await importI18nModule();
+    const { i18n } = await import('../i18n');
 
     expect(getItemSpy).toHaveBeenCalledWith('language');
     expect(i18n.language).toBe('en');
