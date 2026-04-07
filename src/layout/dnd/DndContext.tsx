@@ -2,19 +2,32 @@
 import React, { useState } from 'react';
 import {
   DndContext,
+  DragOverlay,
   closestCenter,
   type DragStartEvent,
   type DragEndEvent,
 } from '@dnd-kit/core';
-import { useLayoutStore } from '../store/layoutStore';
+import { useLayoutStore } from '@/layout/store/layoutStore';
 import { DragActiveContext } from './DragActiveContext';
-import { findNode } from '../utils/treeUtils';
-import type { WidgetRef, LeafNode } from '../types';
+import { findNode } from '@/layout/utils/treeUtils';
+import { getWidgetDef } from '@/widgets/registry';
+import type { EWidgetResource } from '@/lib/types';
+import type { WidgetRef, LeafNode } from '@/layout/types';
+import styles from './DndContext.module.less';
+
+type ActiveDragData = { type: 'panel' | 'gallery'; widgetRef?: WidgetRef };
+
+function DragPreview({ data }: { data: ActiveDragData }) {
+  const resource = data.widgetRef?.resource as EWidgetResource | undefined;
+  const label = resource ? (getWidgetDef(resource)?.label ?? resource) : 'Empty';
+  return <div className={styles.dragPreview}>{label}</div>;
+}
 
 type Props = { children: React.ReactNode };
 
 export function LayoutDndContext({ children }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeDragData, setActiveDragData] = useState<ActiveDragData | null>(null);
   const editMode = useLayoutStore(s => s.editMode);
   const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
   const swapWidgets = useLayoutStore(s => s.swapWidgets);
@@ -26,10 +39,12 @@ export function LayoutDndContext({ children }: Props) {
 
   function onDragStart({ active }: DragStartEvent) {
     setActiveId(String(active.id));
+    setActiveDragData(active.data.current as ActiveDragData);
   }
 
   function onDragEnd({ active, over }: DragEndEvent) {
     setActiveId(null);
+    setActiveDragData(null);
     if (!over || active.id === over.id) return;
 
     const sourceId = String(active.id);
@@ -61,6 +76,9 @@ export function LayoutDndContext({ children }: Props) {
         onDragEnd={dndEnabled ? onDragEnd : undefined}
       >
         {children}
+        <DragOverlay dropAnimation={null}>
+          {activeDragData && <DragPreview data={activeDragData} />}
+        </DragOverlay>
       </DndContext>
     </DragActiveContext.Provider>
   );
