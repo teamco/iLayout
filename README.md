@@ -1,3 +1,5 @@
+[![Pipeline](https://github.com/teamco/iLayout/actions/workflows/pipeline.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/pipeline.yml)
+
 # iLayout
 
 Widget-based layout builder with drag-and-drop, authentication, role-based permissions, and multi-language support.
