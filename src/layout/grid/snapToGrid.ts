@@ -100,3 +100,35 @@ export function snapToGrid(
 
   return result;
 }
+
+/**
+ * Returns absolute pixel positions of horizontal row edges.
+ * Same logic as getGridEdges but for rows.
+ */
+export function getHorizontalGridEdges(canvasHeight: number, rows: number, rowGutter: number): number[] {
+  const rowHeight = (canvasHeight - (rows - 1) * rowGutter) / rows;
+  const edges: number[] = [0];
+  for (let i = 1; i < rows; i++) {
+    edges.push(i * (rowHeight + rowGutter) - rowGutter);
+    edges.push(i * (rowHeight + rowGutter));
+  }
+  edges.push(canvasHeight);
+  return edges;
+}
+
+/**
+ * Snaps a single pixel value to the nearest grid edge.
+ * Used for section height snapping.
+ */
+export function snapToNearestEdge(value: number, edges: number[]): number {
+  let best = edges[0];
+  let bestDist = Math.abs(value - best);
+  for (let i = 1; i < edges.length; i++) {
+    const dist = Math.abs(value - edges[i]);
+    if (dist < bestDist) {
+      best = edges[i];
+      bestDist = dist;
+    }
+  }
+  return best;
+}

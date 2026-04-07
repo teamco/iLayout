@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { snapToGrid, getGridEdges } from '../snapToGrid';
+import { snapToGrid, getGridEdges, getHorizontalGridEdges, snapToNearestEdge } from '../snapToGrid';
 
 const COLUMNS = 24;
 const GUTTER = 16;
@@ -73,5 +73,26 @@ describe('snapToGrid', () => {
     const result = snapToGrid(sizes, 0, 1000, COLUMNS, GUTTER);
     expect(result.every(s => s >= 0)).toBe(true);
     expect(result.reduce((a, b) => a + b, 0)).toBeCloseTo(1000);
+  });
+});
+
+describe('getHorizontalGridEdges', () => {
+  it('returns correct edges for a 800px canvas with 24 rows', () => {
+    const edges = getHorizontalGridEdges(800, 24, 16);
+    expect(edges[0]).toBeCloseTo(0);
+    expect(edges[edges.length - 1]).toBeCloseTo(800);
+    // 24 rows → 23 gutters → 23*2 inner edges + 0 + canvasSize = 48
+    expect(edges.length).toBe(2 * (24 - 1) + 2);
+  });
+});
+
+describe('snapToNearestEdge', () => {
+  it('snaps to the nearest edge', () => {
+    const edges = [0, 50, 100, 150, 200];
+    expect(snapToNearestEdge(47, edges)).toBe(50);
+    expect(snapToNearestEdge(73, edges)).toBe(50);
+    expect(snapToNearestEdge(76, edges)).toBe(100);
+    expect(snapToNearestEdge(0, edges)).toBe(0);
+    expect(snapToNearestEdge(200, edges)).toBe(200);
   });
 });
