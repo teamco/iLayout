@@ -36,6 +36,7 @@ export type LayoutRecord = IEntityMeta & {
   status: LayoutStatus;
   data: LayoutNode;
   is_private: boolean;
+  mode: import('@/layout/types').LayoutMode;
 };
 
 // ─── Widget enums ─────────────────────────────────────────────────────────────
