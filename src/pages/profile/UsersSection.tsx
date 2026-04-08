@@ -154,7 +154,7 @@ export function UsersSection() {
         loading={isFetching}
         pagination={false}
         size="small"
-        scroll={{ x: 800 }}
+        scroll={{ x: 1000 }}
         footer={() => (
           <TableFooter
             computedFilteredCount={users.length}

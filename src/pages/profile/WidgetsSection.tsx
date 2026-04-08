@@ -96,7 +96,7 @@ export function WidgetsSection() {
         loading={isFetching}
         pagination={tableParams.pagination}
         size="small"
-        scroll={{ x: 800 }}
+        scroll={{ x: 1000 }}
         onChange={
           handleTableChange as Parameters<
             typeof Table<WidgetRecord>
