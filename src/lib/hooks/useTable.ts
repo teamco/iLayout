@@ -240,7 +240,6 @@ export const useTable = <T>(
     }).length;
   }, [entities, filteredInfo]);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleTableChange: TOnChange = (
     _pagination,
     filters,
