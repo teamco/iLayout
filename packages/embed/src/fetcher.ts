@@ -1,5 +1,8 @@
 import type { LayoutNode } from './types';
 
+const DEFAULT_API_BASE = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const DEFAULT_API_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY as string | undefined;
+
 export type FetchOptions = {
   layout?: LayoutNode;
   layoutUrl?: string;
@@ -63,9 +66,11 @@ async function doFetch(opts: FetchOptions): Promise<LayoutNode> {
   if (opts.layoutUrl) return fetchFromUrl(opts.layoutUrl);
 
   if (opts.layoutId) {
-    if (!opts.apiBase) throw new Error('apiBase is required when using layoutId');
-    if (!opts.apiKey) throw new Error('apiKey is required when using layoutId');
-    return fetchFromApi(opts.layoutId, opts.apiBase, opts.apiKey);
+    const apiBase = opts.apiBase ?? DEFAULT_API_BASE;
+    const apiKey = opts.apiKey ?? DEFAULT_API_KEY;
+    if (!apiBase) throw new Error('apiBase is required when using layoutId (set VITE_SUPABASE_URL at build time or pass apiBase prop)');
+    if (!apiKey) throw new Error('apiKey is required when using layoutId (set VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY at build time or pass apiKey prop)');
+    return fetchFromApi(opts.layoutId, apiBase, apiKey);
   }
 
   throw new Error('No layout source provided');
