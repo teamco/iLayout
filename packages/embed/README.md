@@ -1,3 +1,5 @@
+[![Publish to NPM](https://github.com/teamco/iLayout/actions/workflows/publish.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/publish.yml)
+
 # @teamco/anthill-layout-embed
 
 Embed [Anthill Layout](https://github.com/teamco/iLayout) on any website. Works as a React component or a plain `<script>` tag.

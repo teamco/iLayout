@@ -1,4 +1,5 @@
 [![Pipeline](https://github.com/teamco/iLayout/actions/workflows/pipeline.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/pipeline.yml)
+[![Publish to NPM](https://github.com/teamco/iLayout/actions/workflows/publish.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/publish.yml)
 
 # iLayout
 
