@@ -18,8 +18,8 @@ npm i @teamco/anthill-layout-embed
 import { WidgetLayout } from '@teamco/anthill-layout-embed';
 import '@teamco/anthill-layout-embed/style.css';
 
-// Load by layout ID (fetches from API)
-<WidgetLayout layoutId="abc-123" apiBase="https://your-api.com" apiKey="your-anon-key" />
+// Load by layout ID
+<WidgetLayout layoutId="abc-123" />
 
 // Load from URL
 <WidgetLayout layoutUrl="https://cdn.example.com/my-layout.json" />
@@ -33,10 +33,7 @@ import '@teamco/anthill-layout-embed/style.css';
 ```html
 <script src="https://unpkg.com/@teamco/anthill-layout-embed/dist/embed.js"></script>
 
-<div data-widget-layout="abc-123"
-     data-api-base="https://your-api.com"
-     data-api-key="your-anon-key">
-</div>
+<div data-widget-layout="abc-123"></div>
 ```
 
 Or load from a URL:
@@ -65,8 +62,8 @@ AntHillLayout.mount(document.getElementById('my-container'), {
 | `layoutUrl` | `data-widget-layout-url` | URL to a layout JSON file |
 | `fullPage` | `data-full-page` | Stretch to full viewport |
 | `theme` | `data-theme` | Theme object (JSON string in HTML) |
-| `apiBase` | `data-api-base` | API base URL |
-| `apiKey` | `data-api-key` | API anon key |
+| `apiBase` | `data-api-base` | API base URL (optional, defaults to built-in) |
+| `apiKey` | `data-api-key` | API anon key (optional, defaults to built-in) |
 | `onLoad` | -- | Callback after layout loads (React only) |
 | `onError` | -- | Callback on error (React only) |
 
