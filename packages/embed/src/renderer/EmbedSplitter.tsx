@@ -1,5 +1,5 @@
 import type { SplitterNode } from '../types';
-import { renderNode } from './EmbedLayoutRenderer';
+import { renderNode } from './renderNode';
 
 type Props = { node: SplitterNode };
 

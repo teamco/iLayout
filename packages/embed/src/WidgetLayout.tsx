@@ -50,14 +50,15 @@ export function WidgetLayout({
       });
   }, [layout, layoutUrl, layoutId, apiBase, apiKey, onLoad, onError]);
 
+  /* eslint-disable react-hooks/set-state-in-effect -- fetch on mount sets state intentionally */
   useEffect(() => {
     if (layout) {
-      setState({ status: 'ready', data: layout });
       onLoad?.();
       return;
     }
     load();
   }, [layout, layoutUrl, layoutId, apiBase, apiKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const themeVars = themeToStyleVars(theme);
   const className = ['al-root', fullPage && 'al-root--full-page'].filter(Boolean).join(' ');

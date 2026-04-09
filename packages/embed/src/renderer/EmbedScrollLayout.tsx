@@ -1,5 +1,5 @@
 import type { ScrollRoot, SectionNode } from '../types';
-import { renderNode } from './EmbedLayoutRenderer';
+import { renderNode } from './renderNode';
 
 function getSectionStyle(section: SectionNode): React.CSSProperties {
   const style: React.CSSProperties = { width: '100%', position: 'relative' };
