@@ -44,7 +44,7 @@ async function fetchFromApi(
   apiBase: string,
   apiKey: string,
 ): Promise<LayoutNode> {
-  const url = `${apiBase}/rest/v1/layouts?id=eq.${layoutId}&status=eq.published&order=version.desc&limit=1`;
+  const url = `${apiBase}/rest/v1/layouts?id=eq.${encodeURIComponent(layoutId)}&status=eq.published&order=version.desc&limit=1`;
   const res = await fetch(url, {
     headers: {
       apikey: apiKey,

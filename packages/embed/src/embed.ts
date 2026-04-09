@@ -2,7 +2,8 @@
 import { mount, scanAndMount } from './mount';
 
 // Expose global API
-(window as Record<string, unknown>).AntHillLayout = { mount };
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(window as any).AntHillLayout = { mount };
 
 // Auto-mount on DOM ready
 if (document.readyState === 'loading') {

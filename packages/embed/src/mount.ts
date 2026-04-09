@@ -1,7 +1,6 @@
 // packages/embed/src/mount.ts
 import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
-import { flushSync } from 'react-dom';
 import { WidgetLayout } from './WidgetLayout';
 import type { WidgetLayoutProps } from './WidgetLayout';
 import type { WidgetLayoutTheme } from './types';
@@ -30,9 +29,7 @@ function propsFromElement(el: Element): WidgetLayoutProps {
 
 export function mount(el: Element, props: WidgetLayoutProps): void {
   const root = createRoot(el);
-  flushSync(() => {
-    root.render(createElement(WidgetLayout, props));
-  });
+  root.render(createElement(WidgetLayout, props));
 }
 
 export function scanAndMount(): void {
