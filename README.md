@@ -44,6 +44,19 @@ pnpm test         # Run tests (vitest)
 pnpm preview      # Preview production build
 ```
 
+## Embed Package
+
+Embed published layouts on any website with a React component or `<script>` tag.
+
+[![npm](https://img.shields.io/npm/v/@teamco/anthill-layout-embed)](https://www.npmjs.com/package/@teamco/anthill-layout-embed)
+
+```html
+<script src="https://unpkg.com/@teamco/anthill-layout-embed/dist/embed.js"></script>
+<div data-widget-layout="your-layout-id"></div>
+```
+
+See full docs: [packages/embed/README.md](./packages/embed/README.md)
+
 ## Architecture
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed system architecture.
@@ -84,6 +97,7 @@ src/
 - [Widget Directory + Renderer](./docs/superpowers/specs/2026-04-07-widget-directory-renderer-design.md)
 - [Layout Modes](./docs/superpowers/specs/2026-04-07-layout-modes-design.md)
 - [Scroll Layout UI](./docs/superpowers/specs/2026-04-07-scroll-layout-ui-design.md)
+- [Embed Package](./docs/superpowers/specs/2026-04-09-embed-package-design.md)
 
 ### Implementation Plans
 
@@ -101,6 +115,7 @@ src/
 - [Layout Modes — Types + Store](./docs/superpowers/plans/2026-04-07-layout-modes-types-store.md)
 - [Horizontal Grid](./docs/superpowers/plans/2026-04-07-horizontal-grid.md)
 - [Scroll Layout UI](./docs/superpowers/plans/2026-04-07-scroll-layout-ui.md)
+- [Embed Package](./docs/superpowers/plans/2026-04-09-embed-package.md)
 
 ### Session Notes
 
