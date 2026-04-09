@@ -1,0 +1,156 @@
+/* packages/embed/src/styles.css */
+
+/* ─── Theme defaults ─────────────────────────────────────────────────────── */
+
+.al-root {
+  --al-color-primary: #1677ff;
+  --al-color-bg: #ffffff;
+  --al-color-text: #1f1f1f;
+  --al-color-border: #e8e8e8;
+  --al-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --al-font-size: 14px;
+  --al-border-radius: 6px;
+  --al-spacing: 0px;
+
+  font-family: var(--al-font-family);
+  font-size: var(--al-font-size);
+  color: var(--al-color-text);
+  background: var(--al-color-bg);
+  width: 100%;
+  height: 100%;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.al-root *,
+.al-root *::before,
+.al-root *::after {
+  box-sizing: border-box;
+}
+
+/* ─── Full-page mode ─────────────────────────────────────────────────────── */
+
+.al-root--full-page {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+}
+
+/* ─── Splitter ───────────────────────────────────────────────────────────── */
+
+.al-splitter {
+  width: 100%;
+  height: 100%;
+  gap: var(--al-spacing);
+}
+
+/* ─── Panel ──────────────────────────────────────────────────────────────── */
+
+.al-panel {
+  position: relative;
+}
+
+/* ─── Leaf ───────────────────────────────────────────────────────────────── */
+
+.al-leaf {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--al-border-radius);
+}
+
+/* ─── Scroll layout ──────────────────────────────────────────────────────── */
+
+.al-scroll {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.al-section {
+  position: relative;
+}
+
+/* ─── Widget helpers ─────────────────────────────────────────────────────── */
+
+.al-widget {
+  width: 100%;
+  height: 100%;
+}
+
+.al-widget-empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 12px;
+}
+
+.al-widget-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.al-widget-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ─── Loading / Error states ─────────────────────────────────────────────── */
+
+.al-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.al-skeleton {
+  width: 60%;
+  height: 24px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: al-shimmer 1.5s infinite;
+  border-radius: var(--al-border-radius);
+}
+
+@keyframes al-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.al-error {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #999;
+  font-size: 14px;
+}
+
+.al-error-retry {
+  padding: 6px 16px;
+  border: 1px solid var(--al-color-border);
+  border-radius: var(--al-border-radius);
+  background: var(--al-color-bg);
+  color: var(--al-color-text);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.al-error-retry:hover {
+  border-color: var(--al-color-primary);
+  color: var(--al-color-primary);
+}
