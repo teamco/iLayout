@@ -1,6 +1,6 @@
 {
   "name": "@teamco/anthill-layout-embed",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "description": "Embed Anthill Layout on any website — React component or script tag",
   "license": "MIT",
