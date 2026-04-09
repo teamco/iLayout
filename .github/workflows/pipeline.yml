@@ -16,36 +16,62 @@ permissions:
 
 jobs:
   # ---------------------------------------------------------
-  # 1. CHECK (LINT + TEST)
+  # 1. CHECK (LINT + TEST) — Matrix
   # ---------------------------------------------------------
-  check-client:
-    name: 'Check Client'
+  check:
+    name: 'Check ${{ matrix.package }}'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [client, embed]
+        include:
+          - package: client
+            working-directory: .
+          - package: embed
+            working-directory: packages/embed
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
-      - name: Lint Apps > Client
+      - name: Lint
+        if: matrix.package == 'client'
         run: pnpm run lint
-      - name: Unit Tests Apps > Client
+      - name: Test ${{ matrix.package }}
+        working-directory: ${{ matrix.working-directory }}
         run: pnpm run test
 
-  build-client:
-    name: 'Build Client'
-    needs: [check-client]
+  # ---------------------------------------------------------
+  # 2. BUILD — Matrix
+  # ---------------------------------------------------------
+  build:
+    name: 'Build ${{ matrix.package }}'
+    needs: [check]
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [client, embed]
+        include:
+          - package: client
+            working-directory: .
+            build: pnpm run build
+          - package: embed
+            working-directory: packages/embed
+            build: pnpm run build
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
-      - name: Build Apps > Client
-        run: pnpm run build
+      - name: Build ${{ matrix.package }}
+        working-directory: ${{ matrix.working-directory }}
+        run: ${{ matrix.build }}
 
   # ---------------------------------------------------------
-  # 2. RELEASE (Bump & Publish)
+  # 3. RELEASE (Bump & Publish)
   # ---------------------------------------------------------
   release:
     name: 'Release'
     needs:
-      - build-client
+      - build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:

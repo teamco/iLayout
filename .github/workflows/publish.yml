@@ -1,0 +1,53 @@
+name: Publish to NPM
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    name: 'Build & Publish @teamco/anthill-layout-embed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - name: Enable pnpm
+        run: corepack enable pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build embed package
+        working-directory: packages/embed
+        run: pnpm build
+
+      - name: Check if version exists
+        working-directory: packages/embed
+        run: |
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view $PACKAGE_NAME@$VERSION version 2>/dev/null; then
+            echo "Version $VERSION already published. Skipping."
+            echo "SKIP_PUBLISH=true" >> $GITHUB_ENV
+          else
+            echo "SKIP_PUBLISH=false" >> $GITHUB_ENV
+          fi
+
+      - name: Publish
+        if: env.SKIP_PUBLISH == 'false'
+        working-directory: packages/embed
+        run: npm publish --provenance --access public
