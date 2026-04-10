@@ -48,7 +48,9 @@ export function useCreateLayout() {
     mutationFn: (data: LayoutNode) => api.createLayout(data),
     onSuccess: (created) => {
       queryClient.setQueryData(KEYS.layout(created.id), created);
-      queryClient.invalidateQueries({ queryKey: KEYS.layouts(created.user_id) });
+      void queryClient.invalidateQueries({
+        queryKey: KEYS.layouts(created.user_id),
+      });
     },
   });
 }
@@ -56,11 +58,16 @@ export function useCreateLayout() {
 export function useSaveLayout() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: LayoutNode }) => api.saveLayout(id, data),
+    mutationFn: ({ id, data }: { id: string; data: LayoutNode }) =>
+      api.saveLayout(id, data),
     onSuccess: (saved, variables) => {
       queryClient.setQueryData(KEYS.layout(variables.id), saved);
-      queryClient.invalidateQueries({ queryKey: KEYS.layouts(saved.user_id) });
-      queryClient.invalidateQueries({ queryKey: KEYS.history(variables.id) });
+      void queryClient.invalidateQueries({
+        queryKey: KEYS.layouts(saved.user_id),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: KEYS.history(variables.id),
+      });
     },
   });
 }
@@ -68,10 +75,17 @@ export function useSaveLayout() {
 export function useSetStatus() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, version, status }: { id: string; version: number; status: LayoutStatus }) =>
-      api.setStatus(id, version, status),
+    mutationFn: ({
+      id,
+      version,
+      status,
+    }: {
+      id: string;
+      version: number;
+      status: LayoutStatus;
+    }) => api.setStatus(id, version, status),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['layouts'] });
+      void queryClient.invalidateQueries({ queryKey: ['layouts'] });
     },
   });
 }
