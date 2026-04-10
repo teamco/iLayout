@@ -64,6 +64,17 @@ function makeInitialRoot(): LayoutNode {
 function makeActions(
   set: (fn: (state: LayoutStore) => void) => void,
 ): LayoutActions {
+  function getScrollRoot(state: LayoutStore): ScrollRoot | null {
+    if (state.root.type === 'scroll') return state.root as unknown as ScrollRoot;
+    if (state.root.type === 'grid') {
+      const grid = state.root as unknown as GridRoot;
+      for (const col of grid.columns) {
+        if (col.child.type === 'scroll') return col.child as unknown as ScrollRoot;
+      }
+    }
+    return null;
+  }
+
   return {
     addPanel(targetId, direction) {
       set((state) => {
@@ -143,7 +154,7 @@ function makeActions(
 
     setLayoutMode(mode) {
       set((state) => {
-        if (mode === 'scroll' && state.root.type !== 'scroll') {
+        if (mode === 'scroll' && state.root.type !== 'scroll' && state.root.type !== 'grid') {
           const section: SectionNode = {
             id: nanoid(),
             type: 'section',
@@ -155,12 +166,16 @@ function makeActions(
             type: 'scroll',
             sections: [section],
           } as unknown as LayoutNode;
-        } else if (mode === 'viewport' && state.root.type === 'scroll') {
-          const scrollRoot = state.root as unknown as ScrollRoot;
-          state.root = scrollRoot.sections[0]?.child ?? {
-            id: nanoid(),
-            type: 'leaf',
-          };
+        } else if (mode === 'viewport') {
+          if (state.root.type === 'grid') {
+            const grid = state.root as unknown as GridRoot;
+            const scrollCol = grid.columns.find((c) => c.child.type === 'scroll');
+            const scrollRoot = scrollCol?.child as unknown as ScrollRoot | undefined;
+            state.root = scrollRoot?.sections[0]?.child ?? { id: nanoid(), type: 'leaf' };
+          } else if (state.root.type === 'scroll') {
+            const scrollRoot = state.root as unknown as ScrollRoot;
+            state.root = scrollRoot.sections[0]?.child ?? { id: nanoid(), type: 'leaf' };
+          }
         }
         state.layoutMode = mode;
       });
@@ -168,8 +183,8 @@ function makeActions(
 
     addSection(position, targetSectionId) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         const idx = scrollRoot.sections.findIndex(
           (s) => s.id === targetSectionId,
         );
@@ -187,8 +202,8 @@ function makeActions(
 
     removeSection(sectionId) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         if (scrollRoot.sections.length <= 1) return;
         scrollRoot.sections = scrollRoot.sections.filter(
           (s) => s.id !== sectionId,
@@ -198,8 +213,8 @@ function makeActions(
 
     resizeSection(sectionId, height) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         const section = scrollRoot.sections.find((s) => s.id === sectionId);
         if (section) section.height = height;
       });
@@ -207,8 +222,8 @@ function makeActions(
 
     updateSectionConfig(sectionId, config) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         const section = scrollRoot.sections.find((s) => s.id === sectionId);
         if (!section) return;
         if (config.overlap !== undefined) section.overlap = config.overlap;
@@ -218,8 +233,8 @@ function makeActions(
 
     reorderSections(fromIndex, toIndex) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         const [moved] = scrollRoot.sections.splice(fromIndex, 1);
         scrollRoot.sections.splice(toIndex, 0, moved);
       });
