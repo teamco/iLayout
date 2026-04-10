@@ -1,7 +1,7 @@
 // src/layout/components/GridLayout.tsx
 import { useState } from 'react';
 import { Button, Tooltip } from 'antd';
-import { CloseOutlined } from '@ant-design/icons';
+import { SettingOutlined } from '@ant-design/icons';
 import type { GridRoot, GridColumn, SectionNode } from '@/layout/types';
 import type { ScrollRoot } from '@/layout/types';
 import { useLayoutStore } from '@/layout/store/layoutStore';
@@ -10,6 +10,7 @@ import { ScrollLayout } from './ScrollLayout';
 import { SectionNodeComponent } from './SectionNodeComponent';
 import { SectionHandle } from './SectionHandle';
 import { SectionConfig } from './SectionConfig';
+import { GridColumnConfig } from './GridColumnConfig';
 import { GridColumnHandle } from './GridColumnHandle';
 import styles from './GridLayout.module.less';
 
@@ -36,14 +37,18 @@ function ColumnContent({ col }: { col: GridColumn }) {
   return <>{renderNode(col.child)}</>;
 }
 
-function SidebarCloseButton({ columnId }: { columnId: string }) {
-  const removeGridColumn = useLayoutStore((s) => s.removeGridColumn);
+function SidebarConfigButton({
+  columnId,
+  onConfig,
+}: {
+  columnId: string;
+  onConfig: (id: string) => void;
+}) {
   return (
-    <Tooltip title="Remove column">
+    <Tooltip title="Column config">
       <Button
         size="small"
-        danger
-        icon={<CloseOutlined />}
+        icon={<SettingOutlined />}
         style={{
           position: 'absolute',
           top: 4,
@@ -51,7 +56,7 @@ function SidebarCloseButton({ columnId }: { columnId: string }) {
           zIndex: 10,
           opacity: 0.6,
         }}
-        onClick={() => removeGridColumn(columnId)}
+        onClick={() => onConfig(columnId)}
       />
     </Tooltip>
   );
@@ -62,6 +67,7 @@ type Props = { root: GridRoot };
 export function GridLayout({ root }: Props) {
   const editMode = useLayoutStore((s) => s.editMode);
   const [configSectionId, setConfigSectionId] = useState<string | null>(null);
+  const [configColumnId, setConfigColumnId] = useState<string | null>(null);
 
   // Split columns: find the scroll (center) column index
   const scrollIdx = root.columns.findIndex((c) => c.child.type === 'scroll');
@@ -84,7 +90,12 @@ export function GridLayout({ root }: Props) {
           className={styles.sidebar}
           style={{ width: col.size }}
         >
-          {editMode && <SidebarCloseButton columnId={col.id} />}
+          {editMode && (
+            <SidebarConfigButton
+              columnId={col.id}
+              onConfig={setConfigColumnId}
+            />
+          )}
           <ColumnContent col={col} />
           {editMode && (
             <GridColumnHandle
@@ -125,7 +136,12 @@ export function GridLayout({ root }: Props) {
           className={styles.sidebar}
           style={{ width: col.size }}
         >
-          {editMode && <SidebarCloseButton columnId={col.id} />}
+          {editMode && (
+            <SidebarConfigButton
+              columnId={col.id}
+              onConfig={setConfigColumnId}
+            />
+          )}
           {editMode && i === 0 && centerColumns[0] && (
             <GridColumnHandle
               leftColumnId={centerColumns[0].id}
@@ -146,6 +162,11 @@ export function GridLayout({ root }: Props) {
         open={configSectionId !== null}
         sectionId={configSectionId}
         onClose={() => setConfigSectionId(null)}
+      />
+      <GridColumnConfig
+        open={configColumnId !== null}
+        columnId={configColumnId}
+        onClose={() => setConfigColumnId(null)}
       />
     </div>
   );
