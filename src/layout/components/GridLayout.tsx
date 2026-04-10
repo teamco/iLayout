@@ -1,5 +1,7 @@
 // src/layout/components/GridLayout.tsx
 import { useState } from 'react';
+import { Button, Tooltip } from 'antd';
+import { CloseOutlined } from '@ant-design/icons';
 import type { GridRoot, GridColumn, SectionNode } from '@/layout/types';
 import type { ScrollRoot } from '@/layout/types';
 import { useLayoutStore } from '@/layout/store/layoutStore';
@@ -34,6 +36,27 @@ function ColumnContent({ col }: { col: GridColumn }) {
   return <>{renderNode(col.child)}</>;
 }
 
+function SidebarCloseButton({ columnId }: { columnId: string }) {
+  const removeGridColumn = useLayoutStore((s) => s.removeGridColumn);
+  return (
+    <Tooltip title="Remove column">
+      <Button
+        size="small"
+        danger
+        icon={<CloseOutlined />}
+        style={{
+          position: 'absolute',
+          top: 4,
+          right: 4,
+          zIndex: 10,
+          opacity: 0.6,
+        }}
+        onClick={() => removeGridColumn(columnId)}
+      />
+    </Tooltip>
+  );
+}
+
 type Props = { root: GridRoot };
 
 export function GridLayout({ root }: Props) {
@@ -61,6 +84,7 @@ export function GridLayout({ root }: Props) {
           className={styles.sidebar}
           style={{ width: col.size }}
         >
+          {editMode && <SidebarCloseButton columnId={col.id} />}
           <ColumnContent col={col} />
           {editMode && (
             <GridColumnHandle
@@ -101,6 +125,7 @@ export function GridLayout({ root }: Props) {
           className={styles.sidebar}
           style={{ width: col.size }}
         >
+          {editMode && <SidebarCloseButton columnId={col.id} />}
           {editMode && i === 0 && centerColumns[0] && (
             <GridColumnHandle
               leftColumnId={centerColumns[0].id}
