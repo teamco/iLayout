@@ -16,6 +16,8 @@ import type {
   SectionNode,
   SectionHeight,
   ScrollRoot,
+  GridRoot,
+  GridColumn,
 } from '../types';
 
 export type LayoutState = {
@@ -48,6 +50,10 @@ export type LayoutActions = {
     config: Partial<Pick<SectionNode, 'overlap' | 'zIndex'>>,
   ) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
+  addGridColumn: (position: 'left' | 'right', size?: string) => void;
+  removeGridColumn: (columnId: string) => void;
+  addGridSection: (position: 'top' | 'bottom') => void;
+  resizeGridColumn: (columnId: string, size: string) => void;
 };
 
 export type LayoutStore = LayoutState & LayoutActions;
@@ -59,6 +65,34 @@ function makeInitialRoot(): LayoutNode {
 function makeActions(
   set: (fn: (state: LayoutStore) => void) => void,
 ): LayoutActions {
+  function getScrollRoot(state: LayoutStore): ScrollRoot | null {
+    if (state.root.type === 'scroll')
+      return state.root as unknown as ScrollRoot;
+    if (state.root.type === 'grid') {
+      const grid = state.root as unknown as GridRoot;
+      for (const col of grid.columns) {
+        if (col.child.type === 'scroll')
+          return col.child as unknown as ScrollRoot;
+      }
+    }
+    return null;
+  }
+
+  function findGridSection(
+    state: LayoutStore,
+    sectionId: string,
+  ): SectionNode | null {
+    if (state.root.type !== 'grid') return null;
+    const grid = state.root as unknown as GridRoot;
+    for (const s of [
+      ...(grid.headerSections ?? []),
+      ...(grid.footerSections ?? []),
+    ]) {
+      if (s.id === sectionId) return s;
+    }
+    return null;
+  }
+
   return {
     addPanel(targetId, direction) {
       set((state) => {
@@ -138,7 +172,11 @@ function makeActions(
 
     setLayoutMode(mode) {
       set((state) => {
-        if (mode === 'scroll' && state.root.type !== 'scroll') {
+        if (
+          mode === 'scroll' &&
+          state.root.type !== 'scroll' &&
+          state.root.type !== 'grid'
+        ) {
           const section: SectionNode = {
             id: nanoid(),
             type: 'section',
@@ -150,12 +188,26 @@ function makeActions(
             type: 'scroll',
             sections: [section],
           } as unknown as LayoutNode;
-        } else if (mode === 'viewport' && state.root.type === 'scroll') {
-          const scrollRoot = state.root as unknown as ScrollRoot;
-          state.root = scrollRoot.sections[0]?.child ?? {
-            id: nanoid(),
-            type: 'leaf',
-          };
+        } else if (mode === 'viewport') {
+          if (state.root.type === 'grid') {
+            const grid = state.root as unknown as GridRoot;
+            const scrollCol = grid.columns.find(
+              (c) => c.child.type === 'scroll',
+            );
+            const scrollRoot = scrollCol?.child as unknown as
+              | ScrollRoot
+              | undefined;
+            state.root = scrollRoot?.sections[0]?.child ?? {
+              id: nanoid(),
+              type: 'leaf',
+            };
+          } else if (state.root.type === 'scroll') {
+            const scrollRoot = state.root as unknown as ScrollRoot;
+            state.root = scrollRoot.sections[0]?.child ?? {
+              id: nanoid(),
+              type: 'leaf',
+            };
+          }
         }
         state.layoutMode = mode;
       });
@@ -163,8 +215,8 @@ function makeActions(
 
     addSection(position, targetSectionId) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         const idx = scrollRoot.sections.findIndex(
           (s) => s.id === targetSectionId,
         );
@@ -182,8 +234,24 @@ function makeActions(
 
     removeSection(sectionId) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        // Check grid header/footer sections first
+        if (state.root.type === 'grid') {
+          const grid = state.root as unknown as GridRoot;
+          if (grid.headerSections?.some((s) => s.id === sectionId)) {
+            grid.headerSections = grid.headerSections.filter(
+              (s) => s.id !== sectionId,
+            );
+            return;
+          }
+          if (grid.footerSections?.some((s) => s.id === sectionId)) {
+            grid.footerSections = grid.footerSections.filter(
+              (s) => s.id !== sectionId,
+            );
+            return;
+          }
+        }
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         if (scrollRoot.sections.length <= 1) return;
         scrollRoot.sections = scrollRoot.sections.filter(
           (s) => s.id !== sectionId,
@@ -193,8 +261,13 @@ function makeActions(
 
     resizeSection(sectionId, height) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const gridSection = findGridSection(state, sectionId);
+        if (gridSection) {
+          gridSection.height = height;
+          return;
+        }
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         const section = scrollRoot.sections.find((s) => s.id === sectionId);
         if (section) section.height = height;
       });
@@ -202,9 +275,10 @@ function makeActions(
 
     updateSectionConfig(sectionId, config) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
-        const section = scrollRoot.sections.find((s) => s.id === sectionId);
+        const gridSection = findGridSection(state, sectionId);
+        const section =
+          gridSection ??
+          getScrollRoot(state)?.sections.find((s) => s.id === sectionId);
         if (!section) return;
         if (config.overlap !== undefined) section.overlap = config.overlap;
         if (config.zIndex !== undefined) section.zIndex = config.zIndex;
@@ -213,10 +287,83 @@ function makeActions(
 
     reorderSections(fromIndex, toIndex) {
       set((state) => {
-        if (state.root.type !== 'scroll') return;
-        const scrollRoot = state.root as unknown as ScrollRoot;
+        const scrollRoot = getScrollRoot(state);
+        if (!scrollRoot) return;
         const [moved] = scrollRoot.sections.splice(fromIndex, 1);
         scrollRoot.sections.splice(toIndex, 0, moved);
+      });
+    },
+
+    addGridColumn(position, size = '200px') {
+      set((state) => {
+        const newLeaf: LayoutNode = { id: nanoid(), type: 'leaf' };
+        const newColumn: GridColumn = { id: nanoid(), size, child: newLeaf };
+
+        if (state.root.type === 'grid') {
+          const grid = state.root as unknown as GridRoot;
+          if (position === 'left') {
+            grid.columns.unshift(newColumn);
+          } else {
+            grid.columns.push(newColumn);
+          }
+        } else {
+          const existingColumn: GridColumn = {
+            id: nanoid(),
+            size: '1fr',
+            child: state.root,
+          };
+          const columns =
+            position === 'left'
+              ? [newColumn, existingColumn]
+              : [existingColumn, newColumn];
+          state.root = {
+            id: nanoid(),
+            type: 'grid',
+            columns,
+            headerSections: [],
+            footerSections: [],
+          } as unknown as LayoutNode;
+        }
+      });
+    },
+
+    removeGridColumn(columnId) {
+      set((state) => {
+        if (state.root.type !== 'grid') return;
+        const grid = state.root as unknown as GridRoot;
+        grid.columns = grid.columns.filter((c) => c.id !== columnId);
+        if (grid.columns.length === 1) {
+          state.root = grid.columns[0].child;
+        }
+      });
+    },
+
+    resizeGridColumn(columnId, size) {
+      set((state) => {
+        if (state.root.type !== 'grid') return;
+        const grid = state.root as unknown as GridRoot;
+        const col = grid.columns.find((c) => c.id === columnId);
+        if (col) col.size = size;
+      });
+    },
+
+    addGridSection(position) {
+      set((state) => {
+        if (state.root.type !== 'grid') return;
+        const grid = state.root as unknown as GridRoot;
+        const newSection: SectionNode = {
+          id: nanoid(),
+          type: 'section',
+          height: { type: 'min', value: '200px' },
+          child: { id: nanoid(), type: 'leaf' },
+        };
+        if (position === 'top') {
+          if (!grid.headerSections) grid.headerSections = [];
+          grid.headerSections.push(newSection);
+        } else {
+          if (!grid.footerSections) grid.footerSections = [];
+          grid.footerSections.push(newSection);
+        }
       });
     },
   };

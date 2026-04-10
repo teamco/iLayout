@@ -67,6 +67,25 @@ export type ScrollRoot = {
   sections: SectionNode[];
 };
 
-export type LayoutNode = LeafNode | SplitterNode | SectionNode | ScrollRoot;
+export type GridColumn = {
+  id: string;
+  size: string;
+  child: LayoutNode;
+};
+
+export type GridRoot = {
+  id: string;
+  type: 'grid';
+  columns: GridColumn[];
+  headerSections: SectionNode[];
+  footerSections: SectionNode[];
+};
+
+export type LayoutNode =
+  | LeafNode
+  | SplitterNode
+  | SectionNode
+  | ScrollRoot
+  | GridRoot;
 
 export type SplitDirection = 'left' | 'right' | 'top' | 'bottom';

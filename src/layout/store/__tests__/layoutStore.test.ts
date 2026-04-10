@@ -3,7 +3,8 @@ import { describe, it, expect } from 'vitest';
 import { act } from '@testing-library/react';
 import { createLayoutStore } from '../layoutStore';
 import type { SplitterNode, LeafNode } from '../../types';
-import type { ScrollRoot } from '../../types';
+import type { ScrollRoot, GridRoot } from '../../types';
+import type { LayoutNode } from '../../types';
 
 describe('layoutStore', () => {
   it('adds a panel by splitting right', () => {
@@ -206,5 +207,247 @@ describe('layout modes', () => {
     act(() => store.getState().reorderSections(0, 2));
     const reordered = store.getState().root as unknown as ScrollRoot;
     expect(reordered.sections[2].id).toBe(ids[0]);
+  });
+});
+
+describe('grid column actions', () => {
+  it('addGridColumn wraps scroll root in grid with left column', () => {
+    const scrollRoot: ScrollRoot = {
+      id: 'sr1',
+      type: 'scroll',
+      sections: [
+        {
+          id: 'sec1',
+          type: 'section',
+          height: { type: 'fixed', value: '100vh' },
+          child: { id: 'l1', type: 'leaf' },
+        },
+      ],
+    };
+    const store = createLayoutStore(scrollRoot as unknown as LayoutNode);
+    store.getState().addGridColumn('left');
+    const root = store.getState().root as unknown as GridRoot;
+    expect(root.type).toBe('grid');
+    expect(root.columns).toHaveLength(2);
+    expect(root.columns[0].child.type).toBe('leaf');
+    expect(root.columns[1].child.type).toBe('scroll');
+  });
+
+  it('addGridColumn adds right column to existing grid', () => {
+    const gridRoot: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        {
+          id: 'c1',
+          size: '1fr',
+          child: {
+            id: 'sr1',
+            type: 'scroll',
+            sections: [],
+          } as unknown as LayoutNode,
+        },
+      ],
+      headerSections: [],
+      footerSections: [],
+    };
+    const store = createLayoutStore(gridRoot as unknown as LayoutNode);
+    store.getState().addGridColumn('right');
+    const root = store.getState().root as unknown as GridRoot;
+    expect(root.columns).toHaveLength(2);
+    expect(root.columns[1].child.type).toBe('leaf');
+  });
+
+  it('removeGridColumn unwraps grid when one column left', () => {
+    const scrollChild = {
+      id: 'sr1',
+      type: 'scroll',
+      sections: [],
+    } as unknown as LayoutNode;
+    const gridRoot: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        { id: 'c1', size: '200px', child: { id: 'l1', type: 'leaf' } },
+        { id: 'c2', size: '1fr', child: scrollChild },
+      ],
+      headerSections: [],
+      footerSections: [],
+    };
+    const store = createLayoutStore(gridRoot as unknown as LayoutNode);
+    store.getState().removeGridColumn('c1');
+    expect(store.getState().root.type).toBe('scroll');
+  });
+
+  it('resizeGridColumn updates column size', () => {
+    const gridRoot: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        { id: 'c1', size: '200px', child: { id: 'l1', type: 'leaf' } },
+        { id: 'c2', size: '1fr', child: { id: 'l2', type: 'leaf' } },
+      ],
+      headerSections: [],
+      footerSections: [],
+    };
+    const store = createLayoutStore(gridRoot as unknown as LayoutNode);
+    store.getState().resizeGridColumn('c1', '300px');
+    const root = store.getState().root as unknown as GridRoot;
+    expect(root.columns[0].size).toBe('300px');
+  });
+});
+
+describe('grid section actions', () => {
+  function makeGridRoot(): GridRoot {
+    return {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        {
+          id: 'c1',
+          size: '1fr',
+          child: {
+            id: 'sr1',
+            type: 'scroll',
+            sections: [
+              {
+                id: 'sec1',
+                type: 'section',
+                height: { type: 'fixed', value: '100vh' },
+                child: { id: 'l1', type: 'leaf' },
+              },
+            ],
+          } as unknown as LayoutNode,
+        },
+      ],
+      headerSections: [],
+      footerSections: [],
+    };
+  }
+
+  it('addGridSection top adds to headerSections', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    store.getState().addGridSection('top');
+    const grid = store.getState().root as unknown as GridRoot;
+    expect(grid.headerSections).toHaveLength(1);
+    expect(grid.headerSections[0].type).toBe('section');
+  });
+
+  it('addGridSection bottom adds to footerSections', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    store.getState().addGridSection('bottom');
+    const grid = store.getState().root as unknown as GridRoot;
+    expect(grid.footerSections).toHaveLength(1);
+    expect(grid.footerSections[0].type).toBe('section');
+  });
+
+  it('addGridSection creates section with min height and leaf child', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    store.getState().addGridSection('top');
+    const grid = store.getState().root as unknown as GridRoot;
+    const section = grid.headerSections[0];
+    expect(section.height).toEqual({ type: 'min', value: '200px' });
+    expect(section.child.type).toBe('leaf');
+  });
+
+  it('removeSection removes from grid headerSections', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    store.getState().addGridSection('top');
+    const grid = store.getState().root as unknown as GridRoot;
+    const sectionId = grid.headerSections[0].id;
+    store.getState().removeSection(sectionId);
+    const updated = store.getState().root as unknown as GridRoot;
+    expect(updated.headerSections).toHaveLength(0);
+  });
+
+  it('removeSection removes from grid footerSections', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    store.getState().addGridSection('bottom');
+    const grid = store.getState().root as unknown as GridRoot;
+    const sectionId = grid.footerSections[0].id;
+    store.getState().removeSection(sectionId);
+    const updated = store.getState().root as unknown as GridRoot;
+    expect(updated.footerSections).toHaveLength(0);
+  });
+
+  it('resizeSection works on grid header section', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    store.getState().addGridSection('top');
+    const grid = store.getState().root as unknown as GridRoot;
+    const sectionId = grid.headerSections[0].id;
+    store.getState().resizeSection(sectionId, { type: 'fixed', value: '80px' });
+    const updated = store.getState().root as unknown as GridRoot;
+    expect(updated.headerSections[0].height).toEqual({
+      type: 'fixed',
+      value: '80px',
+    });
+  });
+
+  it('updateSectionConfig works on grid header section', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    store.getState().addGridSection('top');
+    const grid = store.getState().root as unknown as GridRoot;
+    const sectionId = grid.headerSections[0].id;
+    store
+      .getState()
+      .updateSectionConfig(sectionId, { overlap: '-20px', zIndex: 10 });
+    const updated = store.getState().root as unknown as GridRoot;
+    expect(updated.headerSections[0].overlap).toBe('-20px');
+    expect(updated.headerSections[0].zIndex).toBe(10);
+  });
+
+  it('setLayoutMode viewport unwraps grid to scroll column first section child', () => {
+    const leafChild: LayoutNode = { id: 'inner-leaf', type: 'leaf' };
+    const gridRoot: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        {
+          id: 'left-col',
+          size: '200px',
+          child: { id: 'sidebar', type: 'leaf' },
+        },
+        {
+          id: 'scroll-col',
+          size: '1fr',
+          child: {
+            id: 'sr1',
+            type: 'scroll',
+            sections: [
+              {
+                id: 'sec1',
+                type: 'section',
+                height: { type: 'fixed', value: '100vh' },
+                child: leafChild,
+              },
+            ],
+          } as unknown as LayoutNode,
+        },
+      ],
+      headerSections: [],
+      footerSections: [],
+    };
+    const store = createLayoutStore(gridRoot as unknown as LayoutNode);
+    store.getState().setLayoutMode('viewport');
+    expect(store.getState().layoutMode).toBe('viewport');
+    expect(store.getState().root.id).toBe('inner-leaf');
+    expect(store.getState().root.type).toBe('leaf');
+  });
+
+  it('addSection works when root is grid (finds scroll inside column)', () => {
+    const store = createLayoutStore(makeGridRoot() as unknown as LayoutNode);
+    // The grid has a scroll column with one section; add another section
+    const grid = store.getState().root as unknown as GridRoot;
+    const scrollChild = grid.columns[0].child as unknown as {
+      sections: Array<{ id: string }>;
+    };
+    const firstSectionId = scrollChild.sections[0].id;
+    store.getState().addSection('after', firstSectionId);
+    const updated = store.getState().root as unknown as GridRoot;
+    const updatedScroll = updated.columns[0].child as unknown as {
+      sections: Array<{ id: string }>;
+    };
+    expect(updatedScroll.sections).toHaveLength(2);
+    expect(updatedScroll.sections[0].id).toBe(firstSectionId);
   });
 });

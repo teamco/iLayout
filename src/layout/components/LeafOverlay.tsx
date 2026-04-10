@@ -13,15 +13,24 @@ import type {
   SplitDirection,
   SplitterNode,
   ScrollRoot,
+  GridRoot,
 } from '@/layout/types';
 import styles from './LeafOverlay.module.less';
 
 /** Find which section contains a given node id */
 function findSectionForNode(root: LayoutNode, nodeId: string): string | null {
-  if (root.type !== 'scroll') return null;
-  const scrollRoot = root as unknown as ScrollRoot;
-  for (const section of scrollRoot.sections) {
-    if (containsNode(section.child, nodeId)) return section.id;
+  if (root.type === 'scroll') {
+    const scrollRoot = root as unknown as ScrollRoot;
+    for (const section of scrollRoot.sections) {
+      if (containsNode(section.child, nodeId)) return section.id;
+    }
+  }
+  if (root.type === 'grid') {
+    const grid = root as unknown as GridRoot;
+    for (const col of grid.columns) {
+      const result = findSectionForNode(col.child, nodeId);
+      if (result) return result;
+    }
   }
   return null;
 }
@@ -31,6 +40,14 @@ function containsNode(node: LayoutNode, targetId: string): boolean {
   if (node.type === 'splitter')
     return node.children.some((c) => containsNode(c, targetId));
   if (node.type === 'section') return containsNode(node.child, targetId);
+  if (node.type === 'scroll') {
+    const scroll = node as unknown as ScrollRoot;
+    return scroll.sections.some((s) => containsNode(s, targetId));
+  }
+  if (node.type === 'grid') {
+    const grid = node as unknown as GridRoot;
+    return grid.columns.some((c) => containsNode(c.child, targetId));
+  }
   return false;
 }
 

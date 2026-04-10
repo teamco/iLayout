@@ -123,31 +123,34 @@ export default function App({ onSave, saving }: AppProps) {
           setAddSectionModalOpen(false);
 
           if (dir === 'left' || dir === 'right') {
-            // Horizontal: wrap entire root in horizontal splitter
-            const { nanoid } = await import('nanoid');
-            const currentRoot = useLayoutStore.getState().root;
-            const newLeaf = { id: nanoid(), type: 'leaf' as const };
-            const after = dir === 'right';
-            useLayoutStore.setState({
-              root: {
-                id: nanoid(),
-                type: 'splitter' as const,
-                direction: 'horizontal' as const,
-                sizes: after ? [80, 20] : [20, 80],
-                children: after
-                  ? [currentRoot, newLeaf]
-                  : [newLeaf, currentRoot],
-              },
-            });
+            useLayoutStore
+              .getState()
+              .addGridColumn(dir === 'left' ? 'left' : 'right');
           } else {
-            // Vertical: add section (page grows, scrollable)
-            // Ensure scroll mode
-            if (useLayoutStore.getState().root.type !== 'scroll') {
-              useLayoutStore.getState().setLayoutMode('scroll');
-            }
+            // Vertical: add full-width section
             const root = useLayoutStore.getState().root;
-            if (root.type === 'scroll') {
+
+            if (root.type === 'grid') {
+              // Grid: add full-width header/footer section
+              useLayoutStore
+                .getState()
+                .addGridSection(dir === 'top' ? 'top' : 'bottom');
+            } else if (root.type === 'scroll') {
+              // Scroll: add section to scroll
               const sr = root as unknown as import('@/layout/types').ScrollRoot;
+              const targetId =
+                dir === 'top'
+                  ? sr.sections[0]?.id
+                  : sr.sections[sr.sections.length - 1]?.id;
+              if (targetId)
+                useLayoutStore
+                  .getState()
+                  .addSection(dir === 'top' ? 'before' : 'after', targetId);
+            } else {
+              // Not scroll or grid — switch to scroll mode first
+              useLayoutStore.getState().setLayoutMode('scroll');
+              const sr = useLayoutStore.getState()
+                .root as unknown as import('@/layout/types').ScrollRoot;
               const targetId =
                 dir === 'top'
                   ? sr.sections[0]?.id

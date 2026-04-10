@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { EmbedLayoutRenderer } from '../EmbedLayoutRenderer';
-import type { LeafNode, SplitterNode, ScrollRoot } from '../../types';
+import type { LeafNode, SplitterNode, ScrollRoot, GridRoot } from '../../types';
 import '../../widgets/init';
 
 const leaf: LeafNode = {
@@ -123,5 +123,86 @@ describe('EmbedLayoutRenderer', () => {
     const { container } = render(<EmbedLayoutRenderer root={nested} />);
     const splitters = container.querySelectorAll('.al-splitter');
     expect(splitters).toHaveLength(2);
+  });
+
+  it('renders grid layout with sidebars and center', () => {
+    const grid: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        { id: 'c1', size: '200px', child: { id: 'sl1', type: 'leaf' } },
+        {
+          id: 'c2',
+          size: '1fr',
+          child: {
+            id: 'sc1',
+            type: 'scroll',
+            sections: [
+              {
+                id: 'sec1',
+                type: 'section',
+                height: { type: 'fixed', value: '100vh' },
+                child: leaf,
+              },
+            ],
+          } as ScrollRoot,
+        },
+        { id: 'c3', size: '200px', child: { id: 'sl2', type: 'leaf' } },
+      ],
+      headerSections: [
+        {
+          id: 'hs1',
+          type: 'section',
+          height: { type: 'min', value: '100px' },
+          child: {
+            id: 'hl1',
+            type: 'leaf',
+            widget: {
+              widgetId: 'hw1',
+              resource: 'empty',
+              content: { value: 'Header' },
+              config: {},
+            },
+          },
+        },
+      ],
+      footerSections: [
+        {
+          id: 'fs1',
+          type: 'section',
+          height: { type: 'min', value: '80px' },
+          child: { id: 'fl1', type: 'leaf' },
+        },
+      ],
+    };
+
+    const { container } = render(
+      <EmbedLayoutRenderer root={grid as unknown as LeafNode} />,
+    );
+
+    // Outer flex container
+    const outer = container.querySelector('.al-grid-outer');
+    expect(outer).not.toBeNull();
+
+    // Sidebars
+    const sidebars = container.querySelectorAll('.al-grid-sidebar');
+    expect(sidebars).toHaveLength(2);
+    expect((sidebars[0] as HTMLElement).style.width).toBe('200px');
+    expect((sidebars[1] as HTMLElement).style.width).toBe('200px');
+
+    // Center
+    const center = container.querySelector('.al-grid-center');
+    expect(center).not.toBeNull();
+
+    // Scroll inside center
+    const scrollEl = container.querySelector('.al-scroll');
+    expect(scrollEl).not.toBeNull();
+
+    // Header text
+    expect(screen.getByText('Header')).toBeDefined();
+
+    // Sections (header + scroll section + footer = 3)
+    const sections = container.querySelectorAll('.al-section');
+    expect(sections).toHaveLength(3);
   });
 });
