@@ -10,6 +10,7 @@ Replace SplitterNode-based global vertical panels with a CSS Grid layout (`GridR
 ## Problem
 
 When a user adds a global vertical panel (sidebar) via the "+" toolbar button in scroll mode, it wraps the scroll layout in a `SplitterNode`. Splitters are viewport-height containers:
+
 - Sidebar is fixed at viewport height, doesn't stretch to full content
 - Nested ScrollLayout needs its own `overflow-y: auto`, creating a double scrollbar
 - Body scroll doesn't work — content is trapped inside the splitter panel
@@ -17,6 +18,7 @@ When a user adds a global vertical panel (sidebar) via the "+" toolbar button in
 ## Solution
 
 New node type `GridRoot` using CSS Grid. The grid defines columns where:
+
 - Sidebar columns stretch to the tallest column's height (grid behavior)
 - The scroll column (center) defines the page height via its sections
 - One scrollbar (body)
@@ -27,8 +29,8 @@ New node type `GridRoot` using CSS Grid. The grid defines columns where:
 ```ts
 type GridColumn = {
   id: string;
-  size: string;        // CSS grid value: '200px', '1fr', '20%', 'minmax(100px, 300px)'
-  child: LayoutNode;   // leaf, splitter, or scroll
+  size: string; // CSS grid value: '200px', '1fr', '20%', 'minmax(100px, 300px)'
+  child: LayoutNode; // leaf, splitter, or scroll
 };
 
 type GridRoot = {
@@ -45,14 +47,20 @@ type GridRoot = {
 ### GridLayout component
 
 ```tsx
-<div class="al-grid" style="grid-template-columns: ${columns.map(c => c.size).join(' ')}">
+<div
+  class="al-grid"
+  style="grid-template-columns: ${columns.map(c => c.size).join(' ')}"
+>
   {columns.map((col, i) => (
     <>
       <div class="al-grid-column" key={col.id}>
         {renderNode(col.child)}
       </div>
       {editMode && i < columns.length - 1 && (
-        <GridColumnHandle leftColumnId={col.id} rightColumnId={columns[i+1].id} />
+        <GridColumnHandle
+          leftColumnId={col.id}
+          rightColumnId={columns[i + 1].id}
+        />
       )}
     </>
   ))}
@@ -79,6 +87,7 @@ type GridRoot = {
 ### GridColumnHandle
 
 Horizontal drag handle between columns. On drag:
+
 - Left column size changes by +dx
 - Right column size changes by -dx
 - Both converted to pixel values on drag, snapped to grid on release
@@ -117,6 +126,7 @@ resizeGridColumn(columnId: string, size: string): void
 ## 4. Toolbar "+" Integration
 
 In scroll mode, the toolbar "+" button:
+
 - "Add panel left" → `addGridColumn('left')`
 - "Add panel right" → `addGridColumn('right')`
 - "Add section above" → `addSection('before', firstSectionId)`
@@ -125,10 +135,12 @@ In scroll mode, the toolbar "+" button:
 ## 5. LeafOverlay Behavior
 
 When a leaf is inside a `GridColumn`:
+
 - "left/right" → splits the leaf horizontally (SplitterNode inside the column)
 - "top/bottom" → splits the leaf vertically (SplitterNode inside the column)
 
 When a leaf is the direct child of a scroll section:
+
 - "top/bottom" → adds a new section (existing behavior)
 - "left/right" → splits horizontally (existing behavior)
 
@@ -139,13 +151,15 @@ When a leaf is the direct child of a scroll section:
 if (node.type === 'grid') return <GridLayout key={node.id} root={node} />;
 
 // LayoutRenderer
-{layoutMode === 'scroll' && root.type === 'scroll' ? (
-  <ScrollLayout root={root} />
-) : layoutMode === 'scroll' && root.type === 'grid' ? (
-  <GridLayout root={root} />
-) : (
-  renderNode(root)
-)}
+{
+  layoutMode === 'scroll' && root.type === 'scroll' ? (
+    <ScrollLayout root={root} />
+  ) : layoutMode === 'scroll' && root.type === 'grid' ? (
+    <GridLayout root={root} />
+  ) : (
+    renderNode(root)
+  );
+}
 ```
 
 ## 7. Scroll Inside Grid

@@ -15,7 +15,10 @@ export function GridLayout({ root }: Props) {
   const templateColumns = root.columns.map((col) => col.size).join(' ');
 
   return (
-    <div className={styles.grid} style={{ gridTemplateColumns: templateColumns }}>
+    <div
+      className={styles.grid}
+      style={{ gridTemplateColumns: templateColumns }}
+    >
       {root.columns.map((col, i) => (
         <div key={col.id} className={styles.column}>
           {col.child.type === 'scroll' ? (

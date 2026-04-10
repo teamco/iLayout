@@ -15,6 +15,7 @@
 ### Task 1: Add GridRoot Types
 
 **Files:**
+
 - Modify: `src/layout/types.ts`
 
 - [ ] **Step 1: Add GridColumn and GridRoot types**
@@ -38,12 +39,20 @@ export type GridRoot = {
 - [ ] **Step 2: Update LayoutNode union**
 
 Change:
+
 ```ts
 export type LayoutNode = LeafNode | SplitterNode | SectionNode | ScrollRoot;
 ```
+
 To:
+
 ```ts
-export type LayoutNode = LeafNode | SplitterNode | SectionNode | ScrollRoot | GridRoot;
+export type LayoutNode =
+  | LeafNode
+  | SplitterNode
+  | SectionNode
+  | ScrollRoot
+  | GridRoot;
 ```
 
 - [ ] **Step 3: Verify types compile**
@@ -63,6 +72,7 @@ git commit -m "feat(grid): add GridRoot and GridColumn types"
 ### Task 2: Update Tree Utilities for GridRoot
 
 **Files:**
+
 - Modify: `src/layout/utils/treeUtils.ts`
 - Test: `src/layout/utils/__tests__/treeUtils.test.ts`
 
@@ -100,7 +110,15 @@ describe('grid support', () => {
     const updated = updateNode(
       gridRoot as unknown as LayoutNode,
       'grid-leaf-a',
-      (n) => ({ ...n, widget: { widgetId: 'w1', resource: 'empty', content: { value: '' }, config: {} } }),
+      (n) => ({
+        ...n,
+        widget: {
+          widgetId: 'w1',
+          resource: 'empty',
+          content: { value: '' },
+          config: {},
+        },
+      }),
     );
     expect((updated as any).columns[0].child.widget).toBeDefined();
   });
@@ -218,6 +236,7 @@ git commit -m "feat(grid): add grid support to tree utilities"
 ### Task 3: Store Actions — addGridColumn, removeGridColumn, resizeGridColumn
 
 **Files:**
+
 - Modify: `src/layout/store/layoutStore.ts`
 - Test: `src/layout/store/__tests__/layoutStore.test.ts`
 
@@ -233,7 +252,14 @@ describe('grid column actions', () => {
     const scrollRoot: ScrollRoot = {
       id: 'sr1',
       type: 'scroll',
-      sections: [{ id: 'sec1', type: 'section', height: { type: 'fixed', value: '100vh' }, child: { id: 'l1', type: 'leaf' } }],
+      sections: [
+        {
+          id: 'sec1',
+          type: 'section',
+          height: { type: 'fixed', value: '100vh' },
+          child: { id: 'l1', type: 'leaf' },
+        },
+      ],
     };
     const store = createLayoutStore(scrollRoot as unknown as LayoutNode);
     store.getState().addGridColumn('left');
@@ -249,7 +275,15 @@ describe('grid column actions', () => {
       id: 'g1',
       type: 'grid',
       columns: [
-        { id: 'c1', size: '1fr', child: { id: 'sr1', type: 'scroll', sections: [] } as unknown as LayoutNode },
+        {
+          id: 'c1',
+          size: '1fr',
+          child: {
+            id: 'sr1',
+            type: 'scroll',
+            sections: [],
+          } as unknown as LayoutNode,
+        },
       ],
     };
     const store = createLayoutStore(gridRoot as unknown as LayoutNode);
@@ -260,7 +294,11 @@ describe('grid column actions', () => {
   });
 
   it('removeGridColumn unwraps grid when one column left', () => {
-    const scrollChild = { id: 'sr1', type: 'scroll', sections: [] } as unknown as LayoutNode;
+    const scrollChild = {
+      id: 'sr1',
+      type: 'scroll',
+      sections: [],
+    } as unknown as LayoutNode;
     const gridRoot: GridRoot = {
       id: 'g1',
       type: 'grid',
@@ -393,6 +431,7 @@ git commit -m "feat(grid): add grid column store actions"
 ### Task 4: GridLayout Component + GridColumnHandle
 
 **Files:**
+
 - Create: `src/layout/components/GridLayout.tsx`
 - Create: `src/layout/components/GridLayout.module.less`
 - Create: `src/layout/components/GridColumnHandle.tsx`
@@ -433,7 +472,10 @@ export function GridLayout({ root }: Props) {
   const templateColumns = root.columns.map((col) => col.size).join(' ');
 
   return (
-    <div className={styles.grid} style={{ gridTemplateColumns: templateColumns }}>
+    <div
+      className={styles.grid}
+      style={{ gridTemplateColumns: templateColumns }}
+    >
       {root.columns.map((col, i) => (
         <div key={col.id} className={styles.column}>
           {renderNode(col.child)}
@@ -470,25 +512,22 @@ export function GridColumnHandle({ leftColumnId, rightColumnId }: Props) {
     rightWidth: number;
   } | null>(null);
 
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-      const el = e.currentTarget as HTMLElement;
-      const column = el.parentElement;
-      const nextColumn = column?.nextElementSibling as HTMLElement | null;
-      if (!column || !nextColumn) return;
+    const el = e.currentTarget as HTMLElement;
+    const column = el.parentElement;
+    const nextColumn = column?.nextElementSibling as HTMLElement | null;
+    if (!column || !nextColumn) return;
 
-      startRef.current = {
-        x: e.clientX,
-        leftWidth: column.offsetWidth,
-        rightWidth: nextColumn.offsetWidth,
-      };
-      el.setPointerCapture(e.pointerId);
-    },
-    [],
-  );
+    startRef.current = {
+      x: e.clientX,
+      leftWidth: column.offsetWidth,
+      rightWidth: nextColumn.offsetWidth,
+    };
+    el.setPointerCapture(e.pointerId);
+  }, []);
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
@@ -505,14 +544,11 @@ export function GridColumnHandle({ leftColumnId, rightColumnId }: Props) {
     [leftColumnId, rightColumnId, resizeGridColumn],
   );
 
-  const handlePointerUp = useCallback(
-    (e: React.PointerEvent) => {
-      if (!startRef.current) return;
-      startRef.current = null;
-      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    },
-    [],
-  );
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    if (!startRef.current) return;
+    startRef.current = null;
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+  }, []);
 
   return (
     <div
@@ -554,17 +590,20 @@ git commit -m "feat(grid): add GridLayout component with column resize handle"
 ### Task 5: Wire GridLayout into LayoutRenderer
 
 **Files:**
+
 - Modify: `src/layout/components/LayoutRenderer.tsx`
 
 - [ ] **Step 1: Add grid rendering to renderNode**
 
 Add import:
+
 ```ts
 import type { GridRoot } from '@/layout/types';
 import { GridLayout } from './GridLayout';
 ```
 
 In `renderNode`, add before the `scroll` case:
+
 ```ts
 if (node.type === 'grid')
   return <GridLayout key={node.id} root={node as unknown as GridRoot} />;
@@ -573,6 +612,7 @@ if (node.type === 'grid')
 - [ ] **Step 2: Add grid root handling in LayoutRenderer**
 
 Update the render logic:
+
 ```tsx
 export function LayoutRenderer() {
   const root = useLayoutStore((s) => s.root);
@@ -597,6 +637,7 @@ export function LayoutRenderer() {
 - [ ] **Step 3: ScrollLayout inside grid column — no nested flag**
 
 In `renderNode`, the `scroll` case currently passes `nested`:
+
 ```ts
 if (node.type === 'scroll')
   return <ScrollLayout key={node.id} root={node} nested />;
@@ -615,11 +656,13 @@ import { ScrollLayout } from './ScrollLayout';
 import type { ScrollRoot } from '@/layout/types';
 
 // In the render:
-{col.child.type === 'scroll' ? (
-  <ScrollLayout root={col.child as unknown as ScrollRoot} />
-) : (
-  renderNode(col.child)
-)}
+{
+  col.child.type === 'scroll' ? (
+    <ScrollLayout root={col.child as unknown as ScrollRoot} />
+  ) : (
+    renderNode(col.child)
+  );
+}
 ```
 
 This ensures scroll inside grid = no inner overflow (body scrolls). Scroll inside splitter = nested (inner overflow).
@@ -641,6 +684,7 @@ git commit -m "feat(grid): wire GridLayout into LayoutRenderer"
 ### Task 6: Toolbar "+" — Use addGridColumn Instead of Splitter
 
 **Files:**
+
 - Modify: `src/App.tsx`
 
 - [ ] **Step 1: Replace splitter wrapping with addGridColumn**
@@ -660,9 +704,7 @@ if (dir === 'left' || dir === 'right') {
       type: 'splitter' as const,
       direction: 'horizontal' as const,
       sizes: after ? [80, 20] : [20, 80],
-      children: after
-        ? [currentRoot, newLeaf]
-        : [newLeaf, currentRoot],
+      children: after ? [currentRoot, newLeaf] : [newLeaf, currentRoot],
     },
   });
 }
@@ -699,6 +741,7 @@ git commit -m "feat(grid): toolbar + uses addGridColumn for global panels"
 ### Task 7: Update LeafOverlay for Grid Context
 
 **Files:**
+
 - Modify: `src/layout/components/LeafOverlay.tsx`
 
 - [ ] **Step 1: Update findSectionForNode to handle grid**
@@ -763,6 +806,7 @@ git commit -m "feat(grid): update LeafOverlay to traverse grid nodes"
 ### Task 8: Update setLayoutMode for Grid Conversion
 
 **Files:**
+
 - Modify: `src/layout/store/layoutStore.ts`
 
 - [ ] **Step 1: Handle viewport↔scroll conversion with grid**
@@ -823,6 +867,7 @@ git commit -m "feat(grid): handle grid in setLayoutMode conversion"
 ### Task 9: Update addSection for Grid Root
 
 **Files:**
+
 - Modify: `src/layout/store/layoutStore.ts`
 
 - [ ] **Step 1: Update addSection to find scroll inside grid**
@@ -871,7 +916,8 @@ function getScrollRoot(state: LayoutStore): ScrollRoot | null {
   if (state.root.type === 'grid') {
     const grid = state.root as unknown as GridRoot;
     for (const col of grid.columns) {
-      if (col.child.type === 'scroll') return col.child as unknown as ScrollRoot;
+      if (col.child.type === 'scroll')
+        return col.child as unknown as ScrollRoot;
     }
   }
   return null;

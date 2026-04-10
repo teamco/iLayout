@@ -185,7 +185,15 @@ describe('grid support', () => {
     const updated = updateNode(
       gridRoot as unknown as LayoutNode,
       'grid-leaf-a',
-      (n) => ({ ...n, widget: { widgetId: 'w1', resource: 'empty', content: { value: '' }, config: {} } }),
+      (n) => ({
+        ...n,
+        widget: {
+          widgetId: 'w1',
+          resource: 'empty',
+          content: { value: '' },
+          config: {},
+        },
+      }),
     );
     expect((updated as any).columns[0].child.widget).toBeDefined();
   });

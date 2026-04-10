@@ -79,6 +79,11 @@ export type GridRoot = {
   columns: GridColumn[];
 };
 
-export type LayoutNode = LeafNode | SplitterNode | SectionNode | ScrollRoot | GridRoot;
+export type LayoutNode =
+  | LeafNode
+  | SplitterNode
+  | SectionNode
+  | ScrollRoot
+  | GridRoot;
 
 export type SplitDirection = 'left' | 'right' | 'top' | 'bottom';

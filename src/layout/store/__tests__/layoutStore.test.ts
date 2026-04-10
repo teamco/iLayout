@@ -215,7 +215,14 @@ describe('grid column actions', () => {
     const scrollRoot: ScrollRoot = {
       id: 'sr1',
       type: 'scroll',
-      sections: [{ id: 'sec1', type: 'section', height: { type: 'fixed', value: '100vh' }, child: { id: 'l1', type: 'leaf' } }],
+      sections: [
+        {
+          id: 'sec1',
+          type: 'section',
+          height: { type: 'fixed', value: '100vh' },
+          child: { id: 'l1', type: 'leaf' },
+        },
+      ],
     };
     const store = createLayoutStore(scrollRoot as unknown as LayoutNode);
     store.getState().addGridColumn('left');
@@ -231,7 +238,15 @@ describe('grid column actions', () => {
       id: 'g1',
       type: 'grid',
       columns: [
-        { id: 'c1', size: '1fr', child: { id: 'sr1', type: 'scroll', sections: [] } as unknown as LayoutNode },
+        {
+          id: 'c1',
+          size: '1fr',
+          child: {
+            id: 'sr1',
+            type: 'scroll',
+            sections: [],
+          } as unknown as LayoutNode,
+        },
       ],
     };
     const store = createLayoutStore(gridRoot as unknown as LayoutNode);
@@ -242,7 +257,11 @@ describe('grid column actions', () => {
   });
 
   it('removeGridColumn unwraps grid when one column left', () => {
-    const scrollChild = { id: 'sr1', type: 'scroll', sections: [] } as unknown as LayoutNode;
+    const scrollChild = {
+      id: 'sr1',
+      type: 'scroll',
+      sections: [],
+    } as unknown as LayoutNode;
     const gridRoot: GridRoot = {
       id: 'g1',
       type: 'grid',

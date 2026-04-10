@@ -15,25 +15,22 @@ export function GridColumnHandle({ leftColumnId, rightColumnId }: Props) {
     rightWidth: number;
   } | null>(null);
 
-  const handlePointerDown = useCallback(
-    (e: React.PointerEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-      const el = e.currentTarget as HTMLElement;
-      const column = el.parentElement;
-      const nextColumn = column?.nextElementSibling as HTMLElement | null;
-      if (!column || !nextColumn) return;
+    const el = e.currentTarget as HTMLElement;
+    const column = el.parentElement;
+    const nextColumn = column?.nextElementSibling as HTMLElement | null;
+    if (!column || !nextColumn) return;
 
-      startRef.current = {
-        x: e.clientX,
-        leftWidth: column.offsetWidth,
-        rightWidth: nextColumn.offsetWidth,
-      };
-      el.setPointerCapture(e.pointerId);
-    },
-    [],
-  );
+    startRef.current = {
+      x: e.clientX,
+      leftWidth: column.offsetWidth,
+      rightWidth: nextColumn.offsetWidth,
+    };
+    el.setPointerCapture(e.pointerId);
+  }, []);
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
@@ -50,14 +47,11 @@ export function GridColumnHandle({ leftColumnId, rightColumnId }: Props) {
     [leftColumnId, rightColumnId, resizeGridColumn],
   );
 
-  const handlePointerUp = useCallback(
-    (e: React.PointerEvent) => {
-      if (!startRef.current) return;
-      startRef.current = null;
-      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    },
-    [],
-  );
+  const handlePointerUp = useCallback((e: React.PointerEvent) => {
+    if (!startRef.current) return;
+    startRef.current = null;
+    (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+  }, []);
 
   return (
     <div

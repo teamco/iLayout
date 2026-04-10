@@ -65,11 +65,13 @@ function makeActions(
   set: (fn: (state: LayoutStore) => void) => void,
 ): LayoutActions {
   function getScrollRoot(state: LayoutStore): ScrollRoot | null {
-    if (state.root.type === 'scroll') return state.root as unknown as ScrollRoot;
+    if (state.root.type === 'scroll')
+      return state.root as unknown as ScrollRoot;
     if (state.root.type === 'grid') {
       const grid = state.root as unknown as GridRoot;
       for (const col of grid.columns) {
-        if (col.child.type === 'scroll') return col.child as unknown as ScrollRoot;
+        if (col.child.type === 'scroll')
+          return col.child as unknown as ScrollRoot;
       }
     }
     return null;
@@ -154,7 +156,11 @@ function makeActions(
 
     setLayoutMode(mode) {
       set((state) => {
-        if (mode === 'scroll' && state.root.type !== 'scroll' && state.root.type !== 'grid') {
+        if (
+          mode === 'scroll' &&
+          state.root.type !== 'scroll' &&
+          state.root.type !== 'grid'
+        ) {
           const section: SectionNode = {
             id: nanoid(),
             type: 'section',
@@ -169,12 +175,22 @@ function makeActions(
         } else if (mode === 'viewport') {
           if (state.root.type === 'grid') {
             const grid = state.root as unknown as GridRoot;
-            const scrollCol = grid.columns.find((c) => c.child.type === 'scroll');
-            const scrollRoot = scrollCol?.child as unknown as ScrollRoot | undefined;
-            state.root = scrollRoot?.sections[0]?.child ?? { id: nanoid(), type: 'leaf' };
+            const scrollCol = grid.columns.find(
+              (c) => c.child.type === 'scroll',
+            );
+            const scrollRoot = scrollCol?.child as unknown as
+              | ScrollRoot
+              | undefined;
+            state.root = scrollRoot?.sections[0]?.child ?? {
+              id: nanoid(),
+              type: 'leaf',
+            };
           } else if (state.root.type === 'scroll') {
             const scrollRoot = state.root as unknown as ScrollRoot;
-            state.root = scrollRoot.sections[0]?.child ?? { id: nanoid(), type: 'leaf' };
+            state.root = scrollRoot.sections[0]?.child ?? {
+              id: nanoid(),
+              type: 'leaf',
+            };
           }
         }
         state.layoutMode = mode;
@@ -258,9 +274,10 @@ function makeActions(
             size: '1fr',
             child: state.root,
           };
-          const columns = position === 'left'
-            ? [newColumn, existingColumn]
-            : [existingColumn, newColumn];
+          const columns =
+            position === 'left'
+              ? [newColumn, existingColumn]
+              : [existingColumn, newColumn];
           state.root = {
             id: nanoid(),
             type: 'grid',

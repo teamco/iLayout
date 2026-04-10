@@ -123,7 +123,9 @@ export default function App({ onSave, saving }: AppProps) {
           setAddSectionModalOpen(false);
 
           if (dir === 'left' || dir === 'right') {
-            useLayoutStore.getState().addGridColumn(dir === 'left' ? 'left' : 'right');
+            useLayoutStore
+              .getState()
+              .addGridColumn(dir === 'left' ? 'left' : 'right');
           } else {
             // Vertical: add section (page grows, scrollable)
             // Ensure scroll mode
