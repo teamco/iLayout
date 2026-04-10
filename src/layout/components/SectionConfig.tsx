@@ -1,7 +1,12 @@
 import { useEffect } from 'react';
 import { Modal, Form, InputNumber, Select, Button, Space } from 'antd';
 import { useTranslation } from 'react-i18next';
-import type { SectionHeight, ScrollRoot } from '@/layout/types';
+import type {
+  SectionHeight,
+  ScrollRoot,
+  GridRoot,
+  SectionNode,
+} from '@/layout/types';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 
 type Props = { open: boolean; sectionId: string | null; onClose: () => void };
@@ -30,6 +35,35 @@ function parseHeight(height: SectionHeight): {
   };
 }
 
+function findSectionById(
+  root: import('@/layout/types').LayoutNode,
+  id: string | null,
+): SectionNode | undefined {
+  if (!id) return undefined;
+  if (root.type === 'scroll') {
+    const sr = root as unknown as ScrollRoot;
+    const found = sr.sections.find((s) => s.id === id);
+    if (found) return found;
+  }
+  if (root.type === 'grid') {
+    const grid = root as unknown as GridRoot;
+    for (const s of [
+      ...(grid.headerSections ?? []),
+      ...(grid.footerSections ?? []),
+    ]) {
+      if (s.id === id) return s;
+    }
+    for (const col of grid.columns) {
+      if (col.child.type === 'scroll') {
+        const sr = col.child as unknown as ScrollRoot;
+        const found = sr.sections.find((s) => s.id === id);
+        if (found) return found;
+      }
+    }
+  }
+  return undefined;
+}
+
 export function SectionConfig({ open, sectionId, onClose }: Props) {
   const { t } = useTranslation();
   const [form] = Form.useForm<FormValues>();
@@ -38,9 +72,7 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
   const updateSectionConfig = useLayoutStore((s) => s.updateSectionConfig);
   const removeSection = useLayoutStore((s) => s.removeSection);
 
-  const scrollRoot =
-    root.type === 'scroll' ? (root as unknown as ScrollRoot) : null;
-  const section = scrollRoot?.sections.find((s) => s.id === sectionId);
+  const section = findSectionById(root, sectionId);
 
   useEffect(() => {
     if (open && section) {

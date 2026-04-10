@@ -1,4 +1,5 @@
 // src/layout/components/GridLayout.tsx
+import { useState } from 'react';
 import type { GridRoot, GridColumn, SectionNode } from '@/layout/types';
 import type { ScrollRoot } from '@/layout/types';
 import { useLayoutStore } from '@/layout/store/layoutStore';
@@ -6,14 +7,21 @@ import { renderNode } from './LayoutRenderer';
 import { ScrollLayout } from './ScrollLayout';
 import { SectionNodeComponent } from './SectionNodeComponent';
 import { SectionHandle } from './SectionHandle';
+import { SectionConfig } from './SectionConfig';
 import { GridColumnHandle } from './GridColumnHandle';
 import styles from './GridLayout.module.less';
 
-function FullWidthSection({ section }: { section: SectionNode }) {
+function FullWidthSection({
+  section,
+  onConfig,
+}: {
+  section: SectionNode;
+  onConfig: (id: string) => void;
+}) {
   const editMode = useLayoutStore((s) => s.editMode);
   return (
     <div>
-      <SectionNodeComponent section={section} onConfig={() => {}} />
+      <SectionNodeComponent section={section} onConfig={onConfig} />
       {editMode && <SectionHandle aboveSectionId={section.id} />}
     </div>
   );
@@ -30,6 +38,7 @@ type Props = { root: GridRoot };
 
 export function GridLayout({ root }: Props) {
   const editMode = useLayoutStore((s) => s.editMode);
+  const [configSectionId, setConfigSectionId] = useState<string | null>(null);
 
   // Split columns: find the scroll (center) column index
   const scrollIdx = root.columns.findIndex((c) => c.child.type === 'scroll');
@@ -67,13 +76,21 @@ export function GridLayout({ root }: Props) {
       {/* Center: header + scroll sections + footer */}
       <div className={styles.center}>
         {root.headerSections?.map((section) => (
-          <FullWidthSection key={section.id} section={section} />
+          <FullWidthSection
+            key={section.id}
+            section={section}
+            onConfig={setConfigSectionId}
+          />
         ))}
         {centerColumns.map((col) => (
           <ColumnContent key={col.id} col={col} />
         ))}
         {root.footerSections?.map((section) => (
-          <FullWidthSection key={section.id} section={section} />
+          <FullWidthSection
+            key={section.id}
+            section={section}
+            onConfig={setConfigSectionId}
+          />
         ))}
       </div>
 
@@ -99,6 +116,12 @@ export function GridLayout({ root }: Props) {
           )}
         </div>
       ))}
+
+      <SectionConfig
+        open={configSectionId !== null}
+        sectionId={configSectionId}
+        onClose={() => setConfigSectionId(null)}
+      />
     </div>
   );
 }

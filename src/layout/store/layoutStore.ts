@@ -78,6 +78,21 @@ function makeActions(
     return null;
   }
 
+  function findGridSection(
+    state: LayoutStore,
+    sectionId: string,
+  ): SectionNode | null {
+    if (state.root.type !== 'grid') return null;
+    const grid = state.root as unknown as GridRoot;
+    for (const s of [
+      ...(grid.headerSections ?? []),
+      ...(grid.footerSections ?? []),
+    ]) {
+      if (s.id === sectionId) return s;
+    }
+    return null;
+  }
+
   return {
     addPanel(targetId, direction) {
       set((state) => {
@@ -219,6 +234,22 @@ function makeActions(
 
     removeSection(sectionId) {
       set((state) => {
+        // Check grid header/footer sections first
+        if (state.root.type === 'grid') {
+          const grid = state.root as unknown as GridRoot;
+          if (grid.headerSections?.some((s) => s.id === sectionId)) {
+            grid.headerSections = grid.headerSections.filter(
+              (s) => s.id !== sectionId,
+            );
+            return;
+          }
+          if (grid.footerSections?.some((s) => s.id === sectionId)) {
+            grid.footerSections = grid.footerSections.filter(
+              (s) => s.id !== sectionId,
+            );
+            return;
+          }
+        }
         const scrollRoot = getScrollRoot(state);
         if (!scrollRoot) return;
         if (scrollRoot.sections.length <= 1) return;
@@ -230,6 +261,11 @@ function makeActions(
 
     resizeSection(sectionId, height) {
       set((state) => {
+        const gridSection = findGridSection(state, sectionId);
+        if (gridSection) {
+          gridSection.height = height;
+          return;
+        }
         const scrollRoot = getScrollRoot(state);
         if (!scrollRoot) return;
         const section = scrollRoot.sections.find((s) => s.id === sectionId);
@@ -239,9 +275,10 @@ function makeActions(
 
     updateSectionConfig(sectionId, config) {
       set((state) => {
-        const scrollRoot = getScrollRoot(state);
-        if (!scrollRoot) return;
-        const section = scrollRoot.sections.find((s) => s.id === sectionId);
+        const gridSection = findGridSection(state, sectionId);
+        const section =
+          gridSection ??
+          getScrollRoot(state)?.sections.find((s) => s.id === sectionId);
         if (!section) return;
         if (config.overlap !== undefined) section.overlap = config.overlap;
         if (config.zIndex !== undefined) section.zIndex = config.zIndex;
