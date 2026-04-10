@@ -6,7 +6,7 @@ import {
   removeNode,
   updateNode,
 } from '../treeUtils';
-import type { LayoutNode, SplitterNode } from '../../types';
+import type { LayoutNode, SplitterNode, GridRoot } from '../../types';
 
 const leaf = (id: string): LayoutNode => ({ id, type: 'leaf' });
 
@@ -155,5 +155,63 @@ describe('removeNode', () => {
     const outer = h('outer', [inner, leaf('c')]);
     const result = removeNode(outer, 'b') as SplitterNode;
     expect(result.children.map((n) => n.id)).toEqual(['a', 'c']);
+  });
+});
+
+const gridLeafA: LayoutNode = { id: 'grid-leaf-a', type: 'leaf' };
+const gridLeafB: LayoutNode = { id: 'grid-leaf-b', type: 'leaf' };
+const gridRoot: GridRoot = {
+  id: 'grid-root',
+  type: 'grid',
+  columns: [
+    { id: 'col-1', size: '200px', child: gridLeafA },
+    { id: 'col-2', size: '1fr', child: gridLeafB },
+  ],
+};
+
+describe('grid support', () => {
+  it('findNode finds nodes inside grid columns', () => {
+    const result = findNode(gridRoot as unknown as LayoutNode, 'grid-leaf-a');
+    expect(result).not.toBeNull();
+    expect(result!.node.id).toBe('grid-leaf-a');
+  });
+
+  it('getDepth works for nodes in grid columns', () => {
+    const depth = getDepth(gridLeafA, gridRoot as unknown as LayoutNode);
+    expect(depth).toBe(0);
+  });
+
+  it('updateNode updates nodes inside grid columns', () => {
+    const updated = updateNode(
+      gridRoot as unknown as LayoutNode,
+      'grid-leaf-a',
+      (n) => ({ ...n, widget: { widgetId: 'w1', resource: 'empty', content: { value: '' }, config: {} } }),
+    );
+    expect((updated as any).columns[0].child.widget).toBeDefined();
+  });
+
+  it('removeNode works inside grid columns', () => {
+    const splitterInGrid: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        {
+          id: 'c1',
+          size: '1fr',
+          child: {
+            id: 's1',
+            type: 'splitter',
+            direction: 'horizontal',
+            sizes: [50, 50],
+            children: [
+              { id: 'la', type: 'leaf' },
+              { id: 'lb', type: 'leaf' },
+            ],
+          },
+        },
+      ],
+    };
+    const result = removeNode(splitterInGrid as unknown as LayoutNode, 'la');
+    expect((result as any).columns[0].child.id).toBe('lb');
   });
 });

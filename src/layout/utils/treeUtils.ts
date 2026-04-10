@@ -4,6 +4,7 @@ import type {
   SplitDirection,
   SectionNode,
   ScrollRoot,
+  GridRoot,
 } from '../types';
 
 type FindResult = {
@@ -31,6 +32,13 @@ export function findNode(root: LayoutNode, id: string): FindResult | null {
       if (found) return found;
     }
   }
+  if (root.type === 'grid') {
+    const grid = root as unknown as GridRoot;
+    for (const col of grid.columns) {
+      const found = findNode(col.child, id);
+      if (found) return found;
+    }
+  }
   return null;
 }
 
@@ -49,6 +57,13 @@ export function getDepth(target: LayoutNode, root: LayoutNode): number {
     if (node.type === 'scroll') {
       for (const section of (node as unknown as ScrollRoot).sections) {
         const d = walk(section, depth);
+        if (d !== null) return d;
+      }
+    }
+    if (node.type === 'grid') {
+      const grid = node as unknown as GridRoot;
+      for (const col of grid.columns) {
+        const d = walk(col.child, depth);
         if (d !== null) return d;
       }
     }
@@ -83,6 +98,16 @@ export function updateNode(
       sections: scroll.sections.map((s) => ({
         ...s,
         child: updateNode(s.child, id, fn),
+      })),
+    } as unknown as LayoutNode;
+  }
+  if (root.type === 'grid') {
+    const grid = root as unknown as GridRoot;
+    return {
+      ...grid,
+      columns: grid.columns.map((col) => ({
+        ...col,
+        child: updateNode(col.child, id, fn),
       })),
     } as unknown as LayoutNode;
   }
@@ -183,6 +208,16 @@ export function removeNode(root: LayoutNode, id: string): LayoutNode {
       sections: scroll.sections.map((s) => ({
         ...s,
         child: removeNode(s.child, id),
+      })),
+    } as unknown as LayoutNode;
+  }
+  if (root.type === 'grid') {
+    const grid = root as unknown as GridRoot;
+    return {
+      ...grid,
+      columns: grid.columns.map((col) => ({
+        ...col,
+        child: removeNode(col.child, id),
       })),
     } as unknown as LayoutNode;
   }
