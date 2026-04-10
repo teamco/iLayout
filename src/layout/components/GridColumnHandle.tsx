@@ -1,5 +1,6 @@
 // src/layout/components/GridColumnHandle.tsx
 import React, { useCallback, useRef } from 'react';
+import type { GridRoot } from '@/layout/types';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 
 type Props = {
@@ -9,28 +10,40 @@ type Props = {
 
 export function GridColumnHandle({ leftColumnId, rightColumnId }: Props) {
   const resizeGridColumn = useLayoutStore((s) => s.resizeGridColumn);
+  const root = useLayoutStore((s) => s.root);
   const startRef = useRef<{
     x: number;
     leftWidth: number;
     rightWidth: number;
+    leftIsFr: boolean;
+    rightIsFr: boolean;
   } | null>(null);
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    const el = e.currentTarget as HTMLElement;
-    const column = el.parentElement;
-    const nextColumn = column?.nextElementSibling as HTMLElement | null;
-    if (!column || !nextColumn) return;
+      const el = e.currentTarget as HTMLElement;
+      const column = el.parentElement;
+      const nextColumn = column?.nextElementSibling as HTMLElement | null;
+      if (!column || !nextColumn) return;
 
-    startRef.current = {
-      x: e.clientX,
-      leftWidth: column.offsetWidth,
-      rightWidth: nextColumn.offsetWidth,
-    };
-    el.setPointerCapture(e.pointerId);
-  }, []);
+      const grid = root.type === 'grid' ? (root as unknown as GridRoot) : null;
+      const leftCol = grid?.columns.find((c) => c.id === leftColumnId);
+      const rightCol = grid?.columns.find((c) => c.id === rightColumnId);
+
+      startRef.current = {
+        x: e.clientX,
+        leftWidth: column.offsetWidth,
+        rightWidth: nextColumn.offsetWidth,
+        leftIsFr: leftCol?.size.includes('fr') ?? false,
+        rightIsFr: rightCol?.size.includes('fr') ?? false,
+      };
+      el.setPointerCapture(e.pointerId);
+    },
+    [root, leftColumnId, rightColumnId],
+  );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
@@ -41,8 +54,13 @@ export function GridColumnHandle({ leftColumnId, rightColumnId }: Props) {
       const newLeft = Math.max(MIN_WIDTH, startRef.current.leftWidth + dx);
       const newRight = Math.max(MIN_WIDTH, startRef.current.rightWidth - dx);
 
-      resizeGridColumn(leftColumnId, `${Math.round(newLeft)}px`);
-      resizeGridColumn(rightColumnId, `${Math.round(newRight)}px`);
+      // Only resize px columns; fr columns stay as fr (grid auto-adjusts)
+      if (!startRef.current.leftIsFr) {
+        resizeGridColumn(leftColumnId, `${Math.round(newLeft)}px`);
+      }
+      if (!startRef.current.rightIsFr) {
+        resizeGridColumn(rightColumnId, `${Math.round(newRight)}px`);
+      }
     },
     [leftColumnId, rightColumnId, resizeGridColumn],
   );
