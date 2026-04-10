@@ -7,67 +7,123 @@ import {
   snapToNearestEdge,
 } from '@/layout/grid/snapToGrid';
 
-type Props = { sectionId: string };
+type Props = {
+  aboveSectionId: string;
+  belowSectionId?: string;
+};
 
-export function SectionHandle({ sectionId }: Props) {
+export function SectionHandle({ aboveSectionId, belowSectionId }: Props) {
   const resizeSection = useLayoutStore((s) => s.resizeSection);
   const root = useLayoutStore((s) => s.root);
   const { canvasHeight, rows, rowGutter } = useGridContext();
-  const startRef = useRef<{ y: number; height: number } | null>(null);
+  const startRef = useRef<{
+    y: number;
+    aboveHeight: number;
+    belowHeight: number;
+  } | null>(null);
 
   const scrollRoot =
     root.type === 'scroll' ? (root as unknown as ScrollRoot) : null;
-  const section = scrollRoot?.sections.find((s) => s.id === sectionId);
-  const isDisabled = !section || section.height.type === 'auto';
+  const aboveSection = scrollRoot?.sections.find(
+    (s) => s.id === aboveSectionId,
+  );
+  const belowSection = belowSectionId
+    ? scrollRoot?.sections.find((s) => s.id === belowSectionId)
+    : null;
+
+  const isDisabled = !aboveSection || aboveSection.height.type === 'auto';
 
   const handlePointerDown = useCallback(
     (e: React.PointerEvent) => {
       if (isDisabled) return;
       e.preventDefault();
       e.stopPropagation();
+
       const el = e.currentTarget as HTMLElement;
-      const sectionEl =
-        (el.previousElementSibling?.querySelector(
-          '[data-section]',
-        ) as HTMLElement | null) ??
-        (el.previousElementSibling as HTMLElement | null);
-      if (!sectionEl) return;
-      startRef.current = { y: e.clientY, height: sectionEl.offsetHeight };
+      const aboveEl = el.previousElementSibling as HTMLElement | null;
+      if (!aboveEl) return;
+
+      // Find below section element (next wrapper div's first child)
+      const wrapper = el.parentElement;
+      const nextWrapper = wrapper?.nextElementSibling;
+      const belowEl = nextWrapper?.firstElementChild as HTMLElement | null;
+
+      startRef.current = {
+        y: e.clientY,
+        aboveHeight: aboveEl.offsetHeight,
+        belowHeight: belowEl?.offsetHeight ?? 0,
+      };
       el.setPointerCapture(e.pointerId);
     },
     [isDisabled],
+  );
+
+  const applyResize = useCallback(
+    (dy: number, snap: boolean) => {
+      if (!startRef.current) return;
+
+      const MIN_HEIGHT = 50;
+      let newAboveHeight = Math.max(
+        MIN_HEIGHT,
+        startRef.current.aboveHeight + dy,
+      );
+
+      if (snap && canvasHeight > 0) {
+        const edges = getHorizontalGridEdges(canvasHeight, rows, rowGutter);
+        newAboveHeight = snapToNearestEdge(newAboveHeight, edges);
+      }
+
+      resizeSection(aboveSectionId, {
+        type: 'fixed',
+        value: `${Math.round(newAboveHeight)}px`,
+      });
+
+      if (belowSectionId && belowSection) {
+        let newBelowHeight = Math.max(
+          MIN_HEIGHT,
+          startRef.current.belowHeight - dy,
+        );
+
+        if (snap && canvasHeight > 0) {
+          const edges = getHorizontalGridEdges(canvasHeight, rows, rowGutter);
+          newBelowHeight = snapToNearestEdge(newBelowHeight, edges);
+        }
+
+        resizeSection(belowSectionId, {
+          type: 'fixed',
+          value: `${Math.round(newBelowHeight)}px`,
+        });
+      }
+    },
+    [
+      aboveSectionId,
+      belowSectionId,
+      belowSection,
+      resizeSection,
+      canvasHeight,
+      rows,
+      rowGutter,
+    ],
   );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent) => {
       if (!startRef.current) return;
       const dy = e.clientY - startRef.current.y;
-      const newHeight = Math.max(50, startRef.current.height + dy);
-      resizeSection(sectionId, {
-        type: 'fixed',
-        value: `${Math.round(newHeight)}px`,
-      });
+      applyResize(dy, false);
     },
-    [sectionId, resizeSection],
+    [applyResize],
   );
 
   const handlePointerUp = useCallback(
     (e: React.PointerEvent) => {
       if (!startRef.current) return;
       const dy = e.clientY - startRef.current.y;
-      let newHeight = Math.max(50, startRef.current.height + dy);
-      if (canvasHeight > 0) {
-        const edges = getHorizontalGridEdges(canvasHeight, rows, rowGutter);
-        newHeight = snapToNearestEdge(newHeight, edges);
-      }
-      resizeSection(sectionId, {
-        type: 'fixed',
-        value: `${Math.round(newHeight)}px`,
-      });
+      applyResize(dy, true);
       startRef.current = null;
       (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
     },
-    [sectionId, resizeSection, canvasHeight, rows, rowGutter],
+    [applyResize],
   );
 
   return (

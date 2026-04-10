@@ -13,7 +13,8 @@ import styles from './LayoutRenderer.module.less';
 export function renderNode(node: LayoutNode): React.ReactNode {
   if (node.type === 'splitter')
     return <SplitterNodeComponent key={node.id} node={node} />;
-  if (node.type === 'scroll') return <ScrollLayout key={node.id} root={node} />;
+  if (node.type === 'scroll')
+    return <ScrollLayout key={node.id} root={node} nested />;
   if (node.type === 'section') return renderNode(node.child);
   return <LeafNodeComponent key={node.id} node={node} />;
 }
