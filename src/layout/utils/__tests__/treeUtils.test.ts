@@ -169,6 +169,30 @@ const gridRoot: GridRoot = {
   ],
 };
 
+const gridHeaderLeaf: LayoutNode = { id: 'header-leaf', type: 'leaf' };
+const gridFooterLeaf: LayoutNode = { id: 'footer-leaf', type: 'leaf' };
+const gridRootWithSections: GridRoot = {
+  id: 'grid-with-sections',
+  type: 'grid',
+  columns: [{ id: 'col-main', size: '1fr', child: { id: 'col-leaf', type: 'leaf' } }],
+  headerSections: [
+    {
+      id: 'header-sec',
+      type: 'section',
+      height: { type: 'fixed', value: '80px' },
+      child: gridHeaderLeaf,
+    },
+  ],
+  footerSections: [
+    {
+      id: 'footer-sec',
+      type: 'section',
+      height: { type: 'fixed', value: '60px' },
+      child: gridFooterLeaf,
+    },
+  ],
+};
+
 describe('grid support', () => {
   it('findNode finds nodes inside grid columns', () => {
     const result = findNode(gridRoot as unknown as LayoutNode, 'grid-leaf-a');
@@ -218,8 +242,100 @@ describe('grid support', () => {
           },
         },
       ],
+      headerSections: [],
+      footerSections: [],
     };
     const result = removeNode(splitterInGrid as unknown as LayoutNode, 'la');
     expect((result as any).columns[0].child.id).toBe('lb');
+  });
+
+  it('findNode finds nodes in grid headerSections', () => {
+    const result = findNode(gridRootWithSections as unknown as LayoutNode, 'header-leaf');
+    expect(result).not.toBeNull();
+    expect(result!.node.id).toBe('header-leaf');
+  });
+
+  it('findNode finds nodes in grid footerSections', () => {
+    const result = findNode(gridRootWithSections as unknown as LayoutNode, 'footer-leaf');
+    expect(result).not.toBeNull();
+    expect(result!.node.id).toBe('footer-leaf');
+  });
+
+  it('findNode finds section nodes themselves in headerSections', () => {
+    const result = findNode(gridRootWithSections as unknown as LayoutNode, 'header-sec');
+    expect(result).not.toBeNull();
+    expect(result!.node.id).toBe('header-sec');
+  });
+
+  it('updateNode updates nodes inside grid headerSections', () => {
+    const updated = updateNode(
+      gridRootWithSections as unknown as LayoutNode,
+      'header-leaf',
+      (n) => ({
+        ...n,
+        widget: {
+          widgetId: 'header-widget',
+          resource: 'empty',
+          content: { value: '' },
+          config: {},
+        },
+      }),
+    );
+    const updatedGrid = updated as unknown as GridRoot;
+    expect(updatedGrid.headerSections[0].child).toMatchObject({
+      id: 'header-leaf',
+      widget: { widgetId: 'header-widget' },
+    });
+  });
+
+  it('updateNode updates nodes inside grid footerSections', () => {
+    const updated = updateNode(
+      gridRootWithSections as unknown as LayoutNode,
+      'footer-leaf',
+      (n) => ({
+        ...n,
+        widget: {
+          widgetId: 'footer-widget',
+          resource: 'empty',
+          content: { value: '' },
+          config: {},
+        },
+      }),
+    );
+    const updatedGrid = updated as unknown as GridRoot;
+    expect(updatedGrid.footerSections[0].child).toMatchObject({
+      id: 'footer-leaf',
+      widget: { widgetId: 'footer-widget' },
+    });
+  });
+
+  it('removeNode works in grid headerSections', () => {
+    const gridWithSplitterInHeader: GridRoot = {
+      id: 'g2',
+      type: 'grid',
+      columns: [{ id: 'c1', size: '1fr', child: { id: 'col-leaf', type: 'leaf' } }],
+      headerSections: [
+        {
+          id: 'header-sec2',
+          type: 'section',
+          height: { type: 'fixed', value: '80px' },
+          child: {
+            id: 'hsplit',
+            type: 'splitter',
+            direction: 'horizontal',
+            sizes: [50, 50],
+            children: [
+              { id: 'ha', type: 'leaf' },
+              { id: 'hb', type: 'leaf' },
+            ],
+          },
+        },
+      ],
+      footerSections: [],
+    };
+    const result = removeNode(gridWithSplitterInHeader as unknown as LayoutNode, 'ha');
+    const resultGrid = result as unknown as GridRoot;
+    // Splitter with 2→1 should collapse to surviving child
+    expect(resultGrid.headerSections[0].child.id).toBe('hb');
   });
 });
