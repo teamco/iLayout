@@ -74,6 +74,27 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
 
   const section = findSectionById(root, sectionId);
 
+  // Check if this is the only scroll section (can't delete)
+  const isOnlyScrollSection = (() => {
+    if (!sectionId) return false;
+    let scrollRoot: ScrollRoot | null = null;
+    if (root.type === 'scroll') scrollRoot = root as unknown as ScrollRoot;
+    if (root.type === 'grid') {
+      const grid = root as unknown as GridRoot;
+      for (const col of grid.columns) {
+        if (col.child.type === 'scroll') {
+          scrollRoot = col.child as unknown as ScrollRoot;
+          break;
+        }
+      }
+    }
+    if (!scrollRoot) return false;
+    return (
+      scrollRoot.sections.length <= 1 &&
+      scrollRoot.sections.some((s) => s.id === sectionId)
+    );
+  })();
+
   useEffect(() => {
     if (open && section) {
       const h = parseHeight(section.height);
@@ -120,7 +141,7 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
       onCancel={onClose}
       footer={
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button danger onClick={handleDelete}>
+          <Button danger onClick={handleDelete} disabled={isOnlyScrollSection}>
             {t('common.delete')}
           </Button>
           <Space>
