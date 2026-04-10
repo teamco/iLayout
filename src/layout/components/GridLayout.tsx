@@ -9,17 +9,11 @@ import { SectionHandle } from './SectionHandle';
 import { GridColumnHandle } from './GridColumnHandle';
 import styles from './GridLayout.module.less';
 
-function FullWidthSection({
-  section,
-  onConfig,
-}: {
-  section: SectionNode;
-  onConfig: (id: string) => void;
-}) {
+function FullWidthSection({ section }: { section: SectionNode }) {
   const editMode = useLayoutStore((s) => s.editMode);
   return (
-    <div style={{ gridColumn: '1 / -1' }}>
-      <SectionNodeComponent section={section} onConfig={onConfig} />
+    <div>
+      <SectionNodeComponent section={section} onConfig={() => {}} />
       {editMode && <SectionHandle aboveSectionId={section.id} />}
     </div>
   );
@@ -33,38 +27,32 @@ export function GridLayout({ root }: Props) {
   const templateColumns = root.columns.map((col) => col.size).join(' ');
 
   return (
-    <div
-      className={styles.grid}
-      style={{ gridTemplateColumns: templateColumns }}
-    >
+    <div className={styles.wrapper}>
       {root.headerSections?.map((section) => (
-        <FullWidthSection
-          key={section.id}
-          section={section}
-          onConfig={() => {}}
-        />
+        <FullWidthSection key={section.id} section={section} />
       ))}
-      {root.columns.map((col, i) => (
-        <div key={col.id} className={styles.column}>
-          {col.child.type === 'scroll' ? (
-            <ScrollLayout root={col.child as unknown as ScrollRoot} />
-          ) : (
-            renderNode(col.child)
-          )}
-          {editMode && i < root.columns.length - 1 && (
-            <GridColumnHandle
-              leftColumnId={col.id}
-              rightColumnId={root.columns[i + 1].id}
-            />
-          )}
-        </div>
-      ))}
+      <div
+        className={styles.grid}
+        style={{ gridTemplateColumns: templateColumns }}
+      >
+        {root.columns.map((col, i) => (
+          <div key={col.id} className={styles.column}>
+            {col.child.type === 'scroll' ? (
+              <ScrollLayout root={col.child as unknown as ScrollRoot} />
+            ) : (
+              renderNode(col.child)
+            )}
+            {editMode && i < root.columns.length - 1 && (
+              <GridColumnHandle
+                leftColumnId={col.id}
+                rightColumnId={root.columns[i + 1].id}
+              />
+            )}
+          </div>
+        ))}
+      </div>
       {root.footerSections?.map((section) => (
-        <FullWidthSection
-          key={section.id}
-          section={section}
-          onConfig={() => {}}
-        />
+        <FullWidthSection key={section.id} section={section} />
       ))}
     </div>
   );
