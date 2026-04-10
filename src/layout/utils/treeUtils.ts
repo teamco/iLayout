@@ -34,6 +34,13 @@ export function findNode(root: LayoutNode, id: string): FindResult | null {
   }
   if (root.type === 'grid') {
     const grid = root as unknown as GridRoot;
+    for (const section of [
+      ...(grid.headerSections ?? []),
+      ...(grid.footerSections ?? []),
+    ]) {
+      const found = findNode(section, id);
+      if (found) return found;
+    }
     for (const col of grid.columns) {
       const found = findNode(col.child, id);
       if (found) return found;
@@ -62,6 +69,13 @@ export function getDepth(target: LayoutNode, root: LayoutNode): number {
     }
     if (node.type === 'grid') {
       const grid = node as unknown as GridRoot;
+      for (const section of [
+        ...(grid.headerSections ?? []),
+        ...(grid.footerSections ?? []),
+      ]) {
+        const d = walk(section, depth);
+        if (d !== null) return d;
+      }
       for (const col of grid.columns) {
         const d = walk(col.child, depth);
         if (d !== null) return d;
@@ -105,6 +119,14 @@ export function updateNode(
     const grid = root as unknown as GridRoot;
     return {
       ...grid,
+      headerSections: (grid.headerSections ?? []).map((s) => ({
+        ...s,
+        child: updateNode(s.child, id, fn),
+      })),
+      footerSections: (grid.footerSections ?? []).map((s) => ({
+        ...s,
+        child: updateNode(s.child, id, fn),
+      })),
       columns: grid.columns.map((col) => ({
         ...col,
         child: updateNode(col.child, id, fn),
@@ -215,6 +237,14 @@ export function removeNode(root: LayoutNode, id: string): LayoutNode {
     const grid = root as unknown as GridRoot;
     return {
       ...grid,
+      headerSections: (grid.headerSections ?? []).map((s) => ({
+        ...s,
+        child: removeNode(s.child, id),
+      })),
+      footerSections: (grid.footerSections ?? []).map((s) => ({
+        ...s,
+        child: removeNode(s.child, id),
+      })),
       columns: grid.columns.map((col) => ({
         ...col,
         child: removeNode(col.child, id),

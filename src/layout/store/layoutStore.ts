@@ -52,6 +52,7 @@ export type LayoutActions = {
   reorderSections: (fromIndex: number, toIndex: number) => void;
   addGridColumn: (position: 'left' | 'right', size?: string) => void;
   removeGridColumn: (columnId: string) => void;
+  addGridSection: (position: 'top' | 'bottom') => void;
   resizeGridColumn: (columnId: string, size: string) => void;
 };
 
@@ -282,6 +283,8 @@ function makeActions(
             id: nanoid(),
             type: 'grid',
             columns,
+            headerSections: [],
+            footerSections: [],
           } as unknown as LayoutNode;
         }
       });
@@ -304,6 +307,26 @@ function makeActions(
         const grid = state.root as unknown as GridRoot;
         const col = grid.columns.find((c) => c.id === columnId);
         if (col) col.size = size;
+      });
+    },
+
+    addGridSection(position) {
+      set((state) => {
+        if (state.root.type !== 'grid') return;
+        const grid = state.root as unknown as GridRoot;
+        const newSection: SectionNode = {
+          id: nanoid(),
+          type: 'section',
+          height: { type: 'min', value: '200px' },
+          child: { id: nanoid(), type: 'leaf' },
+        };
+        if (position === 'top') {
+          if (!grid.headerSections) grid.headerSections = [];
+          grid.headerSections.push(newSection);
+        } else {
+          if (!grid.footerSections) grid.footerSections = [];
+          grid.footerSections.push(newSection);
+        }
       });
     },
   };

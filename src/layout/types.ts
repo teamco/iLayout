@@ -77,6 +77,8 @@ export type GridRoot = {
   id: string;
   type: 'grid';
   columns: GridColumn[];
+  headerSections: SectionNode[];
+  footerSections: SectionNode[];
 };
 
 export type LayoutNode =
