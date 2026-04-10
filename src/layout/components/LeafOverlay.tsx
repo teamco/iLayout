@@ -132,15 +132,17 @@ export function LeafOverlay({ node, dragListeners, dragAttributes }: Props) {
         </div>
       )}
 
-      {!isRoot && layoutMode !== 'scroll' && (
-        <Button
-          size="small"
-          danger
-          icon={<CloseOutlined />}
-          className={styles.removeBtn}
-          onClick={() => removePanel(node.id)}
-        />
-      )}
+      {!isRoot &&
+        (layoutMode !== 'scroll' ||
+          findNode(root, node.id)?.parent !== null) && (
+          <Button
+            size="small"
+            danger
+            icon={<CloseOutlined />}
+            className={styles.removeBtn}
+            onClick={() => removePanel(node.id)}
+          />
+        )}
 
       {showAddButton && (
         <Button
