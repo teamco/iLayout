@@ -61,7 +61,7 @@ export type WidgetDefinition = {
 **Location:** `src/widgets/registry.ts`
 
 ```ts
-Map<EWidgetResource, WidgetDefinition>
+Map<EWidgetResource, WidgetDefinition>;
 ```
 
 - `registerWidget(def)` — adds to map
@@ -69,6 +69,7 @@ Map<EWidgetResource, WidgetDefinition>
 - `getAllWidgetDefs()` — returns all definitions (for gallery)
 
 All widget modules auto-register via side-effect imports at the bottom of registry.ts:
+
 ```ts
 import './empty';
 import './youtube';
@@ -78,12 +79,14 @@ import './image';
 ## Built-in Widgets
 
 ### Empty (`src/widgets/empty/`)
+
 - **Component:** renders "Empty" placeholder text
 - **No editor** — content is static
 - **Default content:** `{ value: '' }`
 - **Icon:** `BorderOutlined`
 
 ### YouTube (`src/widgets/youtube/`)
+
 - **Component:** renders YouTube embed iframe from `content.value` (URL → embed URL conversion)
 - **Editor:** Input for YouTube URL + live iframe preview below
 - **Default content:** `{ value: '' }`
@@ -91,6 +94,7 @@ import './image';
 - **URL conversion:** `https://www.youtube.com/watch?v=ID` → `https://www.youtube.com/embed/ID`
 
 ### Image (`src/widgets/image/`)
+
 - **Component:** renders `<img>` from `content.value` (URL), fills container
 - **Editor:** Input for image URL + preview below
 - **Default content:** `{ value: '' }`
@@ -125,6 +129,7 @@ Currently shows widgets from the old `widgetRegistry`. Update to:
 **Location:** `src/pages/WidgetEditorPage.tsx`
 
 In the Content tab:
+
 1. Read current `resource` value from form
 2. Look up `getWidgetDef(resource)` — if it has an `editor`, render it instead of plain TextArea
 3. Editor receives `content` and `onChange` — syncs back to form state
@@ -137,6 +142,7 @@ In the Content tab:
 ## File Structure
 
 New files:
+
 ```
 src/widgets/types.ts
 src/widgets/registry.ts
@@ -154,9 +160,11 @@ src/widgets/image/definition.ts
 ```
 
 Modified files:
+
 - `src/layout/widgets/WidgetRenderer.tsx`
 - `src/layout/widgets/WidgetGallery.tsx`
 - `src/pages/WidgetEditorPage.tsx`
 
 Deleted files:
+
 - `src/layout/widgets/widgetRegistry.ts`

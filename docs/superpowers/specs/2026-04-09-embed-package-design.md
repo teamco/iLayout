@@ -103,16 +103,16 @@ import { WidgetLayout } from '@anthill-layout/embed';
 
 ### Props table
 
-| Prop (React) | data-attr (HTML) | Description |
-|---|---|---|
-| `layoutId` | `data-widget-layout` | Layout ID, fetch from API |
-| `layout` | — | Inline JSON (React only) |
-| `layoutUrl` | `data-widget-layout-url` | URL to JSON file |
-| `fullPage` | `data-full-page` | Stretch to full viewport |
-| `theme` | `data-theme` | Theme object (JSON string in HTML) |
-| `apiBase` | `data-api-base` | Custom API endpoint |
-| `onLoad` | — | Callback after load (React only) |
-| `onError` | — | Callback on error (React only) |
+| Prop (React) | data-attr (HTML)         | Description                        |
+| ------------ | ------------------------ | ---------------------------------- |
+| `layoutId`   | `data-widget-layout`     | Layout ID, fetch from API          |
+| `layout`     | —                        | Inline JSON (React only)           |
+| `layoutUrl`  | `data-widget-layout-url` | URL to JSON file                   |
+| `fullPage`   | `data-full-page`         | Stretch to full viewport           |
+| `theme`      | `data-theme`             | Theme object (JSON string in HTML) |
+| `apiBase`    | `data-api-base`          | Custom API endpoint                |
+| `onLoad`     | —                        | Callback after load (React only)   |
+| `onError`    | —                        | Callback on error (React only)     |
 
 **Priority:** `layout` (inline) > `layoutUrl` > `layoutId`. If multiple provided, highest priority wins.
 
@@ -122,13 +122,13 @@ The embed renderer is a lightweight fork — **no antd, no Zustand store, no DnD
 
 ### Components
 
-| Component | Replaces | Implementation |
-|---|---|---|
-| `EmbedLayoutRenderer` | `LayoutRenderer` | Recursive tree walker, no store dependency |
-| `EmbedSplitter` | `SplitterNodeComponent` | CSS `display: flex` with `flex-basis: {size}%` |
-| `EmbedLeaf` | `LeafNodeComponent` | Widget container, no overlay/edit controls |
-| `EmbedScrollLayout` | `ScrollLayout` | Vertical sections container |
-| `EmbedWidgetRenderer` | `WidgetRenderer` | `getWidgetDef()` → component, no edit logic |
+| Component             | Replaces                | Implementation                                 |
+| --------------------- | ----------------------- | ---------------------------------------------- |
+| `EmbedLayoutRenderer` | `LayoutRenderer`        | Recursive tree walker, no store dependency     |
+| `EmbedSplitter`       | `SplitterNodeComponent` | CSS `display: flex` with `flex-basis: {size}%` |
+| `EmbedLeaf`           | `LeafNodeComponent`     | Widget container, no overlay/edit controls     |
+| `EmbedScrollLayout`   | `ScrollLayout`          | Vertical sections container                    |
+| `EmbedWidgetRenderer` | `WidgetRenderer`        | `getWidgetDef()` → component, no edit logic    |
 
 ### Why not antd Splitter?
 
@@ -188,14 +188,14 @@ This allows the embed script to fetch published layouts without authentication.
 
 ```ts
 type WidgetLayoutTheme = {
-  colorPrimary?: string;     // --al-color-primary
-  colorBg?: string;          // --al-color-bg
-  colorText?: string;        // --al-color-text
-  colorBorder?: string;      // --al-color-border
-  fontFamily?: string;       // --al-font-family
-  fontSize?: number;         // --al-font-size (px)
-  borderRadius?: number;     // --al-border-radius (px)
-  spacing?: number;          // --al-spacing (px) — gap between panels
+  colorPrimary?: string; // --al-color-primary
+  colorBg?: string; // --al-color-bg
+  colorText?: string; // --al-color-text
+  colorBorder?: string; // --al-color-border
+  fontFamily?: string; // --al-font-family
+  fontSize?: number; // --al-font-size (px)
+  borderRadius?: number; // --al-border-radius (px)
+  spacing?: number; // --al-spacing (px) — gap between panels
 };
 ```
 
@@ -204,12 +204,15 @@ type WidgetLayoutTheme = {
 Theme prop is mapped to CSS custom properties on the root element:
 
 ```html
-<div class="al-root" style="
+<div
+  class="al-root"
+  style="
   --al-color-primary: #1a73e8;
   --al-color-bg: #ffffff;
   --al-font-family: Inter, sans-serif;
   --al-border-radius: 8px;
-">
+"
+>
   ...layout tree...
 </div>
 ```
@@ -257,6 +260,7 @@ Clients can also override variables directly in their CSS:
 Two builds from one package:
 
 **ESM (npm):**
+
 - Entry: `src/index.ts`
 - Output: `dist/index.mjs` + `dist/index.d.ts`
 - React, react-dom as `peerDependencies` (not bundled)
@@ -264,6 +268,7 @@ Two builds from one package:
 - ~15-30 KB gzipped
 
 **IIFE (script tag):**
+
 - Entry: `src/embed.ts`
 - Output: `dist/embed.js`
 - React, react-dom **bundled inside**

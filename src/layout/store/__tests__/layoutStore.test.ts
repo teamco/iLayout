@@ -27,7 +27,14 @@ describe('layoutStore', () => {
   it('sets a widget on a leaf', () => {
     const store = createLayoutStore();
     const rootId = store.getState().root.id;
-    act(() => store.getState().setWidget(rootId, { widgetId: 'w1', resource: 'component', content: { value: '' }, config: {} }));
+    act(() =>
+      store.getState().setWidget(rootId, {
+        widgetId: 'w1',
+        resource: 'component',
+        content: { value: '' },
+        config: {},
+      }),
+    );
     const root = store.getState().root as LeafNode;
     expect(root.widget?.widgetId).toBe('w1');
   });
@@ -37,8 +44,22 @@ describe('layoutStore', () => {
     const rootId = store.getState().root.id;
     act(() => store.getState().addPanel(rootId, 'right'));
     const { children } = store.getState().root as SplitterNode;
-    act(() => store.getState().setWidget(children[0].id, { widgetId: 'A', resource: 'component', content: { value: '' }, config: {} }));
-    act(() => store.getState().setWidget(children[1].id, { widgetId: 'B', resource: 'component', content: { value: '' }, config: {} }));
+    act(() =>
+      store.getState().setWidget(children[0].id, {
+        widgetId: 'A',
+        resource: 'component',
+        content: { value: '' },
+        config: {},
+      }),
+    );
+    act(() =>
+      store.getState().setWidget(children[1].id, {
+        widgetId: 'B',
+        resource: 'component',
+        content: { value: '' },
+        config: {},
+      }),
+    );
     act(() => store.getState().swapWidgets(children[0].id, children[1].id));
     const updated = store.getState().root as SplitterNode;
     expect((updated.children[0] as LeafNode).widget?.widgetId).toBe('B');
@@ -86,7 +107,10 @@ describe('layout modes', () => {
     const scrollRoot = store.getState().root as unknown as ScrollRoot;
     expect(scrollRoot.sections).toHaveLength(1);
     expect(scrollRoot.sections[0].type).toBe('section');
-    expect(scrollRoot.sections[0].height).toEqual({ type: 'fixed', value: '100vh' });
+    expect(scrollRoot.sections[0].height).toEqual({
+      type: 'fixed',
+      value: '100vh',
+    });
   });
 
   it('switches back to viewport taking first section child', () => {
@@ -128,10 +152,14 @@ describe('layout modes', () => {
     const twoSections = store.getState().root as unknown as ScrollRoot;
     expect(twoSections.sections).toHaveLength(2);
     act(() => store.getState().removeSection(twoSections.sections[1].id));
-    expect((store.getState().root as unknown as ScrollRoot).sections).toHaveLength(1);
+    expect(
+      (store.getState().root as unknown as ScrollRoot).sections,
+    ).toHaveLength(1);
     // Cannot remove last section
     act(() => store.getState().removeSection(firstId));
-    expect((store.getState().root as unknown as ScrollRoot).sections).toHaveLength(1);
+    expect(
+      (store.getState().root as unknown as ScrollRoot).sections,
+    ).toHaveLength(1);
   });
 
   it('resizes a section', () => {
@@ -139,9 +167,16 @@ describe('layout modes', () => {
     act(() => store.getState().setLayoutMode('scroll'));
     const scrollRoot = store.getState().root as unknown as ScrollRoot;
     const sectionId = scrollRoot.sections[0].id;
-    act(() => store.getState().resizeSection(sectionId, { type: 'fixed', value: '500px' }));
+    act(() =>
+      store
+        .getState()
+        .resizeSection(sectionId, { type: 'fixed', value: '500px' }),
+    );
     const updated = store.getState().root as unknown as ScrollRoot;
-    expect(updated.sections[0].height).toEqual({ type: 'fixed', value: '500px' });
+    expect(updated.sections[0].height).toEqual({
+      type: 'fixed',
+      value: '500px',
+    });
   });
 
   it('updates section config (overlap, zIndex)', () => {
@@ -149,7 +184,11 @@ describe('layout modes', () => {
     act(() => store.getState().setLayoutMode('scroll'));
     const scrollRoot = store.getState().root as unknown as ScrollRoot;
     const sectionId = scrollRoot.sections[0].id;
-    act(() => store.getState().updateSectionConfig(sectionId, { overlap: '-30px', zIndex: 5 }));
+    act(() =>
+      store
+        .getState()
+        .updateSectionConfig(sectionId, { overlap: '-30px', zIndex: 5 }),
+    );
     const updated = store.getState().root as unknown as ScrollRoot;
     expect(updated.sections[0].overlap).toBe('-30px');
     expect(updated.sections[0].zIndex).toBe(5);
@@ -163,7 +202,7 @@ describe('layout modes', () => {
     act(() => store.getState().addSection('after', firstId));
     act(() => store.getState().addSection('after', firstId));
     const three = store.getState().root as unknown as ScrollRoot;
-    const ids = three.sections.map(s => s.id);
+    const ids = three.sections.map((s) => s.id);
     act(() => store.getState().reorderSections(0, 2));
     const reordered = store.getState().root as unknown as ScrollRoot;
     expect(reordered.sections[2].id).toBe(ids[0]);

@@ -6,13 +6,16 @@ let timer: ReturnType<typeof setTimeout> | null = null;
 let currentLayoutId: string | null = null;
 let currentStorage: LayoutStorage | null = null;
 
-export function initAutoSave(layoutId: string, storage: LayoutStorage): () => void {
+export function initAutoSave(
+  layoutId: string,
+  storage: LayoutStorage,
+): () => void {
   // Cancel any pending save for previous layout
   if (timer) clearTimeout(timer);
   currentLayoutId = layoutId;
   currentStorage = storage;
 
-  return useLayoutStore.subscribe(state => {
+  return useLayoutStore.subscribe((state) => {
     const root = state.root;
     if (timer) clearTimeout(timer);
     const id = currentLayoutId;

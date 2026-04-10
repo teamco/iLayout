@@ -29,7 +29,14 @@ export function UserProfilePage() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
       <AppHeader />
-      <div style={{ maxWidth: 600, margin: '32px auto', padding: '0 16px', width: '100%' }}>
+      <div
+        style={{
+          maxWidth: 600,
+          margin: '32px auto',
+          padding: '0 16px',
+          width: '100%',
+        }}
+      >
         <Button
           type="text"
           icon={<ArrowLeftOutlined />}
@@ -39,35 +46,61 @@ export function UserProfilePage() {
           {t('common.back')}
         </Button>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 16,
+            marginBottom: 24,
+          }}
+        >
           <Avatar
             size={64}
-            src={profile.avatar_url
-              ? <img src={profile.avatar_url} referrerPolicy="no-referrer" />
-              : gravatarUrl}
-            icon={!profile.avatar_url && !gravatarUrl ? <UserOutlined /> : undefined}
+            src={
+              profile.avatar_url ? (
+                <img src={profile.avatar_url} referrerPolicy="no-referrer" />
+              ) : (
+                gravatarUrl
+              )
+            }
+            icon={
+              !profile.avatar_url && !gravatarUrl ? <UserOutlined /> : undefined
+            }
           />
           <div>
-            <Title level={4} style={{ margin: 0 }}>{profile.full_name || profile.email}</Title>
+            <Title level={4} style={{ margin: 0 }}>
+              {profile.full_name || profile.email}
+            </Title>
             <Text type="secondary">{profile.email}</Text>
             <div style={{ marginTop: 4 }}>
-              {profile.is_blocked
-                ? <Tag color="red">{t('profile.blockUser')}</Tag>
-                : profile.is_online
-                  ? <Tag color="green">{t('profile.online')}</Tag>
-                  : <Tag>{t('profile.offline')}</Tag>
-              }
+              {profile.is_blocked ? (
+                <Tag color="red">{t('profile.blockUser')}</Tag>
+              ) : profile.is_online ? (
+                <Tag color="green">{t('profile.online')}</Tag>
+              ) : (
+                <Tag>{t('profile.offline')}</Tag>
+              )}
             </div>
           </div>
         </div>
 
         <Descriptions column={1} size="small">
-          <Descriptions.Item label={t('profile.provider')}>{profile.provider ?? '—'}</Descriptions.Item>
-          <Descriptions.Item label={t('profile.userId')}>
-            <Text copyable style={{ fontSize: 12 }}>{profile.id}</Text>
+          <Descriptions.Item label={t('profile.provider')}>
+            {profile.provider ?? '—'}
           </Descriptions.Item>
-          <Descriptions.Item label={t('profile.created')}>{formatDate(profile.created_at)}</Descriptions.Item>
-          <Descriptions.Item label={t('profile.lastSignIn')}>{profile.last_sign_in_at ? formatDate(profile.last_sign_in_at) : '—'}</Descriptions.Item>
+          <Descriptions.Item label={t('profile.userId')}>
+            <Text copyable style={{ fontSize: 12 }}>
+              {profile.id}
+            </Text>
+          </Descriptions.Item>
+          <Descriptions.Item label={t('profile.created')}>
+            {formatDate(profile.created_at)}
+          </Descriptions.Item>
+          <Descriptions.Item label={t('profile.lastSignIn')}>
+            {profile.last_sign_in_at
+              ? formatDate(profile.last_sign_in_at)
+              : '—'}
+          </Descriptions.Item>
         </Descriptions>
       </div>
     </div>

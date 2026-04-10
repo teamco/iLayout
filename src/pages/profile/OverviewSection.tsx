@@ -8,7 +8,11 @@ const { Text } = Typography;
 export function OverviewSection() {
   const { t } = useTranslation();
   return (
-    <PageLayout title={<PageTitle name={t('profile.overview')} Icon={DashboardOutlined} />}>
+    <PageLayout
+      title={
+        <PageTitle name={t('profile.overview')} Icon={DashboardOutlined} />
+      }
+    >
       <Text type="secondary">{t('profile.dashboardComingSoon')}</Text>
     </PageLayout>
   );

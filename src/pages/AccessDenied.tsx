@@ -9,12 +9,21 @@ export function AccessDenied() {
 
   return (
     <Result
-      style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '60vh',
+      }}
       status="403"
       title="403"
       subTitle={t('common.accessDenied')}
       extra={
-        <Button type="primary" onClick={() => void navigate({ to: ERoutes.HOME })}>
+        <Button
+          type="primary"
+          onClick={() => void navigate({ to: ERoutes.HOME })}
+        >
           {t('common.back')}
         </Button>
       }

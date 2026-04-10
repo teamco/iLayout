@@ -108,6 +108,7 @@ describe('layoutStore', () => {
 ```
 
 Key patterns:
+
 - Always wrap state mutations in `act()`
 - Use `createLayoutStore()` (not `useLayoutStore` singleton) for test isolation
 - Each test gets a fresh store instance
@@ -134,6 +135,7 @@ describe('snapToGrid', () => {
 ```
 
 Key patterns:
+
 - Use `toBeCloseTo` for floating point comparisons
 - Test edge cases: empty inputs, zero values, boundary conditions
 - Test invariants: sum preservation, minimum sizes, etc.
@@ -154,11 +156,14 @@ describe('themeStore', () => {
   });
 
   it('resolves system to dark when matchMedia matches', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
     const store = createThemeStore();
     expect(store.getState().resolvedTheme).toBe('dark');
     vi.unstubAllGlobals();
@@ -238,9 +243,13 @@ For tests involving Supabase API calls:
 vi.mock('@/lib/supabase', () => ({
   supabase: {
     auth: {
-      getUser: vi.fn().mockResolvedValue({ data: { user: { id: 'test-user-id' } } }),
+      getUser: vi
+        .fn()
+        .mockResolvedValue({ data: { user: { id: 'test-user-id' } } }),
       getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
-      onAuthStateChange: vi.fn().mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
+      onAuthStateChange: vi
+        .fn()
+        .mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } }),
     },
     from: vi.fn().mockReturnValue({
       select: vi.fn().mockReturnThis(),
@@ -276,7 +285,9 @@ vi.mock('@/auth/abilityContext', () => ({
   useAbility: () => ({
     can: vi.fn().mockReturnValue(true),
   }),
-  AbilityContext: { Consumer: ({ children }: any) => children({ can: () => true }) },
+  AbilityContext: {
+    Consumer: ({ children }: any) => children({ can: () => true }),
+  },
 }));
 ```
 
@@ -293,12 +304,12 @@ vi.mock('react-i18next', () => ({
 
 ## Existing Test Coverage
 
-| Area | File | Tests | Description |
-|------|------|-------|-------------|
-| Layout Store | `layoutStore.test.ts` | 48 | Panel CRUD, widget management, mode switching, section actions |
-| Tree Utils | `treeUtils.test.ts` | varies | findNode, splitNode, removeNode, updateNode |
-| Grid Snap | `snapToGrid.test.ts` | varies | Grid edges, snap-to-grid, horizontal grid, nearest edge |
-| Theme Store | `themeStore.test.ts` | 7 | Theme cycling, system resolution, localStorage persistence |
+| Area         | File                  | Tests  | Description                                                    |
+| ------------ | --------------------- | ------ | -------------------------------------------------------------- |
+| Layout Store | `layoutStore.test.ts` | 48     | Panel CRUD, widget management, mode switching, section actions |
+| Tree Utils   | `treeUtils.test.ts`   | varies | findNode, splitNode, removeNode, updateNode                    |
+| Grid Snap    | `snapToGrid.test.ts`  | varies | Grid edges, snap-to-grid, horizontal grid, nearest edge        |
+| Theme Store  | `themeStore.test.ts`  | 7      | Theme cycling, system resolution, localStorage persistence     |
 
 ## Adding New Tests
 

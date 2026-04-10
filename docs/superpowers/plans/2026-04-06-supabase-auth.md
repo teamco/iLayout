@@ -13,12 +13,14 @@
 ### Task 1: Install packages and create Supabase client
 
 **Files:**
+
 - Create: `src/lib/supabase.ts`
 - Modify: `.gitignore`
 
 - [ ] **Step 1: Install dependencies**
 
 Run:
+
 ```bash
 pnpm add @supabase/supabase-js @tanstack/react-router
 ```
@@ -26,6 +28,7 @@ pnpm add @supabase/supabase-js @tanstack/react-router
 - [ ] **Step 2: Add .env to .gitignore**
 
 Append to `.gitignore`:
+
 ```
 .env
 .env.local
@@ -42,7 +45,9 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY env vars');
+  throw new Error(
+    'Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY env vars',
+  );
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
@@ -65,6 +70,7 @@ git commit -m "feat(auth): install supabase-js and tanstack router, create supab
 ### Task 2: Create AuthContext
 
 **Files:**
+
 - Create: `src/auth/AuthContext.tsx`
 
 - [ ] **Step 1: Create AuthContext.tsx**
@@ -72,7 +78,14 @@ git commit -m "feat(auth): install supabase-js and tanstack router, create supab
 Create `src/auth/AuthContext.tsx`:
 
 ```tsx
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from 'react';
 import type { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
@@ -104,7 +117,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setLoading(false);
     });
@@ -117,7 +132,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, signOut }}>
+    <AuthContext.Provider
+      value={{ session, user: session?.user ?? null, loading, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -141,6 +158,7 @@ git commit -m "feat(auth): create AuthContext with session management"
 ### Task 3: Create LoginPage
 
 **Files:**
+
 - Create: `src/auth/LoginPage.tsx`
 
 - [ ] **Step 1: Create LoginPage.tsx**
@@ -149,8 +167,22 @@ Create `src/auth/LoginPage.tsx`:
 
 ```tsx
 import { useState } from 'react';
-import { Card, Input, Button, Tabs, Divider, Typography, message, Space } from 'antd';
-import { GoogleOutlined, GithubOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Input,
+  Button,
+  Tabs,
+  Divider,
+  Typography,
+  message,
+  Space,
+} from 'antd';
+import {
+  GoogleOutlined,
+  GithubOutlined,
+  MailOutlined,
+  LockOutlined,
+} from '@ant-design/icons';
 import { supabase } from '@/lib/supabase';
 
 const { Text } = Typography;
@@ -164,7 +196,10 @@ function EmailPasswordTab() {
   async function handleSignIn() {
     setError('');
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
     setLoading(false);
     if (error) setError(error.message);
   }
@@ -187,20 +222,24 @@ function EmailPasswordTab() {
         prefix={<MailOutlined />}
         placeholder="Email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         onPressEnter={handleSignIn}
       />
       <Input.Password
         prefix={<LockOutlined />}
         placeholder="Password"
         value={password}
-        onChange={e => setPassword(e.target.value)}
+        onChange={(e) => setPassword(e.target.value)}
         onPressEnter={handleSignIn}
       />
       {error && <Text type="danger">{error}</Text>}
       <Space>
-        <Button type="primary" loading={loading} onClick={handleSignIn}>Sign In</Button>
-        <Button loading={loading} onClick={handleSignUp}>Sign Up</Button>
+        <Button type="primary" loading={loading} onClick={handleSignIn}>
+          Sign In
+        </Button>
+        <Button loading={loading} onClick={handleSignUp}>
+          Sign Up
+        </Button>
       </Space>
     </Space>
   );
@@ -234,11 +273,13 @@ function MagicLinkTab() {
         prefix={<MailOutlined />}
         placeholder="Email"
         value={email}
-        onChange={e => setEmail(e.target.value)}
+        onChange={(e) => setEmail(e.target.value)}
         onPressEnter={handleSend}
       />
       {error && <Text type="danger">{error}</Text>}
-      <Button type="primary" loading={loading} onClick={handleSend}>Send Magic Link</Button>
+      <Button type="primary" loading={loading} onClick={handleSend}>
+        Send Magic Link
+      </Button>
     </Space>
   );
 }
@@ -253,7 +294,14 @@ async function handleOAuth(provider: 'google' | 'github') {
 
 export function LoginPage() {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100dvh',
+      }}
+    >
       <Card title="Sign In" style={{ width: 400 }}>
         <Tabs
           items={[
@@ -263,10 +311,18 @@ export function LoginPage() {
         />
         <Divider>or</Divider>
         <Space direction="vertical" style={{ width: '100%' }}>
-          <Button block icon={<GoogleOutlined />} onClick={() => handleOAuth('google')}>
+          <Button
+            block
+            icon={<GoogleOutlined />}
+            onClick={() => handleOAuth('google')}
+          >
             Continue with Google
           </Button>
-          <Button block icon={<GithubOutlined />} onClick={() => handleOAuth('github')}>
+          <Button
+            block
+            icon={<GithubOutlined />}
+            onClick={() => handleOAuth('github')}
+          >
             Continue with GitHub
           </Button>
         </Space>
@@ -293,6 +349,7 @@ git commit -m "feat(auth): create LoginPage with email, magic link, and OAuth"
 ### Task 4: Create AuthCallback
 
 **Files:**
+
 - Create: `src/auth/AuthCallback.tsx`
 
 - [ ] **Step 1: Create AuthCallback.tsx**
@@ -309,7 +366,9 @@ export function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
         navigate({ to: '/' });
       }
@@ -327,7 +386,14 @@ export function AuthCallback() {
   }, [navigate]);
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh' }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100dvh',
+      }}
+    >
       <Spin size="large" />
     </div>
   );
@@ -351,6 +417,7 @@ git commit -m "feat(auth): create AuthCallback for OAuth redirect handling"
 ### Task 5: Create router and refactor main.tsx + App.tsx
 
 **Files:**
+
 - Create: `src/router.tsx`
 - Modify: `src/main.tsx`
 - Modify: `src/App.tsx`
@@ -374,7 +441,7 @@ import { useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
 function RootComponent() {
-  const resolvedTheme = useThemeStore(s => s.resolvedTheme);
+  const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
 
   useEffect(() => {
     document.documentElement.dataset.theme = resolvedTheme;
@@ -389,7 +456,14 @@ function RootComponent() {
 
   return (
     <AuthProvider>
-      <ConfigProvider theme={{ algorithm: resolvedTheme === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
+      <ConfigProvider
+        theme={{
+          algorithm:
+            resolvedTheme === 'dark'
+              ? theme.darkAlgorithm
+              : theme.defaultAlgorithm,
+        }}
+      >
         <Outlet />
       </ConfigProvider>
     </AuthProvider>
@@ -405,7 +479,9 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       throw redirect({ to: '/login' });
     }
@@ -421,7 +497,9 @@ const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
   async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (session) {
       throw redirect({ to: '/' });
     }
@@ -441,7 +519,11 @@ const callbackRoute = createRoute({
   },
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute, callbackRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  loginRoute,
+  callbackRoute,
+]);
 
 export const router = createRouter({ routeTree });
 
@@ -499,7 +581,14 @@ The updated `src/App.tsx`:
 // src/App.tsx
 import { useEffect, useState } from 'react';
 import { Button, Tooltip } from 'antd';
-import { AppstoreOutlined, CodeOutlined, LogoutOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
+import {
+  AppstoreOutlined,
+  CodeOutlined,
+  LogoutOutlined,
+  SunOutlined,
+  MoonOutlined,
+  DesktopOutlined,
+} from '@ant-design/icons';
 import { useThemeStore } from '@/themes/themeStore';
 import { useAuth } from '@/auth/AuthContext';
 import { LayoutRenderer } from '@/layout/components/LayoutRenderer';
@@ -514,19 +603,19 @@ import styles from './App.module.less';
 const LAYOUT_ID = 'default';
 
 export default function App() {
-  const editMode = useLayoutStore(s => s.editMode);
-  const setEditMode = useLayoutStore(s => s.setEditMode);
-  const showGrid = useLayoutStore(s => s.showGrid);
-  const toggleGrid = useLayoutStore(s => s.toggleGrid);
+  const editMode = useLayoutStore((s) => s.editMode);
+  const setEditMode = useLayoutStore((s) => s.setEditMode);
+  const showGrid = useLayoutStore((s) => s.showGrid);
+  const toggleGrid = useLayoutStore((s) => s.toggleGrid);
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
 
-  const themeMode = useThemeStore(s => s.themeMode);
-  const cycleTheme = useThemeStore(s => s.cycleTheme);
+  const themeMode = useThemeStore((s) => s.themeMode);
+  const cycleTheme = useThemeStore((s) => s.cycleTheme);
 
   const { signOut } = useAuth();
 
   useEffect(() => {
-    localStorageAdapter.load(LAYOUT_ID).then(saved => {
+    localStorageAdapter.load(LAYOUT_ID).then((saved) => {
       if (saved) useLayoutStore.setState({ root: saved });
     });
     return initAutoSave(LAYOUT_ID, localStorageAdapter);
@@ -549,10 +638,26 @@ export default function App() {
       <div className={styles.toolbar}>
         <span className={styles.toolbarTitle}>Anthill Layouts</span>
         <div className={styles.toolbarSpacer} />
-        <Tooltip title={themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'}>
+        <Tooltip
+          title={
+            themeMode === 'light'
+              ? 'Light'
+              : themeMode === 'dark'
+                ? 'Dark'
+                : 'System'
+          }
+        >
           <Button
             size="small"
-            icon={themeMode === 'light' ? <SunOutlined /> : themeMode === 'dark' ? <MoonOutlined /> : <DesktopOutlined />}
+            icon={
+              themeMode === 'light' ? (
+                <SunOutlined />
+              ) : themeMode === 'dark' ? (
+                <MoonOutlined />
+              ) : (
+                <DesktopOutlined />
+              )
+            }
             onClick={cycleTheme}
           />
         </Tooltip>
@@ -581,11 +686,7 @@ export default function App() {
           </Tooltip>
         )}
         <Tooltip title="Sign out">
-          <Button
-            size="small"
-            icon={<LogoutOutlined />}
-            onClick={signOut}
-          />
+          <Button size="small" icon={<LogoutOutlined />} onClick={signOut} />
         </Tooltip>
       </div>
       <div className={styles.canvas}>
@@ -594,7 +695,10 @@ export default function App() {
           {showGrid && <GridOverlay />}
         </GridProvider>
       </div>
-      <LayoutJsonModal open={jsonModalOpen} onClose={() => setJsonModalOpen(false)} />
+      <LayoutJsonModal
+        open={jsonModalOpen}
+        onClose={() => setJsonModalOpen(false)}
+      />
     </div>
   );
 }
@@ -608,6 +712,7 @@ Expected: Build succeeds, tests pass.
 - [ ] **Step 5: Verify manually**
 
 Run: `pnpm dev`
+
 - Navigate to `/` — should redirect to `/login` (no session)
 - Login page shows email/password tab, magic link tab, Google/GitHub buttons
 - Sign in with email+password → redirects to `/` with layout builder

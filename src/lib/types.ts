@@ -48,7 +48,8 @@ export const EWidgetCategory = {
   EMBED: 'embed',
   UTILITY: 'utility',
 } as const;
-export type EWidgetCategory = (typeof EWidgetCategory)[keyof typeof EWidgetCategory];
+export type EWidgetCategory =
+  (typeof EWidgetCategory)[keyof typeof EWidgetCategory];
 
 export const EWidgetResource = {
   YOUTUBE: 'youtube',
@@ -57,7 +58,8 @@ export const EWidgetResource = {
   COMPONENT: 'component',
   EMPTY: 'empty',
 } as const;
-export type EWidgetResource = (typeof EWidgetResource)[keyof typeof EWidgetResource];
+export type EWidgetResource =
+  (typeof EWidgetResource)[keyof typeof EWidgetResource];
 
 // ─── Widget types ─────────────────────────────────────────────────────────────
 

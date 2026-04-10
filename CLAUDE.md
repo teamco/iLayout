@@ -48,13 +48,18 @@ src/layout/
 ## Rules
 
 ### API versions
+
 Before using any component or prop from a library, verify it exists in the **installed version** (check `package.json`). Do not use APIs from older versions. In particular:
+
 - antd 6: `Drawer` uses `size` (`'default' | 'large'`), not `width`. `Card.Meta` is removed — use `Typography.Text` directly. `Splitter` uses `orientation`, not `layout`.
 
 ### Test files
+
 All test files go in a `__tests__/` subfolder next to the module they test. Imports inside `__tests__/` use `../` to reach the module under test.
 
 ### After implementation
+
 When a feature is fully implemented and tests pass:
+
 1. Update `docs/superpowers/specs/` with any design changes.
 2. Save a short summary to `docs/superpowers/plans/` or a dedicated `docs/sessions/YYYY-MM-DD-<feature>.md` describing what was built, key decisions, and anything non-obvious.

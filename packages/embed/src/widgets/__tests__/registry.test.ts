@@ -1,6 +1,11 @@
 // packages/embed/src/widgets/__tests__/registry.test.ts
 import { describe, it, expect, beforeEach } from 'vitest';
-import { registerWidget, getWidgetDef, getAllWidgetDefs, clearRegistry } from '../registry';
+import {
+  registerWidget,
+  getWidgetDef,
+  getAllWidgetDefs,
+  clearRegistry,
+} from '../registry';
 import type { WidgetDefinition } from '../../types';
 
 const stub: WidgetDefinition = {

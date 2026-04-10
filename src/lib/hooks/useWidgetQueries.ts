@@ -45,7 +45,8 @@ export function useCreateWidget() {
 export function useUpdateWidget() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<WidgetRecord> }) => api.updateWidget(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<WidgetRecord> }) =>
+      api.updateWidget(id, data),
     onSuccess: (updated) => {
       queryClient.setQueryData(KEYS.widget(updated.id), updated);
       void queryClient.invalidateQueries({ queryKey: ['widgets'] });

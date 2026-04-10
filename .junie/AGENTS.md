@@ -7,6 +7,7 @@ This document provides project-specific details for advanced developers and AI a
 The project is a Vite-powered React application using TypeScript and `pnpm` for package management.
 
 ### Commands
+
 - `pnpm dev`: Starts the development server with HMR.
 - `pnpm build`: Runs `tsc -b` and `vite build` for a production bundle.
 - `pnpm lint`: Runs ESLint for the whole project.
@@ -16,12 +17,15 @@ The project is a Vite-powered React application using TypeScript and `pnpm` for 
 - `pnpm test:watch`: Runs tests in watch mode.
 
 ### Environment Variables
+
 Copy `.env.example` to `.env` and fill in:
+
 - `VITE_SUPABASE_URL`: Supabase project URL.
 - `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY`: Supabase publishable key.
 - `VITE_ADMINS`: Comma-separated admin emails (for CASL role determination).
 
 ### Key Technologies
+
 - **Vite 8**: Build tool and dev server.
 - **React 19**: Frontend framework.
 - **Supabase**: Auth, PostgreSQL database, and RLS (client in `src/lib/supabase.ts`).
@@ -39,16 +43,19 @@ Copy `.env.example` to `.env` and fill in:
 The project uses **Vitest** with **JSDOM** and **React Testing Library**.
 
 ### Running Tests
+
 - `npm test`: Runs all tests once.
 - `npm run test:watch`: Runs tests in watch mode.
 - To run a specific test file: `pnpm test <path-to-file>`.
 
 ### Configuration
+
 - `vitest.config.ts`: Main test configuration.
 - `src/test-setup.ts`: Sets up global mocks (e.g., `localStorage`, `sessionStorage`) and `@testing-library/jest-dom`.
 - Alias `@` is configured to point to `src/`.
 
 ### Guidelines
+
 - **Ant Design Mocking**: Standard `antd` components (Modals, Tabs) may be difficult to test in JSDOM. Use/extend the custom mock in `__tests__/antd.tsx`.
 - **Hooks Testing**: Use `renderHook` from `@testing-library/react`.
 - **Naming**: All test files go in a `__tests__/` subfolder next to the module they test. Name file `*.test.tsx` or `*.test.ts`.
@@ -58,11 +65,13 @@ The project uses **Vitest** with **JSDOM** and **React Testing Library**.
 - **Router Mocking**: Use `vi.mock('@tanstack/react-router', ...)` to mock `useNavigate`, `useParams`, etc.
 
 ### Critical Gotchas
+
 - **Ant Design 6 API**: `Drawer` uses `size`, not `width`. `Splitter` uses `orientation`, not `layout`. `Space` uses `orientation`, not `direction`.
 - **Theme Switcher**: `data-theme` is set synchronously at module load to prevent FOUC.
 - **RTL Support**: Ant Design `ConfigProvider` handles RTL direction based on active language.
 
 ### Example Test (Verified)
+
 ```tsx
 import { describe, it, expect } from 'vitest';
 import { renderHook } from '@testing-library/react';
@@ -79,9 +88,7 @@ describe('useAuth', () => {
     };
 
     const wrapper = ({ children }: { children: React.ReactNode }) => (
-      <AuthContext.Provider value={mockValue}>
-        {children}
-      </AuthContext.Provider>
+      <AuthContext.Provider value={mockValue}>{children}</AuthContext.Provider>
     );
 
     const { result } = renderHook(() => useAuth(), { wrapper });
@@ -95,12 +102,14 @@ describe('useAuth', () => {
 ## ✍️ Development Information
 
 ### Code Style
+
 - **TypeScript**: Strict typing is preferred.
 - **Functional Components**: Use functional components with hooks.
 - **Imports**: Use `@/` alias for paths under `src/`.
 - **Icons**: Use `@ant-design/icons`.
 
 ### Architecture
+
 - `src/layout/`: Core layout builder (SplitterNode, ScrollLayout, Store).
 - `src/widgets/`: Modular widget system (registry and implementation).
 - `src/pages/`: Route components (Home, Profile, LayoutEditor, WidgetEditor).

@@ -13,6 +13,7 @@
 ### Task 1: Supabase migration — add `mode` column
 
 **Files:**
+
 - No local files — migration via Supabase MCP
 
 - [ ] **Step 1: Apply migration**
@@ -32,6 +33,7 @@ Use `execute_sql` to confirm: `select column_name, column_default from informati
 ### Task 2: Add types to layout/types.ts
 
 **Files:**
+
 - Modify: `src/layout/types.ts`
 
 - [ ] **Step 1: Add new types**
@@ -86,6 +88,7 @@ git commit -m "feat(layout-modes): add LayoutMode, SectionNode, ScrollRoot types
 ### Task 3: Add LayoutMode to LayoutRecord
 
 **Files:**
+
 - Modify: `src/lib/types.ts`
 
 - [ ] **Step 1: Add mode field**
@@ -120,6 +123,7 @@ git commit -m "feat(layout-modes): add mode to LayoutRecord"
 ### Task 4: Add section actions to layoutStore
 
 **Files:**
+
 - Modify: `src/layout/store/layoutStore.ts`
 
 - [ ] **Step 1: Add layoutMode state and section actions**
@@ -127,16 +131,27 @@ git commit -m "feat(layout-modes): add mode to LayoutRecord"
 In `src/layout/store/layoutStore.ts`:
 
 Add imports:
+
 ```ts
-import type { LayoutNode, SplitDirection, WidgetRef, LayoutMode, SectionNode, SectionHeight, ScrollRoot } from '../types';
+import type {
+  LayoutNode,
+  SplitDirection,
+  WidgetRef,
+  LayoutMode,
+  SectionNode,
+  SectionHeight,
+  ScrollRoot,
+} from '../types';
 ```
 
 Add to `LayoutState`:
+
 ```ts
-  layoutMode: LayoutMode;
+layoutMode: LayoutMode;
 ```
 
 Add to `LayoutActions`:
+
 ```ts
   setLayoutMode: (mode: LayoutMode) => void;
   addSection: (position: 'before' | 'after', targetSectionId: string) => void;
@@ -248,6 +263,7 @@ git commit -m "feat(layout-modes): add layoutMode state and section actions to s
 ### Task 5: Add tests for section actions
 
 **Files:**
+
 - Modify: `src/layout/store/__tests__/layoutStore.test.ts`
 
 - [ ] **Step 1: Add section action tests**
@@ -271,7 +287,10 @@ describe('layout modes', () => {
     const scrollRoot = store.getState().root as ScrollRoot;
     expect(scrollRoot.sections).toHaveLength(1);
     expect(scrollRoot.sections[0].type).toBe('section');
-    expect(scrollRoot.sections[0].height).toEqual({ type: 'fixed', value: '100vh' });
+    expect(scrollRoot.sections[0].height).toEqual({
+      type: 'fixed',
+      value: '100vh',
+    });
   });
 
   it('switches back to viewport taking first section child', () => {
@@ -324,9 +343,16 @@ describe('layout modes', () => {
     act(() => store.getState().setLayoutMode('scroll'));
     const scrollRoot = store.getState().root as ScrollRoot;
     const sectionId = scrollRoot.sections[0].id;
-    act(() => store.getState().resizeSection(sectionId, { type: 'fixed', value: '500px' }));
+    act(() =>
+      store
+        .getState()
+        .resizeSection(sectionId, { type: 'fixed', value: '500px' }),
+    );
     const updated = store.getState().root as ScrollRoot;
-    expect(updated.sections[0].height).toEqual({ type: 'fixed', value: '500px' });
+    expect(updated.sections[0].height).toEqual({
+      type: 'fixed',
+      value: '500px',
+    });
   });
 
   it('updates section config (overlap, zIndex)', () => {
@@ -334,7 +360,11 @@ describe('layout modes', () => {
     act(() => store.getState().setLayoutMode('scroll'));
     const scrollRoot = store.getState().root as ScrollRoot;
     const sectionId = scrollRoot.sections[0].id;
-    act(() => store.getState().updateSectionConfig(sectionId, { overlap: '-30px', zIndex: 5 }));
+    act(() =>
+      store
+        .getState()
+        .updateSectionConfig(sectionId, { overlap: '-30px', zIndex: 5 }),
+    );
     const updated = store.getState().root as ScrollRoot;
     expect(updated.sections[0].overlap).toBe('-30px');
     expect(updated.sections[0].zIndex).toBe(5);
@@ -348,7 +378,7 @@ describe('layout modes', () => {
     act(() => store.getState().addSection('after', firstId));
     act(() => store.getState().addSection('after', firstId));
     const three = store.getState().root as ScrollRoot;
-    const ids = three.sections.map(s => s.id);
+    const ids = three.sections.map((s) => s.id);
     act(() => store.getState().reorderSections(0, 2));
     const reordered = store.getState().root as ScrollRoot;
     expect(reordered.sections[2].id).toBe(ids[0]);

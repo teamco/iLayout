@@ -4,10 +4,14 @@ import { findNode } from '../utils/treeUtils';
 import type { SplitterNode } from '../types';
 
 export function useLayoutNode(id: string) {
-  return useLayoutStore(state => {
+  return useLayoutStore((state) => {
     const result = findNode(state.root, id);
     return result
-      ? { node: result.node, parent: result.parent as SplitterNode | null, index: result.index }
+      ? {
+          node: result.node,
+          parent: result.parent as SplitterNode | null,
+          index: result.index,
+        }
       : null;
   });
 }

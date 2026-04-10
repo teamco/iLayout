@@ -1,4 +1,9 @@
-import type { ColumnGroupType, ColumnType, SorterResult, TablePaginationConfig } from 'antd/es/table/interface';
+import type {
+  ColumnGroupType,
+  ColumnType,
+  SorterResult,
+  TablePaginationConfig,
+} from 'antd/es/table/interface';
 import type { GetProp, TableProps } from 'antd';
 
 export interface ITableParams {
@@ -34,7 +39,8 @@ export type TColumn<T extends object = object> = {
   };
 } & (ExtendedColumnType<T> | ExtendedColumnGroupType<T>);
 
-export type TColumns<T extends object = object> = Array<TColumn<T>> & TableProps<T>['columns'];
+export type TColumns<T extends object = object> = Array<TColumn<T>> &
+  TableProps<T>['columns'];
 
 export interface ISelectItemProps {
   label: string;

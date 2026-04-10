@@ -7,7 +7,8 @@
   --al-color-bg: #ffffff;
   --al-color-text: #1f1f1f;
   --al-color-border: #e8e8e8;
-  --al-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --al-font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --al-font-size: 14px;
   --al-border-radius: 6px;
   --al-spacing: 0px;
@@ -124,8 +125,12 @@
 }
 
 @keyframes al-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .al-error {

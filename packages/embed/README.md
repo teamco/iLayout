@@ -55,17 +55,17 @@ AntHillLayout.mount(document.getElementById('my-container'), {
 
 ## Props
 
-| Prop | HTML attribute | Description |
-|------|---------------|-------------|
-| `layoutId` | `data-widget-layout` | Layout ID, fetched from API |
-| `layout` | -- | Inline layout JSON (React only) |
-| `layoutUrl` | `data-widget-layout-url` | URL to a layout JSON file |
-| `fullPage` | `data-full-page` | Stretch to full viewport |
-| `theme` | `data-theme` | Theme object (JSON string in HTML) |
-| `apiBase` | `data-api-base` | API base URL (optional, defaults to built-in) |
-| `apiKey` | `data-api-key` | API anon key (optional, defaults to built-in) |
-| `onLoad` | -- | Callback after layout loads (React only) |
-| `onError` | -- | Callback on error (React only) |
+| Prop        | HTML attribute           | Description                                   |
+| ----------- | ------------------------ | --------------------------------------------- |
+| `layoutId`  | `data-widget-layout`     | Layout ID, fetched from API                   |
+| `layout`    | --                       | Inline layout JSON (React only)               |
+| `layoutUrl` | `data-widget-layout-url` | URL to a layout JSON file                     |
+| `fullPage`  | `data-full-page`         | Stretch to full viewport                      |
+| `theme`     | `data-theme`             | Theme object (JSON string in HTML)            |
+| `apiBase`   | `data-api-base`          | API base URL (optional, defaults to built-in) |
+| `apiKey`    | `data-api-key`           | API anon key (optional, defaults to built-in) |
+| `onLoad`    | --                       | Callback after layout loads (React only)      |
+| `onError`   | --                       | Callback on error (React only)                |
 
 Priority when multiple sources are provided: `layout` > `layoutUrl` > `layoutId`.
 
@@ -101,16 +101,16 @@ Or override CSS variables directly:
 
 ### CSS variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `--al-color-primary` | `#1677ff` | Primary accent color |
-| `--al-color-bg` | `#ffffff` | Background color |
-| `--al-color-text` | `#1f1f1f` | Text color |
-| `--al-color-border` | `#e8e8e8` | Border color |
-| `--al-font-family` | system font stack | Font family |
-| `--al-font-size` | `14px` | Base font size |
-| `--al-border-radius` | `6px` | Border radius |
-| `--al-spacing` | `0px` | Gap between panels |
+| Variable             | Default           | Description          |
+| -------------------- | ----------------- | -------------------- |
+| `--al-color-primary` | `#1677ff`         | Primary accent color |
+| `--al-color-bg`      | `#ffffff`         | Background color     |
+| `--al-color-text`    | `#1f1f1f`         | Text color           |
+| `--al-color-border`  | `#e8e8e8`         | Border color         |
+| `--al-font-family`   | system font stack | Font family          |
+| `--al-font-size`     | `14px`            | Base font size       |
+| `--al-border-radius` | `6px`             | Border radius        |
+| `--al-spacing`       | `0px`             | Gap between panels   |
 
 ## Display modes
 
@@ -134,11 +134,11 @@ Or override CSS variables directly:
 
 ## Bundle sizes
 
-| Build | File | Size (gzip) | React |
-|-------|------|-------------|-------|
-| ESM (npm) | `dist/index.mjs` | ~3 KB | peer dependency |
-| IIFE (script tag) | `dist/embed.js` | ~176 KB | bundled |
-| CSS | `dist/embed.css` | ~0.7 KB | -- |
+| Build             | File             | Size (gzip) | React           |
+| ----------------- | ---------------- | ----------- | --------------- |
+| ESM (npm)         | `dist/index.mjs` | ~3 KB       | peer dependency |
+| IIFE (script tag) | `dist/embed.js`  | ~176 KB     | bundled         |
+| CSS               | `dist/embed.css` | ~0.7 KB     | --              |
 
 ## License
 

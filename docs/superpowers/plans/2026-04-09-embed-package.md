@@ -15,6 +15,7 @@
 ### Task 1: Package Scaffold
 
 **Files:**
+
 - Create: `pnpm-workspace.yaml`
 - Create: `packages/embed/package.json`
 - Create: `packages/embed/tsconfig.json`
@@ -140,6 +141,7 @@ git commit -m "feat(embed): scaffold @anthill-layout/embed package"
 ### Task 2: Layout & Widget Types
 
 **Files:**
+
 - Create: `packages/embed/src/types.ts`
 
 These types mirror the main app's types but are self-contained — no imports from the main app.
@@ -159,9 +161,15 @@ export type WidgetBounds = {
   marginBottom?: CssValue;
   marginLeft?: CssValue;
   align?:
-    | 'top-left' | 'top-center' | 'top-right'
-    | 'center-left' | 'center' | 'center-right'
-    | 'bottom-left' | 'bottom-center' | 'bottom-right';
+    | 'top-left'
+    | 'top-center'
+    | 'top-right'
+    | 'center-left'
+    | 'center'
+    | 'center-right'
+    | 'bottom-left'
+    | 'bottom-center'
+    | 'bottom-right';
 };
 
 // ─── Widget types ─────────────────────────────────────────────────────────────
@@ -173,7 +181,8 @@ export const EWidgetResource = {
   COMPONENT: 'component',
   EMPTY: 'empty',
 } as const;
-export type EWidgetResource = (typeof EWidgetResource)[keyof typeof EWidgetResource];
+export type EWidgetResource =
+  (typeof EWidgetResource)[keyof typeof EWidgetResource];
 
 export type WidgetContent = {
   value: string;
@@ -275,6 +284,7 @@ git commit -m "feat(embed): add layout, widget, and theme types"
 ### Task 3: Widget Registry & Built-in Widgets
 
 **Files:**
+
 - Create: `packages/embed/src/widgets/registry.ts`
 - Create: `packages/embed/src/widgets/YouTubeWidget.tsx`
 - Create: `packages/embed/src/widgets/ImageWidget.tsx`
@@ -287,7 +297,12 @@ git commit -m "feat(embed): add layout, widget, and theme types"
 ```ts
 // packages/embed/src/widgets/__tests__/registry.test.ts
 import { describe, it, expect, beforeEach } from 'vitest';
-import { registerWidget, getWidgetDef, getAllWidgetDefs, clearRegistry } from '../registry';
+import {
+  registerWidget,
+  getWidgetDef,
+  getAllWidgetDefs,
+  clearRegistry,
+} from '../registry';
 import type { WidgetDefinition } from '../../types';
 
 const stub: WidgetDefinition = {
@@ -333,7 +348,9 @@ export function registerWidget(def: WidgetDefinition): void {
   registry.set(def.resource, def);
 }
 
-export function getWidgetDef(resource: EWidgetResource): WidgetDefinition | undefined {
+export function getWidgetDef(
+  resource: EWidgetResource,
+): WidgetDefinition | undefined {
   return registry.get(resource);
 }
 
@@ -393,13 +410,7 @@ export function ImageWidget({ content }: WidgetComponentProps) {
     return <div className="al-widget-empty">No image URL</div>;
   }
 
-  return (
-    <img
-      src={content.value}
-      alt="Widget"
-      className="al-widget-image"
-    />
-  );
+  return <img src={content.value} alt="Widget" className="al-widget-image" />;
 }
 ```
 
@@ -408,11 +419,7 @@ export function ImageWidget({ content }: WidgetComponentProps) {
 import type { WidgetComponentProps } from '../types';
 
 export function EmptyWidget({ content }: WidgetComponentProps) {
-  return (
-    <div className="al-widget-empty">
-      {content.value || 'Empty'}
-    </div>
-  );
+  return <div className="al-widget-empty">{content.value || 'Empty'}</div>;
 }
 ```
 
@@ -425,7 +432,11 @@ import { YouTubeWidget } from './YouTubeWidget';
 import { ImageWidget } from './ImageWidget';
 import { EmptyWidget } from './EmptyWidget';
 
-registerWidget({ resource: 'youtube', label: 'YouTube', component: YouTubeWidget });
+registerWidget({
+  resource: 'youtube',
+  label: 'YouTube',
+  component: YouTubeWidget,
+});
 registerWidget({ resource: 'image', label: 'Image', component: ImageWidget });
 registerWidget({ resource: 'empty', label: 'Empty', component: EmptyWidget });
 ```
@@ -447,6 +458,7 @@ git commit -m "feat(embed): add widget registry and built-in widgets"
 ### Task 4: Fetcher (TDD)
 
 **Files:**
+
 - Create: `packages/embed/src/__tests__/fetcher.test.ts`
 - Create: `packages/embed/src/fetcher.ts`
 
@@ -480,7 +492,9 @@ describe('fetchLayout', () => {
       new Response(JSON.stringify(mockLeaf), { status: 200 }),
     );
 
-    const result = await fetchLayout({ layoutUrl: 'https://example.com/layout.json' });
+    const result = await fetchLayout({
+      layoutUrl: 'https://example.com/layout.json',
+    });
     expect(result).toEqual(mockLeaf);
     expect(fetch).toHaveBeenCalledWith('https://example.com/layout.json');
   });
@@ -554,9 +568,7 @@ describe('fetchLayout', () => {
   });
 
   it('throws when no source provided', async () => {
-    await expect(fetchLayout({})).rejects.toThrow(
-      'No layout source provided',
-    );
+    await expect(fetchLayout({})).rejects.toThrow('No layout source provided');
   });
 });
 ```
@@ -607,7 +619,8 @@ function setCache(key: string, data: LayoutNode): void {
 
 async function fetchFromUrl(url: string): Promise<LayoutNode> {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
+  if (!res.ok)
+    throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
   return res.json() as Promise<LayoutNode>;
 }
 
@@ -623,7 +636,8 @@ async function fetchFromApi(
       'Content-Type': 'application/json',
     },
   });
-  if (!res.ok) throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
+  if (!res.ok)
+    throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
   const rows = (await res.json()) as Array<{ data: LayoutNode }>;
   if (rows.length === 0) throw new Error(`Layout not found: ${layoutId}`);
   return rows[0].data;
@@ -635,7 +649,8 @@ async function doFetch(opts: FetchOptions): Promise<LayoutNode> {
   if (opts.layoutUrl) return fetchFromUrl(opts.layoutUrl);
 
   if (opts.layoutId) {
-    if (!opts.apiBase) throw new Error('apiBase is required when using layoutId');
+    if (!opts.apiBase)
+      throw new Error('apiBase is required when using layoutId');
     if (!opts.apiKey) throw new Error('apiKey is required when using layoutId');
     return fetchFromApi(opts.layoutId, opts.apiBase, opts.apiKey);
   }
@@ -657,14 +672,16 @@ export async function fetchLayout(opts: FetchOptions): Promise<LayoutNode> {
   const existing = inflight.get(key);
   if (existing) return existing;
 
-  const promise = doFetch(opts).then((data) => {
-    setCache(key, data);
-    inflight.delete(key);
-    return data;
-  }).catch((err) => {
-    inflight.delete(key);
-    throw err;
-  });
+  const promise = doFetch(opts)
+    .then((data) => {
+      setCache(key, data);
+      inflight.delete(key);
+      return data;
+    })
+    .catch((err) => {
+      inflight.delete(key);
+      throw err;
+    });
 
   inflight.set(key, promise);
   return promise;
@@ -688,6 +705,7 @@ git commit -m "feat(embed): add layout fetcher with caching and deduplication"
 ### Task 5: Theme Mapper (TDD)
 
 **Files:**
+
 - Create: `packages/embed/src/__tests__/theme.test.ts`
 - Create: `packages/embed/src/theme.ts`
 
@@ -750,7 +768,10 @@ Expected: FAIL — module not found
 // packages/embed/src/theme.ts
 import type { WidgetLayoutTheme } from './types';
 
-const THEME_MAP: Record<keyof WidgetLayoutTheme, { var: string; unit?: string }> = {
+const THEME_MAP: Record<
+  keyof WidgetLayoutTheme,
+  { var: string; unit?: string }
+> = {
   colorPrimary: { var: '--al-color-primary' },
   colorBg: { var: '--al-color-bg' },
   colorText: { var: '--al-color-text' },
@@ -771,7 +792,9 @@ export function themeToStyleVars(
   for (const [key, mapping] of Object.entries(THEME_MAP)) {
     const value = theme[key as keyof WidgetLayoutTheme];
     if (value === undefined) continue;
-    vars[mapping.var] = mapping.unit ? `${value}${mapping.unit}` : String(value);
+    vars[mapping.var] = mapping.unit
+      ? `${value}${mapping.unit}`
+      : String(value);
   }
 
   return vars;
@@ -795,6 +818,7 @@ git commit -m "feat(embed): add theme-to-CSS-variables mapper"
 ### Task 6: Embed Renderer Components (TDD)
 
 **Files:**
+
 - Create: `packages/embed/src/renderer/EmbedWidgetRenderer.tsx`
 - Create: `packages/embed/src/renderer/EmbedLeaf.tsx`
 - Create: `packages/embed/src/renderer/EmbedSplitter.tsx`
@@ -809,7 +833,12 @@ git commit -m "feat(embed): add theme-to-CSS-variables mapper"
 import { describe, it, expect, beforeAll } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { EmbedLayoutRenderer } from '../EmbedLayoutRenderer';
-import type { LeafNode, SplitterNode, ScrollRoot, LayoutNode } from '../../types';
+import type {
+  LeafNode,
+  SplitterNode,
+  ScrollRoot,
+  LayoutNode,
+} from '../../types';
 import '../../widgets/init';
 
 const leaf: LeafNode = {
@@ -832,7 +861,16 @@ const splitter: SplitterNode = {
   sizes: [60, 40],
   children: [
     leaf,
-    { id: 'l3', type: 'leaf', widget: { widgetId: 'w2', resource: 'empty', content: { value: 'World' }, config: {} } },
+    {
+      id: 'l3',
+      type: 'leaf',
+      widget: {
+        widgetId: 'w2',
+        resource: 'empty',
+        content: { value: 'World' },
+        config: {},
+      },
+    },
   ],
 };
 
@@ -873,7 +911,9 @@ describe('EmbedLayoutRenderer', () => {
     const { container } = render(<EmbedLayoutRenderer root={splitter} />);
     const splitterEl = container.querySelector('.al-splitter');
     expect(splitterEl).not.toBeNull();
-    expect(splitterEl!.classList.contains('al-splitter--horizontal')).toBe(true);
+    expect(splitterEl!.classList.contains('al-splitter--horizontal')).toBe(
+      true,
+    );
 
     const panels = container.querySelectorAll('.al-panel');
     expect(panels).toHaveLength(2);
@@ -940,22 +980,55 @@ import { getWidgetDef } from '../widgets/registry';
 type Props = { widget: WidgetRef };
 
 const ALIGN_STYLES: Record<string, React.CSSProperties> = {
-  'top-left': { display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' },
-  'top-center': { display: 'flex', alignItems: 'flex-start', justifyContent: 'center' },
-  'top-right': { display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' },
-  'center-left': { display: 'flex', alignItems: 'center', justifyContent: 'flex-start' },
-  'center': { display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  'center-right': { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
-  'bottom-left': { display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' },
-  'bottom-center': { display: 'flex', alignItems: 'flex-end', justifyContent: 'center' },
-  'bottom-right': { display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' },
+  'top-left': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  'top-center': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  'top-right': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-end',
+  },
+  'center-left': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  center: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  'center-right': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  'bottom-left': {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start',
+  },
+  'bottom-center': {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  'bottom-right': {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+  },
 };
 
 export function EmbedWidgetRenderer({ widget }: Props) {
   const def = getWidgetDef(widget.resource as EWidgetResource);
   const { bounds } = widget;
 
-  const alignStyle = ALIGN_STYLES[bounds?.align ?? 'top-left'] ?? ALIGN_STYLES['top-left'];
+  const alignStyle =
+    ALIGN_STYLES[bounds?.align ?? 'top-left'] ?? ALIGN_STYLES['top-left'];
 
   const mt = bounds?.marginTop;
   const mr = bounds?.marginRight;
@@ -968,7 +1041,9 @@ export function EmbedWidgetRenderer({ widget }: Props) {
     width: '100%',
     height: '100%',
     position: hasMargins ? 'absolute' : 'relative',
-    ...(hasMargins ? { inset: `${mt ?? 0} ${mr ?? 0} ${mb ?? 0} ${ml ?? 0}` } : {}),
+    ...(hasMargins
+      ? { inset: `${mt ?? 0} ${mr ?? 0} ${mb ?? 0} ${ml ?? 0}` }
+      : {}),
   };
 
   if (!def) {
@@ -1029,13 +1104,23 @@ export function EmbedSplitter({ node }: Props) {
   return (
     <div
       className={`al-splitter al-splitter--${node.direction}`}
-      style={{ display: 'flex', flexDirection: direction, width: '100%', height: '100%' }}
+      style={{
+        display: 'flex',
+        flexDirection: direction,
+        width: '100%',
+        height: '100%',
+      }}
     >
       {node.children.map((child, i) => (
         <div
           key={child.id}
           className="al-panel"
-          style={{ flexBasis: `${node.sizes[i]}%`, minWidth: 0, minHeight: 0, overflow: 'hidden' }}
+          style={{
+            flexBasis: `${node.sizes[i]}%`,
+            minWidth: 0,
+            minHeight: 0,
+            overflow: 'hidden',
+          }}
         >
           {renderNode(child)}
         </div>
@@ -1055,9 +1140,14 @@ import { renderNode } from './EmbedLayoutRenderer';
 function getSectionStyle(section: SectionNode): React.CSSProperties {
   const style: React.CSSProperties = { width: '100%', position: 'relative' };
   switch (section.height.type) {
-    case 'fixed': style.height = section.height.value; break;
-    case 'min': style.minHeight = section.height.value; break;
-    default: break;
+    case 'fixed':
+      style.height = section.height.value;
+      break;
+    case 'min':
+      style.minHeight = section.height.value;
+      break;
+    default:
+      break;
   }
   if (section.overlap) style.marginTop = section.overlap;
   if (section.zIndex) style.zIndex = section.zIndex;
@@ -1070,7 +1160,11 @@ export function EmbedScrollLayout({ root }: Props) {
   return (
     <div className="al-scroll">
       {root.sections.map((section) => (
-        <div key={section.id} className="al-section" style={getSectionStyle(section)}>
+        <div
+          key={section.id}
+          className="al-section"
+          style={getSectionStyle(section)}
+        >
           {renderNode(section.child)}
         </div>
       ))}
@@ -1125,6 +1219,7 @@ git commit -m "feat(embed): add lightweight read-only layout renderer"
 ### Task 7: CSS Styles
 
 **Files:**
+
 - Create: `packages/embed/src/styles.css`
 
 - [ ] **Step 1: Create embed styles**
@@ -1139,7 +1234,8 @@ git commit -m "feat(embed): add lightweight read-only layout renderer"
   --al-color-bg: #ffffff;
   --al-color-text: #1f1f1f;
   --al-color-border: #e8e8e8;
-  --al-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --al-font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --al-font-size: 14px;
   --al-border-radius: 6px;
   --al-spacing: 0px;
@@ -1256,8 +1352,12 @@ git commit -m "feat(embed): add lightweight read-only layout renderer"
 }
 
 @keyframes al-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 .al-error {
@@ -1300,6 +1400,7 @@ git commit -m "feat(embed): add al-* prefixed CSS with theme variables"
 ### Task 8: WidgetLayout Component (TDD)
 
 **Files:**
+
 - Create: `packages/embed/src/__tests__/WidgetLayout.test.tsx`
 - Create: `packages/embed/src/WidgetLayout.tsx`
 - Modify: `packages/embed/src/index.ts`
@@ -1357,7 +1458,9 @@ describe('WidgetLayout', () => {
 
   it('shows loading state when fetching', () => {
     vi.spyOn(globalThis, 'fetch').mockReturnValue(new Promise(() => {})); // never resolves
-    const { container } = render(<WidgetLayout layoutUrl="https://example.com/a.json" />);
+    const { container } = render(
+      <WidgetLayout layoutUrl="https://example.com/a.json" />,
+    );
     expect(container.querySelector('.al-loading')).not.toBeNull();
   });
 
@@ -1384,7 +1487,9 @@ describe('WidgetLayout', () => {
       new Response('Not Found', { status: 404 }),
     );
     const onError = vi.fn();
-    render(<WidgetLayout layoutUrl="https://example.com/x.json" onError={onError} />);
+    render(
+      <WidgetLayout layoutUrl="https://example.com/x.json" onError={onError} />,
+    );
     await waitFor(() => {
       expect(onError).toHaveBeenCalled();
     });
@@ -1463,7 +1568,9 @@ export function WidgetLayout({
   }, [layout, layoutUrl, layoutId, apiBase, apiKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const themeVars = themeToStyleVars(theme);
-  const className = ['al-root', fullPage && 'al-root--full-page'].filter(Boolean).join(' ');
+  const className = ['al-root', fullPage && 'al-root--full-page']
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={className} style={themeVars}>
@@ -1514,6 +1621,7 @@ git commit -m "feat(embed): add WidgetLayout React component with fetch/theme/st
 ### Task 9: Auto-Mount & Embed Entry
 
 **Files:**
+
 - Create: `packages/embed/src/mount.ts`
 - Create: `packages/embed/src/embed.ts`
 - Create: `packages/embed/src/__tests__/mount.test.ts`
@@ -1545,7 +1653,8 @@ describe('mount', () => {
   });
 
   it('mounts into element with data-widget-layout-url', async () => {
-    document.body.innerHTML = '<div data-widget-layout-url="https://example.com/l.json"></div>';
+    document.body.innerHTML =
+      '<div data-widget-layout-url="https://example.com/l.json"></div>';
 
     vi.spyOn(globalThis, 'fetch').mockReturnValue(new Promise(() => {}));
 
@@ -1654,6 +1763,7 @@ git commit -m "feat(embed): add auto-mount and embed entry for script tag"
 ### Task 10: Vite Library Build Config
 
 **Files:**
+
 - Create: `packages/embed/vite.config.ts`
 - Modify: `packages/embed/vitest.config.ts` (remove plugin duplication)
 
@@ -1684,7 +1794,12 @@ export default defineConfig({
         // For embed entry: bundle everything (including React)
         if (importer && resolve(importer).includes('embed.ts')) return false;
         // For index entry: externalize React
-        return ['react', 'react-dom', 'react/jsx-runtime', 'react-dom/client'].includes(id);
+        return [
+          'react',
+          'react-dom',
+          'react/jsx-runtime',
+          'react-dom/client',
+        ].includes(id);
       },
     },
     cssCodeSplit: false,
@@ -1795,6 +1910,7 @@ git commit -m "feat(embed): add Vite library builds (ESM + IIFE)"
 ### Task 11: RLS Policy for Anon Access
 
 **Files:**
+
 - Create: `supabase/migrations/XXXXXXXX_published_layouts_anon_read.sql`
 
 Use the next sequential migration number from your existing migrations directory.
@@ -1820,10 +1936,12 @@ Expected: Migration applied successfully
 - [ ] **Step 3: Verify policy**
 
 Run from Supabase SQL editor or CLI:
+
 ```sql
 SELECT policyname, permissive, roles, cmd, qual
 FROM pg_policies WHERE tablename = 'layouts';
 ```
+
 Expected: New row with `policyname = 'Published layouts are publicly readable'`, `roles = {anon}`, `cmd = SELECT`
 
 - [ ] **Step 4: Commit**
@@ -1851,6 +1969,7 @@ Expected: `dist/index.mjs`, `dist/style.css`, `dist/embed.js` all exist
 
 Run: `ls -lh packages/embed/dist/`
 Expected:
+
 - `index.mjs` — under 100 KB (uncompressed, React external)
 - `embed.js` — under 300 KB (uncompressed, React bundled)
 - `style.css` — under 5 KB

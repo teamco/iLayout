@@ -6,12 +6,12 @@ Add routes for viewing/editing layouts from Supabase, a layouts table in the pro
 
 ## Routes
 
-| Path | Component | Auth | Description |
-|------|-----------|------|-------------|
-| `/` | `HomePage` | Protected | Placeholder page |
-| `/users/:userId/layouts/new` | `LayoutEditorPage` | Protected | Create new layout |
-| `/users/:userId/layouts/:layoutId` | `LayoutEditorPage` | Protected | Edit existing layout |
-| `/profile` | `ProfilePage` | Protected | Existing — add layouts table |
+| Path                               | Component          | Auth      | Description                  |
+| ---------------------------------- | ------------------ | --------- | ---------------------------- |
+| `/`                                | `HomePage`         | Protected | Placeholder page             |
+| `/users/:userId/layouts/new`       | `LayoutEditorPage` | Protected | Create new layout            |
+| `/users/:userId/layouts/:layoutId` | `LayoutEditorPage` | Protected | Edit existing layout         |
+| `/profile`                         | `ProfilePage`      | Protected | Existing — add layouts table |
 
 ## HomePage
 
@@ -26,11 +26,13 @@ Simple placeholder page with a heading and a link to Profile → Layouts. Uses a
 Reads `userId` and `layoutId` from route params.
 
 **Create mode** (`layoutId === 'new'`):
+
 - Renders `App` with empty layout state
 - Save button calls `useCreateLayout` mutation
 - On success: navigates to `/users/:userId/layouts/:newId`
 
 **Edit mode** (`layoutId !== 'new'`):
+
 - Loads layout via `useLayout(layoutId)`
 - Populates `useLayoutStore` with loaded `data`
 - Save button calls `useSaveLayout` mutation (creates new version)
@@ -48,6 +50,7 @@ type AppProps = {
 ```
 
 Changes:
+
 - **Save button** in toolbar: `SaveOutlined` icon, visible when `editMode === true`, calls `onSave`
 - Remove localStorage auto-save when `layoutId` is provided (Supabase is the source of truth)
 - Keep localStorage logic as fallback when no `layoutId` (standalone mode)
@@ -57,6 +60,7 @@ Changes:
 Modify `LayoutsSection` in `src/auth/ProfilePage.tsx`.
 
 Antd `Table` with columns:
+
 - **ID** — truncated uuid (first 8 chars), copyable
 - **Status** — antd `Tag`: draft (blue), published (green), deleted (red)
 - **Version** — number
@@ -75,6 +79,7 @@ Data source: `useLayouts(user.id)` from TanStack Query hooks.
 **Location:** `src/router.tsx`
 
 Add routes:
+
 - `/users/$userId/layouts/new` — `LayoutEditorPage`
 - `/users/$userId/layouts/$layoutId` — `LayoutEditorPage`
 
@@ -91,6 +96,7 @@ src/pages/
 ```
 
 Modified files:
+
 - `src/App.tsx` — add Save button, accept props, conditional localStorage
 - `src/auth/ProfilePage.tsx` — LayoutsSection with Table
 - `src/router.tsx` — new routes, update index route

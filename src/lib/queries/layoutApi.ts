@@ -3,7 +3,9 @@ import type { IUser, LayoutRecord, LayoutStatus } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 async function currentUserId(): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
@@ -45,7 +47,10 @@ export async function getLayout(id: string): Promise<LayoutRecord | null> {
   return data as LayoutRecord;
 }
 
-export async function getLayoutVersion(id: string, version: number): Promise<LayoutRecord | null> {
+export async function getLayoutVersion(
+  id: string,
+  version: number,
+): Promise<LayoutRecord | null> {
   const { data, error } = await supabase
     .from('layouts')
     .select('*')
@@ -58,7 +63,9 @@ export async function getLayoutVersion(id: string, version: number): Promise<Lay
   return data as LayoutRecord;
 }
 
-export async function getPublishedLayout(userId: IUser['id']): Promise<LayoutRecord | null> {
+export async function getPublishedLayout(
+  userId: IUser['id'],
+): Promise<LayoutRecord | null> {
   const { data, error } = await supabase
     .from('layouts')
     .select('*')
@@ -92,7 +99,10 @@ export async function createLayout(data: LayoutNode): Promise<LayoutRecord> {
   return row as LayoutRecord;
 }
 
-export async function saveLayout(id: string, data: LayoutNode): Promise<LayoutRecord> {
+export async function saveLayout(
+  id: string,
+  data: LayoutNode,
+): Promise<LayoutRecord> {
   const userId = await currentUserId();
 
   const { data: current, error: fetchError } = await supabase
@@ -125,21 +135,33 @@ export async function saveLayout(id: string, data: LayoutNode): Promise<LayoutRe
   return row as LayoutRecord;
 }
 
-export async function setStatus(id: string, version: number, status: LayoutStatus): Promise<void> {
+export async function setStatus(
+  id: string,
+  version: number,
+  status: LayoutStatus,
+): Promise<void> {
   const userId = await currentUserId();
 
   // Only 1 published layout per user — unpublish all user's layouts first
   if (status === 'published') {
     await supabase
       .from('layouts')
-      .update({ status: 'draft', updated_by: userId, updated_at: new Date().toISOString() })
+      .update({
+        status: 'draft',
+        updated_by: userId,
+        updated_at: new Date().toISOString(),
+      })
       .eq('user_id', userId)
       .eq('status', 'published');
   }
 
   const { error } = await supabase
     .from('layouts')
-    .update({ status, updated_by: userId, updated_at: new Date().toISOString() })
+    .update({
+      status,
+      updated_by: userId,
+      updated_at: new Date().toISOString(),
+    })
     .eq('id', id)
     .eq('version', version);
 

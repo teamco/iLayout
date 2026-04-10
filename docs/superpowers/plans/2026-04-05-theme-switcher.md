@@ -13,6 +13,7 @@
 ### Task 1: Create theme store with tests
 
 **Files:**
+
 - Create: `src/themes/themeStore.ts`
 - Create: `src/themes/__tests__/themeStore.test.ts`
 
@@ -55,11 +56,14 @@ describe('themeStore', () => {
   });
 
   it('resolves system to dark when matchMedia matches', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
     const store = createThemeStore();
     expect(store.getState().themeMode).toBe('system');
     expect(store.getState().resolvedTheme).toBe('dark');
@@ -67,11 +71,14 @@ describe('themeStore', () => {
   });
 
   it('resolves system to light when matchMedia does not match', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
-      matches: false,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
     const store = createThemeStore();
     expect(store.getState().themeMode).toBe('system');
     expect(store.getState().resolvedTheme).toBe('light');
@@ -119,7 +126,9 @@ const STORAGE_KEY = 'theme-mode';
 
 function getSystemTheme(): ResolvedTheme {
   if (typeof window === 'undefined') return 'dark';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
 }
 
 function resolveTheme(mode: ThemeMode): ResolvedTheme {
@@ -129,13 +138,20 @@ function resolveTheme(mode: ThemeMode): ResolvedTheme {
 function loadMode(): ThemeMode {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && CYCLE.includes(stored as ThemeMode)) return stored as ThemeMode;
-  } catch { /* ignore */ }
+    if (stored && CYCLE.includes(stored as ThemeMode))
+      return stored as ThemeMode;
+  } catch {
+    /* ignore */
+  }
   return 'system';
 }
 
 function persistMode(mode: ThemeMode) {
-  try { localStorage.setItem(STORAGE_KEY, mode); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, mode);
+  } catch {
+    /* ignore */
+  }
 }
 
 function makeStore(initialMode?: ThemeMode) {
@@ -203,6 +219,7 @@ git commit -m "feat(theme): create theme store with light/dark/system modes"
 ### Task 2: Add CSS custom properties with `[data-theme]` selectors
 
 **Files:**
+
 - Modify: `src/index.css`
 
 - [ ] **Step 1: Replace prefers-color-scheme with data-theme selectors**
@@ -212,7 +229,8 @@ In `src/index.css`, the current theme variables are defined in `:root` (light de
 Replace the entire `:root` block (lines 1-31) with:
 
 ```css
-:root, [data-theme="light"] {
+:root,
+[data-theme='light'] {
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
@@ -256,7 +274,7 @@ Replace the entire `:root` block (lines 1-31) with:
 Replace the `@media (prefers-color-scheme: dark)` block (lines 33-51) with:
 
 ```css
-[data-theme="dark"] {
+[data-theme='dark'] {
   --text: #9ca3af;
   --text-h: #f3f4f6;
   --bg: #16171d;
@@ -278,7 +296,7 @@ Replace the `@media (prefers-color-scheme: dark)` block (lines 33-51) with:
   --drag-card-bg: #1e2a3a;
 }
 
-[data-theme="dark"] #social .button-icon {
+[data-theme='dark'] #social .button-icon {
   filter: invert(1) brightness(2);
 }
 ```
@@ -300,6 +318,7 @@ git commit -m "feat(theme): replace prefers-color-scheme with data-theme selecto
 ### Task 3: Migrate Less tokens to CSS custom properties
 
 **Files:**
+
 - Modify: `src/themes/mixin.module.less`
 
 - [ ] **Step 1: Replace hardcoded theme-sensitive tokens with var() references**
@@ -307,31 +326,33 @@ git commit -m "feat(theme): replace prefers-color-scheme with data-theme selecto
 In `src/themes/mixin.module.less`, replace the design tokens section (lines 2-11):
 
 From:
+
 ```less
-@app-bg:          #0d0d0d;
-@border-dark:     #222;
-@border-dim:      #333;
-@color-blue:      #1890ff;
-@color-yellow:    #faad14;
-@color-green:     #52c41a;
-@color-white:     #fff;
-@color-muted:     #555;
-@color-dim:       #666;
-@drag-card-bg:    #1e2a3a;
+@app-bg: #0d0d0d;
+@border-dark: #222;
+@border-dim: #333;
+@color-blue: #1890ff;
+@color-yellow: #faad14;
+@color-green: #52c41a;
+@color-white: #fff;
+@color-muted: #555;
+@color-dim: #666;
+@drag-card-bg: #1e2a3a;
 ```
 
 To:
+
 ```less
-@app-bg:          var(--app-bg);
-@border-dark:     var(--border-dark);
-@border-dim:      var(--border-dim);
-@color-blue:      #1890ff;
-@color-yellow:    #faad14;
-@color-green:     #52c41a;
-@color-white:     var(--color-white);
-@color-muted:     var(--color-muted);
-@color-dim:       var(--color-dim);
-@drag-card-bg:    var(--drag-card-bg);
+@app-bg: var(--app-bg);
+@border-dark: var(--border-dark);
+@border-dim: var(--border-dim);
+@color-blue: #1890ff;
+@color-yellow: #faad14;
+@color-green: #52c41a;
+@color-white: var(--color-white);
+@color-muted: var(--color-muted);
+@color-dim: var(--color-dim);
+@drag-card-bg: var(--drag-card-bg);
 ```
 
 Theme-agnostic tokens (`@color-blue`, `@color-yellow`, `@color-green`) stay hardcoded.
@@ -353,6 +374,7 @@ git commit -m "feat(theme): migrate Less tokens to CSS custom properties"
 ### Task 4: Wire theme into App.tsx — button, ConfigProvider, useThemeSync
 
 **Files:**
+
 - Modify: `src/App.tsx`
 
 - [ ] **Step 1: Add imports**
@@ -369,9 +391,9 @@ import { useThemeStore, syncSystemTheme } from '@/themes/themeStore';
 Inside the `App` component, add after existing selectors:
 
 ```tsx
-const themeMode = useThemeStore(s => s.themeMode);
-const resolvedTheme = useThemeStore(s => s.resolvedTheme);
-const cycleTheme = useThemeStore(s => s.cycleTheme);
+const themeMode = useThemeStore((s) => s.themeMode);
+const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
+const cycleTheme = useThemeStore((s) => s.cycleTheme);
 
 useEffect(() => {
   document.documentElement.dataset.theme = resolvedTheme;
@@ -388,10 +410,13 @@ useEffect(() => {
 - [ ] **Step 3: Switch ConfigProvider algorithm**
 
 Change:
+
 ```tsx
 <ConfigProvider theme={{ algorithm: theme.darkAlgorithm }}>
 ```
+
 To:
+
 ```tsx
 <ConfigProvider theme={{ algorithm: resolvedTheme === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm }}>
 ```
@@ -401,10 +426,22 @@ To:
 Add before the Edit Mode button:
 
 ```tsx
-<Tooltip title={themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'}>
+<Tooltip
+  title={
+    themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'
+  }
+>
   <Button
     size="small"
-    icon={themeMode === 'light' ? <SunOutlined /> : themeMode === 'dark' ? <MoonOutlined /> : <DesktopOutlined />}
+    icon={
+      themeMode === 'light' ? (
+        <SunOutlined />
+      ) : themeMode === 'dark' ? (
+        <MoonOutlined />
+      ) : (
+        <DesktopOutlined />
+      )
+    }
     onClick={cycleTheme}
   />
 </Tooltip>
@@ -418,6 +455,7 @@ Expected: All pass.
 - [ ] **Step 6: Verify manually**
 
 Run: `pnpm dev`
+
 - Click theme button: cycles light → dark → system
 - Light mode: white background, dark text, antd light components
 - Dark mode: dark background, light text, antd dark components

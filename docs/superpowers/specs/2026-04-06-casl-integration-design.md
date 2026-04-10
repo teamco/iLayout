@@ -6,11 +6,11 @@ Replace the stubbed `useCanEdit()` with real CASL-based permissions. Three roles
 
 ## Roles
 
-| Role | Determination | Description |
-|------|--------------|-------------|
-| admin | Email in `VITE_ADMINS` | Full access to all layouts and actions |
-| editor | Any authenticated user (default) | CRUD on own layouts only |
-| viewer | Unauthenticated | View published layouts (enforced by Supabase RLS) |
+| Role   | Determination                    | Description                                       |
+| ------ | -------------------------------- | ------------------------------------------------- |
+| admin  | Email in `VITE_ADMINS`           | Full access to all layouts and actions            |
+| editor | Any authenticated user (default) | CRUD on own layouts only                          |
+| viewer | Unauthenticated                  | View published layouts (enforced by Supabase RLS) |
 
 ## Actions & Subjects
 
@@ -60,7 +60,8 @@ Following the CBC pattern with `AbilityBuilder` + `createMongoAbility`:
 ```ts
 function defineAbilityFor(user: User | null): AppAbility {
   const { can, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
-  const isAdmin = user?.email && import.meta.env.VITE_ADMINS?.split(',').includes(user.email);
+  const isAdmin =
+    user?.email && import.meta.env.VITE_ADMINS?.split(',').includes(user.email);
 
   if (isAdmin) {
     can(EAction.MANAGE, ESubject.ALL);
@@ -90,18 +91,23 @@ React context providing the CASL ability instance to the component tree.
 ## Integration Points
 
 ### `useCanEdit.ts`
+
 Replace stub with:
+
 ```ts
 const ability = useAbility();
 return ability.can('edit', 'layout');
 ```
+
 This returns `true` for admin (can manage all) and editor (can edit layouts). Returns `false` for viewer.
 
 ### `App.tsx`
+
 - Edit Mode button: visible when `ability.can('edit', 'layout')`
 - Save button: already gated by `editMode && onSave`
 
 ### `ProfilePage.tsx` (LayoutsSection)
+
 - "New Layout" button: visible when `ability.can('create', 'layout')`
 - "Edit" button: visible when `ability.can('edit', subject('layout', record))`
 - "Publish/Unpublish" button: visible when `ability.can('publish', subject('layout', record))`
@@ -110,11 +116,13 @@ This returns `true` for admin (can manage all) and editor (can edit layouts). Re
 Uses CASL `subject()` helper to pass the actual layout record for ownership check.
 
 ### `router.tsx`
+
 - Wrap `<Outlet />` in `<AbilityProvider>` (inside `AuthProvider`, after user is available)
 
 ## Environment
 
 Add to `.env`:
+
 ```
 VITE_ADMINS=teamco@gmail.com
 ```
@@ -130,6 +138,7 @@ src/auth/
 ```
 
 Modified files:
+
 - `src/layout/hooks/useCanEdit.ts` — replace stub with CASL check
 - `src/App.tsx` — gate Edit Mode button with ability check
 - `src/auth/ProfilePage.tsx` — gate CRUD buttons with ability + ownership checks

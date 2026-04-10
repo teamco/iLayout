@@ -16,12 +16,17 @@ export type TColumnFilter<T> = {
 
 function getByPath(obj: unknown, path: string): unknown {
   return path.split('.').reduce<unknown>((acc, key) => {
-    if (acc && typeof acc === 'object') return (acc as Record<string, unknown>)[key];
+    if (acc && typeof acc === 'object')
+      return (acc as Record<string, unknown>)[key];
     return undefined;
   }, obj);
 }
 
-function formatText(value: unknown, type: string, resolver?: (v: unknown) => string): string {
+function formatText(
+  value: unknown,
+  type: string,
+  resolver?: (v: unknown) => string,
+): string {
   if (resolver) return resolver(value);
 
   switch (type) {
@@ -42,7 +47,11 @@ function formatText(value: unknown, type: string, resolver?: (v: unknown) => str
   }
 }
 
-function getUniversalFilters<T>(data: T[], nested: string, resolver?: (v: unknown) => string): TFilterItem[] {
+function getUniversalFilters<T>(
+  data: T[],
+  nested: string,
+  resolver?: (v: unknown) => string,
+): TFilterItem[] {
   const seenText = new Set<string>();
   const filters: TFilterItem[] = [];
 

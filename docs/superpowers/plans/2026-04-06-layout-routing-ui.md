@@ -13,6 +13,7 @@
 ### Task 1: Create HomePage placeholder
 
 **Files:**
+
 - Create: `src/pages/HomePage.tsx`
 
 - [ ] **Step 1: Create HomePage.tsx**
@@ -31,11 +32,28 @@ export function HomePage() {
   const { user } = useAuth();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100dvh', gap: 16 }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100dvh',
+        gap: 16,
+      }}
+    >
       <Title level={2}>Widgets</Title>
       <Text type="secondary">Your layout dashboard is coming soon.</Text>
       {user && (
-        <Button type="primary" onClick={() => navigate({ to: '/users/$userId/layouts/new', params: { userId: user.id } })}>
+        <Button
+          type="primary"
+          onClick={() =>
+            navigate({
+              to: '/users/$userId/layouts/new',
+              params: { userId: user.id },
+            })
+          }
+        >
           Create New Layout
         </Button>
       )}
@@ -61,6 +79,7 @@ git commit -m "feat(layout): create HomePage placeholder"
 ### Task 2: Refactor App.tsx — add Save button and props
 
 **Files:**
+
 - Modify: `src/App.tsx`
 
 - [ ] **Step 1: Add props and Save button**
@@ -73,7 +92,16 @@ import { useEffect, useState } from 'react';
 import md5 from 'blueimp-md5';
 import { Avatar, Button, Dropdown, Tooltip, Typography, message } from 'antd';
 import type { MenuProps } from 'antd';
-import { AppstoreOutlined, CodeOutlined, LogoutOutlined, SaveOutlined, UserOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
+import {
+  AppstoreOutlined,
+  CodeOutlined,
+  LogoutOutlined,
+  SaveOutlined,
+  UserOutlined,
+  SunOutlined,
+  MoonOutlined,
+  DesktopOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from '@tanstack/react-router';
 import { useThemeStore } from '@/themes/themeStore';
 import { useAuth } from '@/auth/AuthContext';
@@ -95,14 +123,14 @@ type AppProps = {
 };
 
 export default function App({ layoutId, onSave, saving }: AppProps) {
-  const editMode = useLayoutStore(s => s.editMode);
-  const setEditMode = useLayoutStore(s => s.setEditMode);
-  const showGrid = useLayoutStore(s => s.showGrid);
-  const toggleGrid = useLayoutStore(s => s.toggleGrid);
+  const editMode = useLayoutStore((s) => s.editMode);
+  const setEditMode = useLayoutStore((s) => s.setEditMode);
+  const showGrid = useLayoutStore((s) => s.showGrid);
+  const toggleGrid = useLayoutStore((s) => s.toggleGrid);
   const [jsonModalOpen, setJsonModalOpen] = useState(false);
 
-  const themeMode = useThemeStore(s => s.themeMode);
-  const cycleTheme = useThemeStore(s => s.cycleTheme);
+  const themeMode = useThemeStore((s) => s.themeMode);
+  const cycleTheme = useThemeStore((s) => s.cycleTheme);
 
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -127,11 +155,19 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
       type: 'group',
       label: userName,
     },
-    ...(lastSignIn ? [{
-      key: 'lastLogin',
-      label: <Typography.Text type="secondary" style={{ fontSize: 12 }}>Last login: {lastSignIn}</Typography.Text>,
-      disabled: true,
-    }] : []),
+    ...(lastSignIn
+      ? [
+          {
+            key: 'lastLogin',
+            label: (
+              <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                Last login: {lastSignIn}
+              </Typography.Text>
+            ),
+            disabled: true,
+          },
+        ]
+      : []),
     { type: 'divider' as const },
     {
       key: 'profile',
@@ -150,7 +186,7 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
   // Only use localStorage auto-save when not in Supabase mode
   useEffect(() => {
     if (layoutId) return;
-    localStorageAdapter.load(LAYOUT_ID).then(saved => {
+    localStorageAdapter.load(LAYOUT_ID).then((saved) => {
       if (saved) useLayoutStore.setState({ root: saved });
     });
     return initAutoSave(LAYOUT_ID, localStorageAdapter);
@@ -177,10 +213,26 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
       <div className={styles.toolbar}>
         <span className={styles.toolbarTitle}>Widgets</span>
         <div className={styles.toolbarSpacer} />
-        <Tooltip title={themeMode === 'light' ? 'Light' : themeMode === 'dark' ? 'Dark' : 'System'}>
+        <Tooltip
+          title={
+            themeMode === 'light'
+              ? 'Light'
+              : themeMode === 'dark'
+                ? 'Dark'
+                : 'System'
+          }
+        >
           <Button
             size="small"
-            icon={themeMode === 'light' ? <SunOutlined /> : themeMode === 'dark' ? <MoonOutlined /> : <DesktopOutlined />}
+            icon={
+              themeMode === 'light' ? (
+                <SunOutlined />
+              ) : themeMode === 'dark' ? (
+                <MoonOutlined />
+              ) : (
+                <DesktopOutlined />
+              )
+            }
             onClick={cycleTheme}
           />
         </Tooltip>
@@ -219,10 +271,22 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
             />
           </Tooltip>
         )}
-        <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+        <Dropdown
+          menu={{ items: userMenuItems }}
+          trigger={['click']}
+          placement="bottomRight"
+        >
           <Avatar
             size="small"
-            src={avatarSrc ? <img src={avatarSrc} referrerPolicy="no-referrer" onError={() => setAvatarError(true)} /> : undefined}
+            src={
+              avatarSrc ? (
+                <img
+                  src={avatarSrc}
+                  referrerPolicy="no-referrer"
+                  onError={() => setAvatarError(true)}
+                />
+              ) : undefined
+            }
             icon={!avatarSrc ? <UserOutlined /> : undefined}
             style={{ cursor: 'pointer' }}
           />
@@ -234,13 +298,17 @@ export default function App({ layoutId, onSave, saving }: AppProps) {
           {showGrid && <GridOverlay />}
         </GridProvider>
       </div>
-      <LayoutJsonModal open={jsonModalOpen} onClose={() => setJsonModalOpen(false)} />
+      <LayoutJsonModal
+        open={jsonModalOpen}
+        onClose={() => setJsonModalOpen(false)}
+      />
     </div>
   );
 }
 ```
 
 Key changes from current:
+
 - Added `AppProps` type: `layoutId?`, `onSave?`, `saving?`
 - localStorage auto-save skipped when `layoutId` is provided
 - Save button visible when `editMode && onSave`
@@ -264,6 +332,7 @@ git commit -m "feat(layout): add Save button and props to App component"
 ### Task 3: Create LayoutEditorPage
 
 **Files:**
+
 - Create: `src/pages/LayoutEditorPage.tsx`
 
 - [ ] **Step 1: Create LayoutEditorPage.tsx**
@@ -276,10 +345,17 @@ import { useParams, useNavigate } from '@tanstack/react-router';
 import { Spin, message } from 'antd';
 import App from '@/App';
 import { useLayoutStore } from '@/layout/store/layoutStore';
-import { useLayout, useCreateLayout, useSaveLayout } from '@/lib/hooks/useLayoutQueries';
+import {
+  useLayout,
+  useCreateLayout,
+  useSaveLayout,
+} from '@/lib/hooks/useLayoutQueries';
 
 export function LayoutEditorPage() {
-  const { userId, layoutId } = useParams({ strict: false }) as { userId: string; layoutId: string };
+  const { userId, layoutId } = useParams({ strict: false }) as {
+    userId: string;
+    layoutId: string;
+  };
   const navigate = useNavigate();
   const isNew = layoutId === 'new';
 
@@ -297,7 +373,9 @@ export function LayoutEditorPage() {
   // Reset store for new layouts
   useEffect(() => {
     if (isNew) {
-      useLayoutStore.setState({ root: { id: crypto.randomUUID(), type: 'leaf' } });
+      useLayoutStore.setState({
+        root: { id: crypto.randomUUID(), type: 'leaf' },
+      });
       useLayoutStore.getState().setEditMode(true);
     }
   }, [isNew]);
@@ -317,16 +395,26 @@ export function LayoutEditorPage() {
         onError: (err) => message.error(err.message),
       });
     } else {
-      saveMutation.mutate({ id: layoutId, data: root }, {
-        onSuccess: () => message.success('Layout saved'),
-        onError: (err) => message.error(err.message),
-      });
+      saveMutation.mutate(
+        { id: layoutId, data: root },
+        {
+          onSuccess: () => message.success('Layout saved'),
+          onError: (err) => message.error(err.message),
+        },
+      );
     }
   }
 
   if (!isNew && isLoading) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100dvh' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100dvh',
+        }}
+      >
         <Spin size="large" />
       </div>
     );
@@ -359,6 +447,7 @@ git commit -m "feat(layout): create LayoutEditorPage with Supabase load/save"
 ### Task 4: Update Profile LayoutsSection with Table
 
 **Files:**
+
 - Modify: `src/auth/ProfilePage.tsx`
 
 - [ ] **Step 1: Replace LayoutsSection**
@@ -378,7 +467,16 @@ import type { LayoutRecord } from '@/lib/types';
 Update the existing antd import to include `Button`, `Table`, `Tag`, `Popconfirm` (merge with existing `Avatar, Descriptions, Menu, Typography`):
 
 ```tsx
-import { Avatar, Button, Descriptions, Menu, Popconfirm, Table, Tag, Typography } from 'antd';
+import {
+  Avatar,
+  Button,
+  Descriptions,
+  Menu,
+  Popconfirm,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
 ```
 
 Replace the `LayoutsSection` function with:
@@ -396,7 +494,9 @@ function LayoutsSection() {
       dataIndex: 'id',
       key: 'id',
       render: (id: string) => (
-        <Typography.Text copyable style={{ fontSize: 12 }}>{id.slice(0, 8)}</Typography.Text>
+        <Typography.Text copyable style={{ fontSize: 12 }}>
+          {id.slice(0, 8)}
+        </Typography.Text>
       ),
     },
     {
@@ -404,7 +504,12 @@ function LayoutsSection() {
       dataIndex: 'status',
       key: 'status',
       render: (status: string) => {
-        const color = status === 'published' ? 'green' : status === 'draft' ? 'blue' : 'red';
+        const color =
+          status === 'published'
+            ? 'green'
+            : status === 'draft'
+              ? 'blue'
+              : 'red';
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -426,17 +531,25 @@ function LayoutsSection() {
         <span style={{ display: 'flex', gap: 8 }}>
           <Button
             size="small"
-            onClick={() => navigate({
-              to: '/users/$userId/layouts/$layoutId',
-              params: { userId: user!.id, layoutId: record.id },
-            })}
+            onClick={() =>
+              navigate({
+                to: '/users/$userId/layouts/$layoutId',
+                params: { userId: user!.id, layoutId: record.id },
+              })
+            }
           >
             Edit
           </Button>
           {record.status === 'draft' && (
             <Button
               size="small"
-              onClick={() => setStatus.mutate({ id: record.id, version: record.version, status: 'published' })}
+              onClick={() =>
+                setStatus.mutate({
+                  id: record.id,
+                  version: record.version,
+                  status: 'published',
+                })
+              }
             >
               Publish
             </Button>
@@ -444,16 +557,30 @@ function LayoutsSection() {
           {record.status === 'published' && (
             <Button
               size="small"
-              onClick={() => setStatus.mutate({ id: record.id, version: record.version, status: 'draft' })}
+              onClick={() =>
+                setStatus.mutate({
+                  id: record.id,
+                  version: record.version,
+                  status: 'draft',
+                })
+              }
             >
               Unpublish
             </Button>
           )}
           <Popconfirm
             title="Delete this layout?"
-            onConfirm={() => setStatus.mutate({ id: record.id, version: record.version, status: 'deleted' })}
+            onConfirm={() =>
+              setStatus.mutate({
+                id: record.id,
+                version: record.version,
+                status: 'deleted',
+              })
+            }
           >
-            <Button size="small" danger>Delete</Button>
+            <Button size="small" danger>
+              Delete
+            </Button>
           </Popconfirm>
         </span>
       ),
@@ -462,15 +589,26 @@ function LayoutsSection() {
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Title level={4} style={{ margin: 0 }}>Layouts</Title>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: 16,
+        }}
+      >
+        <Title level={4} style={{ margin: 0 }}>
+          Layouts
+        </Title>
         <Button
           type="primary"
           icon={<PlusOutlined />}
-          onClick={() => navigate({
-            to: '/users/$userId/layouts/new',
-            params: { userId: user!.id },
-          })}
+          onClick={() =>
+            navigate({
+              to: '/users/$userId/layouts/new',
+              params: { userId: user!.id },
+            })
+          }
         >
           New Layout
         </Button>
@@ -505,6 +643,7 @@ git commit -m "feat(layout): add layouts table with CRUD to ProfilePage"
 ### Task 5: Update router with new routes
 
 **Files:**
+
 - Modify: `src/router.tsx`
 
 - [ ] **Step 1: Add imports and routes**
@@ -523,7 +662,9 @@ const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       throw redirect({ to: '/login' });
     }
@@ -541,7 +682,9 @@ const layoutNewRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/users/$userId/layouts/new',
   async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       throw redirect({ to: '/login' });
     }
@@ -553,7 +696,9 @@ const layoutEditRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/users/$userId/layouts/$layoutId',
   async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (!session) {
       throw redirect({ to: '/login' });
     }
@@ -565,7 +710,14 @@ const layoutEditRoute = createRoute({
 Update the route tree:
 
 ```tsx
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute, profileRoute, layoutNewRoute, layoutEditRoute, callbackRoute]);
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  loginRoute,
+  profileRoute,
+  layoutNewRoute,
+  layoutEditRoute,
+  callbackRoute,
+]);
 ```
 
 - [ ] **Step 2: Verify build and tests**
@@ -576,6 +728,7 @@ Expected: Both pass.
 - [ ] **Step 3: Verify manually**
 
 Run: `pnpm dev`
+
 - `/` shows HomePage placeholder with "Create New Layout" button
 - Click "Create New Layout" → navigates to `/users/:userId/layouts/new`
 - Layout editor opens in edit mode with empty layout

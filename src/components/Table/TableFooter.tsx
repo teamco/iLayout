@@ -23,8 +23,16 @@ type TTableFooterProps = {
   total?: number;
 };
 
-export const TableFooter = (props: TTableFooterProps): React.JSX.Element | null => {
-  const { className = styles.gridFooter, computedFilteredCount, totalCount, of, total } = props;
+export const TableFooter = (
+  props: TTableFooterProps,
+): React.JSX.Element | null => {
+  const {
+    className = styles.gridFooter,
+    computedFilteredCount,
+    totalCount,
+    of,
+    total,
+  } = props;
 
   // Support legacy API (of/total) for backwards compatibility
   const filteredCount = computedFilteredCount ?? total ?? 0;

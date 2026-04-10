@@ -21,10 +21,15 @@ export function detectType(value: unknown): string {
 
   if (typeof value === 'number') return 'number';
 
-  if ((value as Record<string, unknown>)?.isValid && typeof (value as Record<string, unknown>).isValid === 'function') {
+  if (
+    (value as Record<string, unknown>)?.isValid &&
+    typeof (value as Record<string, unknown>).isValid === 'function'
+  ) {
     try {
       if ((value as { isValid: () => boolean }).isValid()) return 'date';
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }
 
   return 'object';

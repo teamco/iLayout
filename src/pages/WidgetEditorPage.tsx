@@ -1,12 +1,27 @@
 import { useEffect } from 'react';
 import type { ComponentType } from 'react';
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { App as AntApp, Button, Form, Input, Select, Spin, Switch, Tabs, Typography, Space } from 'antd';
+import {
+  App as AntApp,
+  Button,
+  Form,
+  Input,
+  Select,
+  Spin,
+  Switch,
+  Tabs,
+  Typography,
+  Space,
+} from 'antd';
 import { useTranslation } from 'react-i18next';
 import { SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { AppHeader } from '@/components/AppHeader';
 import { ERoutes } from '@/routes';
-import { useWidget, useCreateWidget, useUpdateWidget } from '@/lib/hooks/useWidgetQueries';
+import {
+  useWidget,
+  useCreateWidget,
+  useUpdateWidget,
+} from '@/lib/hooks/useWidgetQueries';
 import { useErrorNotification } from '@/lib/hooks/useErrorNotification';
 import { EWidgetCategory, EWidgetResource } from '@/lib/types';
 import type { WidgetEditorProps } from '@/widgets/types';
@@ -15,8 +30,14 @@ import { getWidgetDef } from '@/widgets/registry';
 const { TextArea } = Input;
 const { Text } = Typography;
 
-const CATEGORY_OPTIONS = Object.values(EWidgetCategory).map((v) => ({ value: v, label: v }));
-const RESOURCE_OPTIONS = Object.values(EWidgetResource).map((v) => ({ value: v, label: v }));
+const CATEGORY_OPTIONS = Object.values(EWidgetCategory).map((v) => ({
+  value: v,
+  label: v,
+}));
+const RESOURCE_OPTIONS = Object.values(EWidgetResource).map((v) => ({
+  value: v,
+  label: v,
+}));
 
 type FormValues = {
   name: string;
@@ -31,7 +52,13 @@ type FormValues = {
   isPublic: boolean;
 };
 
-function ContentEditorWrapper({ form, Editor }: { form: any; Editor: ComponentType<WidgetEditorProps> }) {
+function ContentEditorWrapper({
+  form,
+  Editor,
+}: {
+  form: any;
+  Editor: ComponentType<WidgetEditorProps>;
+}) {
   const value = Form.useWatch('contentValue', form) ?? '';
   return (
     <Editor
@@ -54,7 +81,11 @@ function ContentTab({ form }: { form: any }) {
           <ContentEditorWrapper form={form} Editor={Editor} />
         </Form.Item>
       ) : (
-        <Form.Item label={t('widget.contentValue')} name="contentValue" extra={t('widget.contentHelp')}>
+        <Form.Item
+          label={t('widget.contentValue')}
+          name="contentValue"
+          extra={t('widget.contentHelp')}
+        >
           <TextArea rows={6} />
         </Form.Item>
       )}
@@ -73,7 +104,11 @@ export function WidgetEditorPage() {
   const [form] = Form.useForm<FormValues>();
   const isNew = !widgetId;
 
-  const { data: widget, isLoading, error: loadError } = useWidget(isNew ? undefined : widgetId);
+  const {
+    data: widget,
+    isLoading,
+    error: loadError,
+  } = useWidget(isNew ? undefined : widgetId);
   const createMutation = useCreateWidget();
   const updateMutation = useUpdateWidget();
 
@@ -118,13 +153,19 @@ export function WidgetEditorPage() {
       createMutation.mutate(payload, {
         onSuccess: async (created) => {
           void message.success(t('widget.widgetCreated'));
-          await navigate({ to: ERoutes.WIDGET_EDIT as string, params: { widgetId: created.id } });
+          await navigate({
+            to: ERoutes.WIDGET_EDIT as string,
+            params: { widgetId: created.id },
+          });
         },
       });
     } else {
-      updateMutation.mutate({ id: widgetId, data: payload }, {
-        onSuccess: () => void message.success(t('widget.widgetSaved')),
-      });
+      updateMutation.mutate(
+        { id: widgetId, data: payload },
+        {
+          onSuccess: () => void message.success(t('widget.widgetSaved')),
+        },
+      );
     }
   }
 
@@ -137,7 +178,9 @@ export function WidgetEditorPage() {
       <AppHeader>
         <Button
           icon={<ArrowLeftOutlined />}
-          onClick={() => void navigate({ to: ERoutes.PROFILE_WIDGETS as string })}
+          onClick={() =>
+            void navigate({ to: ERoutes.PROFILE_WIDGETS as string })
+          }
         >
           {t('common.back')}
         </Button>
@@ -150,7 +193,16 @@ export function WidgetEditorPage() {
           {t('common.save')}
         </Button>
       </AppHeader>
-      <div style={{ flex: 1, overflow: 'auto', padding: 24, maxWidth: 700, margin: '0 auto', width: '100%' }}>
+      <div
+        style={{
+          flex: 1,
+          overflow: 'auto',
+          padding: 24,
+          maxWidth: 700,
+          margin: '0 auto',
+          width: '100%',
+        }}
+      >
         <Form
           form={form}
           layout="vertical"
@@ -168,68 +220,104 @@ export function WidgetEditorPage() {
           }}
           onFinish={handleFinish}
         >
-          <Tabs items={[
-            {
-              key: 'general',
-              label: t('widget.tabGeneral'),
-              children: (
-                <>
-                  <Form.Item label={t('widget.name')} name="name" rules={[{ required: true }]}>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item label={t('widget.description')} name="description">
-                    <TextArea rows={3} />
-                  </Form.Item>
-                  <Form.Item label={t('widget.columnCategory')} name="category" rules={[{ required: true }]}>
-                    <Select options={CATEGORY_OPTIONS} />
-                  </Form.Item>
-                  <Form.Item label={t('widget.columnResource')} name="resource" rules={[{ required: true }]}>
-                    <Select options={RESOURCE_OPTIONS} />
-                  </Form.Item>
-                  <Form.Item label={t('widget.tags')} name="tags">
-                    <Select mode="tags" />
-                  </Form.Item>
-                </>
-              ),
-            },
-            {
-              key: 'content',
-              label: t('widget.tabContent'),
-              children: <ContentTab form={form} />,
-            },
-            {
-              key: 'config',
-              label: t('widget.tabConfig'),
-              children: (
-                <>
-                  <Form.Item label={t('widget.isEditable')} name="isEditable" valuePropName="checked">
-                    <Switch />
-                  </Form.Item>
-                  <Form.Item label={t('widget.isClonable')} name="isClonable" valuePropName="checked">
-                    <Switch />
-                  </Form.Item>
-                </>
-              ),
-            },
-            {
-              key: 'settings',
-              label: t('widget.tabSettings'),
-              children: (
-                <>
-                  <Form.Item label={t('widget.isPublic')} name="isPublic" valuePropName="checked" extra={t('widget.publicHelp')}>
-                    <Switch />
-                  </Form.Item>
-                  {widget && (
-                    <Space orientation="vertical">
-                      <Text type="secondary">{t('common.columnStatus')}: {widget.status}</Text>
-                      <Text type="secondary">{t('common.columnCreated')}: {widget.created_at}</Text>
-                      <Text type="secondary">{t('common.columnUpdated')}: {widget.updated_at}</Text>
-                    </Space>
-                  )}
-                </>
-              ),
-            },
-          ]} />
+          <Tabs
+            items={[
+              {
+                key: 'general',
+                label: t('widget.tabGeneral'),
+                children: (
+                  <>
+                    <Form.Item
+                      label={t('widget.name')}
+                      name="name"
+                      rules={[{ required: true }]}
+                    >
+                      <Input />
+                    </Form.Item>
+                    <Form.Item
+                      label={t('widget.description')}
+                      name="description"
+                    >
+                      <TextArea rows={3} />
+                    </Form.Item>
+                    <Form.Item
+                      label={t('widget.columnCategory')}
+                      name="category"
+                      rules={[{ required: true }]}
+                    >
+                      <Select options={CATEGORY_OPTIONS} />
+                    </Form.Item>
+                    <Form.Item
+                      label={t('widget.columnResource')}
+                      name="resource"
+                      rules={[{ required: true }]}
+                    >
+                      <Select options={RESOURCE_OPTIONS} />
+                    </Form.Item>
+                    <Form.Item label={t('widget.tags')} name="tags">
+                      <Select mode="tags" />
+                    </Form.Item>
+                  </>
+                ),
+              },
+              {
+                key: 'content',
+                label: t('widget.tabContent'),
+                children: <ContentTab form={form} />,
+              },
+              {
+                key: 'config',
+                label: t('widget.tabConfig'),
+                children: (
+                  <>
+                    <Form.Item
+                      label={t('widget.isEditable')}
+                      name="isEditable"
+                      valuePropName="checked"
+                    >
+                      <Switch />
+                    </Form.Item>
+                    <Form.Item
+                      label={t('widget.isClonable')}
+                      name="isClonable"
+                      valuePropName="checked"
+                    >
+                      <Switch />
+                    </Form.Item>
+                  </>
+                ),
+              },
+              {
+                key: 'settings',
+                label: t('widget.tabSettings'),
+                children: (
+                  <>
+                    <Form.Item
+                      label={t('widget.isPublic')}
+                      name="isPublic"
+                      valuePropName="checked"
+                      extra={t('widget.publicHelp')}
+                    >
+                      <Switch />
+                    </Form.Item>
+                    {widget && (
+                      <Space orientation="vertical">
+                        <Text type="secondary">
+                          {t('common.columnStatus')}: {widget.status}
+                        </Text>
+                        <Text type="secondary">
+                          {t('common.columnCreated')}: {widget.created_at}
+                        </Text>
+                        <Text type="secondary">
+                          {t('common.columnUpdated')}: {widget.updated_at}
+                        </Text>
+                      </Space>
+                    )}
+                  </>
+                ),
+              },
+            ]}
+          />
         </Form>
       </div>
     </div>

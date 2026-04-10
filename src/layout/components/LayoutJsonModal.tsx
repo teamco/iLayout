@@ -1,6 +1,18 @@
 import { useState, useCallback } from 'react';
-import { App as AntApp, Modal, Tabs, Input, Button, Typography, Space } from 'antd';
-import { CopyOutlined, DownloadOutlined, ImportOutlined } from '@ant-design/icons';
+import {
+  App as AntApp,
+  Modal,
+  Tabs,
+  Input,
+  Button,
+  Typography,
+  Space,
+} from 'antd';
+import {
+  CopyOutlined,
+  DownloadOutlined,
+  ImportOutlined,
+} from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 import { exportJson } from '@/lib/exportJson';
@@ -22,7 +34,7 @@ function validateLayout(data: unknown): data is { id: string; type: string } {
 }
 
 function ViewTab() {
-  const root = useLayoutStore(s => s.root);
+  const root = useLayoutStore((s) => s.root);
   const json = JSON.stringify(root, null, 2);
   const { message } = AntApp.useApp();
   const { t } = useTranslation();
@@ -35,10 +47,21 @@ function ViewTab() {
 
   return (
     <>
-      <pre style={{ maxHeight: 400, overflow: 'auto', fontSize: 12, margin: 0 }}>{json}</pre>
+      <pre
+        style={{ maxHeight: 400, overflow: 'auto', fontSize: 12, margin: 0 }}
+      >
+        {json}
+      </pre>
       <Space style={{ marginTop: 12 }}>
-        <Button icon={<CopyOutlined />} onClick={handleCopy}>{t('jsonModal.copy')}</Button>
-        <Button icon={<DownloadOutlined />} onClick={() => exportJson(json, 'layout')}>{t('jsonModal.export')}</Button>
+        <Button icon={<CopyOutlined />} onClick={handleCopy}>
+          {t('jsonModal.copy')}
+        </Button>
+        <Button
+          icon={<DownloadOutlined />}
+          onClick={() => exportJson(json, 'layout')}
+        >
+          {t('jsonModal.export')}
+        </Button>
       </Space>
     </>
   );
@@ -62,7 +85,9 @@ function ImportTab({ onClose }: { onClose: () => void }) {
       setError(t('jsonModal.invalidLayout'));
       return;
     }
-    useLayoutStore.setState({ root: parsed as ReturnType<typeof useLayoutStore.getState>['root'] });
+    useLayoutStore.setState({
+      root: parsed as ReturnType<typeof useLayoutStore.getState>['root'],
+    });
     setText('');
     onClose();
   }, [text, onClose, t]);
@@ -72,17 +97,28 @@ function ImportTab({ onClose }: { onClose: () => void }) {
       <Input.TextArea
         rows={12}
         value={text}
-        onChange={e => { setText(e.target.value); setError(''); }}
+        onChange={(e) => {
+          setText(e.target.value);
+          setError('');
+        }}
         placeholder={t('jsonModal.pastePlaceholder')}
         style={{ fontFamily: 'monospace', fontSize: 12 }}
       />
       {error && (
-        <Typography.Text type="danger" style={{ display: 'block', marginTop: 8 }}>
+        <Typography.Text
+          type="danger"
+          style={{ display: 'block', marginTop: 8 }}
+        >
           {error}
         </Typography.Text>
       )}
       <Space style={{ marginTop: 12 }}>
-        <Button type="primary" icon={<ImportOutlined />} onClick={handleImport} disabled={!text.trim()}>
+        <Button
+          type="primary"
+          icon={<ImportOutlined />}
+          onClick={handleImport}
+          disabled={!text.trim()}
+        >
           {t('jsonModal.importBtn')}
         </Button>
       </Space>
@@ -93,11 +129,21 @@ function ImportTab({ onClose }: { onClose: () => void }) {
 export function LayoutJsonModal({ open, onClose }: Props) {
   const { t } = useTranslation();
   return (
-    <Modal title={t('jsonModal.title')} open={open} onCancel={onClose} footer={null} width={640}>
+    <Modal
+      title={t('jsonModal.title')}
+      open={open}
+      onCancel={onClose}
+      footer={null}
+      width={640}
+    >
       <Tabs
         items={[
           { key: 'view', label: t('jsonModal.view'), children: <ViewTab /> },
-          { key: 'import', label: t('jsonModal.import'), children: <ImportTab onClose={onClose} /> },
+          {
+            key: 'import',
+            label: t('jsonModal.import'),
+            children: <ImportTab onClose={onClose} />,
+          },
         ]}
       />
     </Modal>

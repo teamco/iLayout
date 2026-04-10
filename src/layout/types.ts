@@ -9,9 +9,15 @@ export type WidgetBounds = {
   marginBottom?: CssValue;
   marginLeft?: CssValue;
   align?:
-    | 'top-left' | 'top-center' | 'top-right'
-    | 'center-left' | 'center' | 'center-right'
-    | 'bottom-left' | 'bottom-center' | 'bottom-right';
+    | 'top-left'
+    | 'top-center'
+    | 'top-right'
+    | 'center-left'
+    | 'center'
+    | 'center-right'
+    | 'bottom-left'
+    | 'bottom-center'
+    | 'bottom-right';
 };
 
 export type WidgetRef = {

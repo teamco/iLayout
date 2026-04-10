@@ -10,7 +10,10 @@ import { ERoutes } from '@/routes';
 import { formatDate } from '@/lib/formatDate';
 import type { WidgetRecord } from '@/lib/types';
 import type { TColumns } from '@/components/Table/types';
-import { columnFilter, type TColumnFilter } from '@/components/Table/filterUtil';
+import {
+  columnFilter,
+  type TColumnFilter,
+} from '@/components/Table/filterUtil';
 import { columnSorter } from '@/components/Table/sorterUtil';
 import type { FilterValue } from 'antd/es/table/interface';
 
@@ -43,14 +46,26 @@ const RESOURCE_COLORS: Record<string, string> = {
   empty: 'default',
 };
 
-export function getWidgetColumns({ t, navigate, onDelete, onUpdate, entities, filteredInfo, sortedInfo }: WidgetColumnsOptions): TColumns<WidgetRecord> {
+export function getWidgetColumns({
+  t,
+  navigate,
+  onDelete,
+  onUpdate,
+  entities,
+  filteredInfo,
+  sortedInfo,
+}: WidgetColumnsOptions): TColumns<WidgetRecord> {
   return [
     {
       title: t('widget.name'),
       dataIndex: 'name',
       key: 'name',
       filterSearch: true,
-      ...(columnFilter(filteredInfo, entities, 'name') as TColumnFilter<WidgetRecord>),
+      ...(columnFilter(
+        filteredInfo,
+        entities,
+        'name',
+      ) as TColumnFilter<WidgetRecord>),
       ...columnSorter(sortedInfo, 'name'),
     },
     {
@@ -59,8 +74,14 @@ export function getWidgetColumns({ t, navigate, onDelete, onUpdate, entities, fi
       key: 'category',
       width: 110,
       concealable: true,
-      ...(columnFilter(filteredInfo, entities, 'category') as TColumnFilter<WidgetRecord>),
-      render: (cat: string) => <Tag color={CATEGORY_COLORS[cat] ?? 'default'}>{cat}</Tag>,
+      ...(columnFilter(
+        filteredInfo,
+        entities,
+        'category',
+      ) as TColumnFilter<WidgetRecord>),
+      render: (cat: string) => (
+        <Tag color={CATEGORY_COLORS[cat] ?? 'default'}>{cat}</Tag>
+      ),
     },
     {
       title: t('widget.columnResource'),
@@ -68,8 +89,14 @@ export function getWidgetColumns({ t, navigate, onDelete, onUpdate, entities, fi
       key: 'resource',
       width: 110,
       concealable: true,
-      ...(columnFilter(filteredInfo, entities, 'resource') as TColumnFilter<WidgetRecord>),
-      render: (res: string) => <Tag color={RESOURCE_COLORS[res] ?? 'default'}>{res}</Tag>,
+      ...(columnFilter(
+        filteredInfo,
+        entities,
+        'resource',
+      ) as TColumnFilter<WidgetRecord>),
+      render: (res: string) => (
+        <Tag color={RESOURCE_COLORS[res] ?? 'default'}>{res}</Tag>
+      ),
     },
     {
       title: t('common.columnStatus'),
@@ -77,9 +104,18 @@ export function getWidgetColumns({ t, navigate, onDelete, onUpdate, entities, fi
       key: 'status',
       width: 100,
       concealable: true,
-      ...(columnFilter(filteredInfo, entities, 'status') as TColumnFilter<WidgetRecord>),
+      ...(columnFilter(
+        filteredInfo,
+        entities,
+        'status',
+      ) as TColumnFilter<WidgetRecord>),
       render: (status: string) => {
-        const color = status === 'published' ? 'green' : status === 'draft' ? 'blue' : 'red';
+        const color =
+          status === 'published'
+            ? 'green'
+            : status === 'draft'
+              ? 'blue'
+              : 'red';
         return <Tag color={color}>{status}</Tag>;
       },
     },
@@ -89,7 +125,9 @@ export function getWidgetColumns({ t, navigate, onDelete, onUpdate, entities, fi
       key: 'is_public',
       width: 90,
       concealable: true,
-      ...(columnFilter(filteredInfo, entities, 'is_public', (v) => v ? 'Public' : 'Private') as TColumnFilter<WidgetRecord>),
+      ...(columnFilter(filteredInfo, entities, 'is_public', (v) =>
+        v ? 'Public' : 'Private',
+      ) as TColumnFilter<WidgetRecord>),
       render: (isPublic: boolean) => (
         <Tooltip title={isPublic ? t('layout.public') : t('layout.private')}>
           {isPublic ? <GlobalOutlined /> : <LockOutlined />}
@@ -120,18 +158,33 @@ export function getWidgetColumns({ t, navigate, onDelete, onUpdate, entities, fi
       width: 80,
       fixed: 'right' as const,
       render: (_: unknown, record: WidgetRecord) => {
-        const widgetSubject = subject(ESubject.WIDGET, { kind: ESubject.WIDGET, user_id: record.user_id });
+        const widgetSubject = subject(ESubject.WIDGET, {
+          kind: ESubject.WIDGET,
+          user_id: record.user_id,
+        });
         const items: MenuProps['items'] = [
           { key: 'edit', label: t('common.edit') },
-          { key: record.status === 'published' ? 'unpublish' : 'publish', label: record.status === 'published' ? t('layout.unpublish') : t('layout.publish') },
-          { key: 'togglePublic', label: record.is_public ? t('layout.private') : t('layout.public') },
+          {
+            key: record.status === 'published' ? 'unpublish' : 'publish',
+            label:
+              record.status === 'published'
+                ? t('layout.unpublish')
+                : t('layout.publish'),
+          },
+          {
+            key: 'togglePublic',
+            label: record.is_public ? t('layout.private') : t('layout.public'),
+          },
           { type: 'divider' },
           { key: 'delete', label: t('common.delete'), danger: true },
         ];
 
         const handleClick: MenuProps['onClick'] = ({ key }) => {
           if (key === 'edit') {
-            void navigate({ to: ERoutes.WIDGET_EDIT as string, params: { widgetId: record.id } });
+            void navigate({
+              to: ERoutes.WIDGET_EDIT as string,
+              params: { widgetId: record.id },
+            });
           } else if (key === 'publish') {
             onUpdate(record.id, { status: 'published' });
           } else if (key === 'unpublish') {
@@ -145,7 +198,10 @@ export function getWidgetColumns({ t, navigate, onDelete, onUpdate, entities, fi
 
         return (
           <Can I={EAction.EDIT} this={widgetSubject}>
-            <Dropdown menu={{ items, onClick: handleClick }} trigger={['click']}>
+            <Dropdown
+              menu={{ items, onClick: handleClick }}
+              trigger={['click']}
+            >
               <Button size="small" icon={<MoreOutlined />} />
             </Dropdown>
           </Can>

@@ -32,23 +32,63 @@ export function ProfilePage() {
   const selectedKey = MENU_KEYS[currentPath] ?? 'profile';
 
   const menuItems = [
-    { key: 'back', icon: <ArrowLeftOutlined />, label: t('common.back'), onClick: () => void navigate({ to: ERoutes.HOME }) },
+    {
+      key: 'back',
+      icon: <ArrowLeftOutlined />,
+      label: t('common.back'),
+      onClick: () => void navigate({ to: ERoutes.HOME }),
+    },
     { type: 'divider' as const },
-    { key: 'overview', icon: <DashboardOutlined />, label: t('profile.overview'), onClick: () => void navigate({ to: ERoutes.PROFILE_OVERVIEW as string }) },
-    { key: 'profile', icon: <UserOutlined />, label: t('profile.profile'), onClick: () => void navigate({ to: ERoutes.PROFILE }) },
-    { key: 'layouts', icon: <LayoutOutlined />, label: t('profile.layouts'), onClick: () => void navigate({ to: ERoutes.PROFILE_LAYOUTS as string }) },
-    { key: 'widgets', icon: <AppstoreOutlined />, label: t('profile.widgets'), onClick: () => void navigate({ to: ERoutes.PROFILE_WIDGETS as string }) },
-    ...(isAdmin ? [
-      { type: 'divider' as const },
-      { key: 'users', icon: <TeamOutlined />, label: t('profile.users'), onClick: () => void navigate({ to: ERoutes.PROFILE_USERS as string }) },
-    ] : []),
+    {
+      key: 'overview',
+      icon: <DashboardOutlined />,
+      label: t('profile.overview'),
+      onClick: () => void navigate({ to: ERoutes.PROFILE_OVERVIEW as string }),
+    },
+    {
+      key: 'profile',
+      icon: <UserOutlined />,
+      label: t('profile.profile'),
+      onClick: () => void navigate({ to: ERoutes.PROFILE }),
+    },
+    {
+      key: 'layouts',
+      icon: <LayoutOutlined />,
+      label: t('profile.layouts'),
+      onClick: () => void navigate({ to: ERoutes.PROFILE_LAYOUTS as string }),
+    },
+    {
+      key: 'widgets',
+      icon: <AppstoreOutlined />,
+      label: t('profile.widgets'),
+      onClick: () => void navigate({ to: ERoutes.PROFILE_WIDGETS as string }),
+    },
+    ...(isAdmin
+      ? [
+          { type: 'divider' as const },
+          {
+            key: 'users',
+            icon: <TeamOutlined />,
+            label: t('profile.users'),
+            onClick: () =>
+              void navigate({ to: ERoutes.PROFILE_USERS as string }),
+          },
+        ]
+      : []),
   ];
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
       <AppHeader />
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-        <div style={{ width: 220, borderRight: '1px solid var(--border-dark)', display: 'flex', flexDirection: 'column' }}>
+        <div
+          style={{
+            width: 220,
+            borderRight: '1px solid var(--border-dark)',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           <Menu
             mode="inline"
             selectedKeys={[selectedKey]}

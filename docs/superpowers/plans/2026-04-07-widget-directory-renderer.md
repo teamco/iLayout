@@ -13,6 +13,7 @@
 ### Task 1: Create widget types and registry
 
 **Files:**
+
 - Create: `src/widgets/types.ts`
 - Create: `src/widgets/registry.ts`
 
@@ -60,7 +61,9 @@ export function registerWidget(def: WidgetDefinition) {
   registry.set(def.resource, def);
 }
 
-export function getWidgetDef(resource: EWidgetResource): WidgetDefinition | undefined {
+export function getWidgetDef(
+  resource: EWidgetResource,
+): WidgetDefinition | undefined {
   return registry.get(resource);
 }
 
@@ -90,6 +93,7 @@ git commit -m "feat(widgets): create widget types and registry"
 ### Task 2: Create Empty widget
 
 **Files:**
+
 - Create: `src/widgets/empty/definition.ts`
 - Create: `src/widgets/empty/EmptyWidget.tsx`
 - Create: `src/widgets/empty/index.ts`
@@ -124,7 +128,17 @@ import type { WidgetComponentProps } from '../types';
 
 export function EmptyWidget({ content }: WidgetComponentProps) {
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted)', fontSize: 12 }}>
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'var(--color-muted)',
+        fontSize: 12,
+      }}
+    >
       {content.value || 'Empty'}
     </div>
   );
@@ -157,6 +171,7 @@ git commit -m "feat(widgets): create Empty widget"
 ### Task 3: Create YouTube widget
 
 **Files:**
+
 - Create: `src/widgets/youtube/definition.ts`
 - Create: `src/widgets/youtube/YouTubeWidget.tsx`
 - Create: `src/widgets/youtube/YouTubeEditor.tsx`
@@ -207,7 +222,17 @@ export function YouTubeWidget({ content }: WidgetComponentProps) {
 
   if (!embedUrl) {
     return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted)', fontSize: 12 }}>
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--color-muted)',
+          fontSize: 12,
+        }}
+      >
         No YouTube URL
       </div>
     );
@@ -247,9 +272,11 @@ export function YouTubeEditor({ content, onChange }: WidgetEditorProps) {
       {content.value && (
         <div style={{ marginTop: 12, aspectRatio: '16/9', maxHeight: 300 }}>
           <iframe
-            src={content.value.includes('/embed/')
-              ? content.value
-              : `https://www.youtube.com/embed/${content.value.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)?.[1] ?? ''}`}
+            src={
+              content.value.includes('/embed/')
+                ? content.value
+                : `https://www.youtube.com/embed/${content.value.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)?.[1] ?? ''}`
+            }
             style={{ width: '100%', height: '100%', border: 'none' }}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
@@ -289,6 +316,7 @@ git commit -m "feat(widgets): create YouTube widget with editor"
 ### Task 4: Create Image widget
 
 **Files:**
+
 - Create: `src/widgets/image/definition.ts`
 - Create: `src/widgets/image/ImageWidget.tsx`
 - Create: `src/widgets/image/ImageEditor.tsx`
@@ -327,7 +355,17 @@ import type { WidgetComponentProps } from '../types';
 export function ImageWidget({ content }: WidgetComponentProps) {
   if (!content.value) {
     return (
-      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-muted)', fontSize: 12 }}>
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'var(--color-muted)',
+          fontSize: 12,
+        }}
+      >
         No image URL
       </div>
     );
@@ -405,6 +443,7 @@ git commit -m "feat(widgets): create Image widget with editor"
 ### Task 5: Update WidgetRef type and WidgetRenderer
 
 **Files:**
+
 - Modify: `src/layout/types.ts`
 - Modify: `src/layout/widgets/WidgetRenderer.tsx`
 
@@ -441,15 +480,15 @@ import styles from './WidgetRenderer.module.less';
 type Props = { widget: WidgetRef };
 
 const ALIGN_CLASS: Record<string, string> = {
-  'top-left':      styles.alignTopLeft,
-  'top-center':    styles.alignTopCenter,
-  'top-right':     styles.alignTopRight,
-  'center-left':   styles.alignCenterLeft,
-  'center':        styles.alignCenter,
-  'center-right':  styles.alignCenterRight,
-  'bottom-left':   styles.alignBottomLeft,
+  'top-left': styles.alignTopLeft,
+  'top-center': styles.alignTopCenter,
+  'top-right': styles.alignTopRight,
+  'center-left': styles.alignCenterLeft,
+  center: styles.alignCenter,
+  'center-right': styles.alignCenterRight,
+  'bottom-left': styles.alignBottomLeft,
   'bottom-center': styles.alignBottomCenter,
-  'bottom-right':  styles.alignBottomRight,
+  'bottom-right': styles.alignBottomRight,
 };
 
 export function WidgetRenderer({ widget }: Props) {
@@ -457,7 +496,8 @@ export function WidgetRenderer({ widget }: Props) {
   const isDragActive = useDragActive();
   const { bounds } = widget;
 
-  const alignClass = ALIGN_CLASS[bounds?.align ?? 'top-left'] ?? styles.alignTopLeft;
+  const alignClass =
+    ALIGN_CLASS[bounds?.align ?? 'top-left'] ?? styles.alignTopLeft;
 
   const mt = bounds?.marginTop;
   const mr = bounds?.marginRight;
@@ -465,9 +505,11 @@ export function WidgetRenderer({ widget }: Props) {
   const ml = bounds?.marginLeft;
   const hasMargins = mt || mr || mb || ml;
 
-  const containerStyle: React.CSSProperties = hasMargins ? {
-    inset: `${mt ?? 0} ${mr ?? 0} ${mb ?? 0} ${ml ?? 0}`,
-  } : {};
+  const containerStyle: React.CSSProperties = hasMargins
+    ? {
+        inset: `${mt ?? 0} ${mr ?? 0} ${mb ?? 0} ${ml ?? 0}`,
+      }
+    : {};
 
   let content: React.ReactNode;
 
@@ -481,7 +523,9 @@ export function WidgetRenderer({ widget }: Props) {
     );
   } else {
     content = (
-      <div className={clsx(styles.fallback, { [styles.dragActive]: isDragActive })}>
+      <div
+        className={clsx(styles.fallback, { [styles.dragActive]: isDragActive })}
+      >
         {widget.widgetId}
       </div>
     );
@@ -498,6 +542,7 @@ export function WidgetRenderer({ widget }: Props) {
 - [ ] **Step 3: Fix any type errors in other files that reference old WidgetRef.type**
 
 Files that may need updating:
+
 - `src/layout/components/LeafNode.tsx` — check for `widget.type === 'iframe'`
 - `src/layout/widgets/WidgetGallery.tsx` — will be updated in Task 6
 - `src/layout/components/LayoutJsonModal.tsx` — no changes needed (just JSON display)
@@ -520,6 +565,7 @@ git commit -m "feat(widgets): update WidgetRef and WidgetRenderer to use registr
 ### Task 6: Update WidgetGallery and remove old registry
 
 **Files:**
+
 - Modify: `src/layout/widgets/WidgetGallery.tsx`
 - Delete: `src/layout/widgets/widgetRegistry.ts`
 
@@ -554,7 +600,13 @@ function defToWidgetRef(def: WidgetDefinition): WidgetRef {
   };
 }
 
-function DraggableWidgetCard({ def, onSelect }: { def: WidgetDefinition; onSelect: (w: WidgetRef) => void }) {
+function DraggableWidgetCard({
+  def,
+  onSelect,
+}: {
+  def: WidgetDefinition;
+  onSelect: (w: WidgetRef) => void;
+}) {
   const widgetRef = defToWidgetRef(def);
   const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: `gallery-${def.resource}`,
@@ -576,7 +628,10 @@ function DraggableWidgetCard({ def, onSelect }: { def: WidgetDefinition; onSelec
           <div>
             <Typography.Text strong>{def.label}</Typography.Text>
             {def.description && (
-              <Typography.Text type="secondary" className={styles.cardDescription}>
+              <Typography.Text
+                type="secondary"
+                className={styles.cardDescription}
+              >
                 {def.description}
               </Typography.Text>
             )}
@@ -592,10 +647,19 @@ export function WidgetGallery({ open, onSelect, onClose }: Props) {
   const builtIn = getAllWidgetDefs();
 
   return (
-    <Drawer title={t('profile.widgets')} open={open} onClose={onClose} size="default">
+    <Drawer
+      title={t('profile.widgets')}
+      open={open}
+      onClose={onClose}
+      size="default"
+    >
       <div className={styles.list}>
-        {builtIn.map(def => (
-          <DraggableWidgetCard key={def.resource} def={def} onSelect={onSelect} />
+        {builtIn.map((def) => (
+          <DraggableWidgetCard
+            key={def.resource}
+            def={def}
+            onSelect={onSelect}
+          />
         ))}
       </div>
     </Drawer>
@@ -628,6 +692,7 @@ git commit -m "feat(widgets): update Gallery to use new registry, remove old wid
 ### Task 7: Update WidgetEditorPage Content tab with custom editors
 
 **Files:**
+
 - Modify: `src/pages/WidgetEditorPage.tsx`
 
 - [ ] **Step 1: Add custom editor support in Content tab**
@@ -635,6 +700,7 @@ git commit -m "feat(widgets): update Gallery to use new registry, remove old wid
 In `src/pages/WidgetEditorPage.tsx`:
 
 Add import:
+
 ```tsx
 import { getWidgetDef } from '@/widgets/registry';
 import type { EWidgetResource } from '@/lib/types';
@@ -701,7 +767,11 @@ function ContentTab({ form }: { form: ReturnType<typeof Form.useForm>[0] }) {
           <ContentEditorWrapper form={form} Editor={Editor} />
         </Form.Item>
       ) : (
-        <Form.Item label={t('widget.contentValue')} name="contentValue" extra={t('widget.contentHelp')}>
+        <Form.Item
+          label={t('widget.contentValue')}
+          name="contentValue"
+          extra={t('widget.contentHelp')}
+        >
           <TextArea rows={6} />
         </Form.Item>
       )}
@@ -712,7 +782,13 @@ function ContentTab({ form }: { form: ReturnType<typeof Form.useForm>[0] }) {
   );
 }
 
-function ContentEditorWrapper({ form, Editor }: { form: any; Editor: ComponentType<WidgetEditorProps> }) {
+function ContentEditorWrapper({
+  form,
+  Editor,
+}: {
+  form: any;
+  Editor: ComponentType<WidgetEditorProps>;
+}) {
   const value = Form.useWatch('contentValue', form) ?? '';
   return (
     <Editor

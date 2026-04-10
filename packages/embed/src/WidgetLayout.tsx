@@ -61,7 +61,9 @@ export function WidgetLayout({
   /* eslint-enable react-hooks/set-state-in-effect */
 
   const themeVars = themeToStyleVars(theme);
-  const className = ['al-root', fullPage && 'al-root--full-page'].filter(Boolean).join(' ');
+  const className = ['al-root', fullPage && 'al-root--full-page']
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={className} style={themeVars}>

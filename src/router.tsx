@@ -22,7 +22,9 @@ import { NotFound } from '@/pages/NotFound';
 import { ERoutes } from '@/routes';
 
 async function requireAuth() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   if (!session) {
     throw redirect({ to: ERoutes.LOGIN });
   }
@@ -43,7 +45,9 @@ const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: ERoutes.LOGIN,
   async beforeLoad() {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     if (session) {
       throw redirect({ to: ERoutes.HOME });
     }
@@ -156,7 +160,10 @@ const routeTree = rootRoute.addChildren([
   callbackRoute,
 ]);
 
-export const router = createRouter({ routeTree, defaultNotFoundComponent: NotFound });
+export const router = createRouter({
+  routeTree,
+  defaultNotFoundComponent: NotFound,
+});
 
 declare module '@tanstack/react-router' {
   interface Register {

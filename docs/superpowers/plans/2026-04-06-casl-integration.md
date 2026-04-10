@@ -13,6 +13,7 @@
 ### Task 1: Create abilities definition + AbilityContext + Can component
 
 **Files:**
+
 - Create: `src/auth/abilities.ts`
 - Create: `src/auth/AbilityContext.tsx`
 - Create: `src/auth/Can.tsx`
@@ -20,6 +21,7 @@
 - [ ] **Step 1: Add VITE_ADMINS to .env**
 
 Append to `.env`:
+
 ```
 VITE_ADMINS=teamco@gmail.com
 ```
@@ -29,7 +31,11 @@ VITE_ADMINS=teamco@gmail.com
 Create `src/auth/abilities.ts`:
 
 ```ts
-import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
+import {
+  AbilityBuilder,
+  createMongoAbility,
+  type MongoAbility,
+} from '@casl/ability';
 import type { User } from '@supabase/supabase-js';
 
 export const EAction = {
@@ -52,7 +58,9 @@ export type AppAbility = MongoAbility<[EAction, ESubject | string]>;
 
 function isAdmin(email?: string): boolean {
   if (!email) return false;
-  const admins = (import.meta.env.VITE_ADMINS || '').split(',').map((e: string) => e.trim().toLowerCase());
+  const admins = (import.meta.env.VITE_ADMINS || '')
+    .split(',')
+    .map((e: string) => e.trim().toLowerCase());
   return admins.includes(email.toLowerCase());
 }
 
@@ -90,7 +98,8 @@ export const AbilityContext = createContext<AppAbility | null>(null);
 
 export function useAbility(): AppAbility {
   const ability = useContext(AbilityContext);
-  if (!ability) throw new Error('useAbility must be used within AbilityProvider');
+  if (!ability)
+    throw new Error('useAbility must be used within AbilityProvider');
   return ability;
 }
 
@@ -116,7 +125,9 @@ import type { AnyAbility } from '@casl/ability';
 import type { Consumer } from 'react';
 import { AbilityContext } from '@/auth/AbilityContext';
 
-export const Can = createContextualCan(AbilityContext.Consumer as Consumer<AnyAbility>);
+export const Can = createContextualCan(
+  AbilityContext.Consumer as Consumer<AnyAbility>,
+);
 ```
 
 - [ ] **Step 5: Verify build**
@@ -136,6 +147,7 @@ git commit -m "feat(casl): create abilities, AbilityContext, and Can component"
 ### Task 2: Wire AbilityProvider into router
 
 **Files:**
+
 - Modify: `src/router.tsx`
 
 - [ ] **Step 1: Add AbilityProvider to RootComponent**
@@ -149,6 +161,7 @@ import { AbilityProvider } from '@/auth/AbilityContext';
 In the `RootComponent` return, wrap `<AntApp>` with `<AbilityProvider>` (inside `AuthProvider` so user is available):
 
 Change:
+
 ```tsx
       <AuthProvider>
         <ConfigProvider theme={{...}}>
@@ -160,6 +173,7 @@ Change:
 ```
 
 To:
+
 ```tsx
       <AuthProvider>
         <AbilityProvider>
@@ -189,6 +203,7 @@ git commit -m "feat(casl): wire AbilityProvider into root route"
 ### Task 3: Replace useCanEdit stub
 
 **Files:**
+
 - Modify: `src/layout/hooks/useCanEdit.ts`
 
 - [ ] **Step 1: Replace stub with real CASL check**
@@ -222,6 +237,7 @@ git commit -m "feat(casl): replace useCanEdit stub with real ability check"
 ### Task 4: Gate App.tsx toolbar buttons with abilities
 
 **Files:**
+
 - Modify: `src/App.tsx`
 
 - [ ] **Step 1: Add ability imports and hook**
@@ -245,27 +261,31 @@ const canEdit = ability.can(EAction.EDIT, ESubject.LAYOUT);
 Wrap the Edit Mode button so it only renders when `canEdit`:
 
 Change:
+
 ```tsx
-        <Button
-          type={editMode ? 'primary' : 'default'}
-          size="small"
-          onClick={() => setEditMode(!editMode)}
-        >
-          {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
-        </Button>
+<Button
+  type={editMode ? 'primary' : 'default'}
+  size="small"
+  onClick={() => setEditMode(!editMode)}
+>
+  {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
+</Button>
 ```
 
 To:
+
 ```tsx
-        {canEdit && (
-          <Button
-            type={editMode ? 'primary' : 'default'}
-            size="small"
-            onClick={() => setEditMode(!editMode)}
-          >
-            {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
-          </Button>
-        )}
+{
+  canEdit && (
+    <Button
+      type={editMode ? 'primary' : 'default'}
+      size="small"
+      onClick={() => setEditMode(!editMode)}
+    >
+      {editMode ? '✏️ Edit Mode ON' : 'Edit Mode'}
+    </Button>
+  );
+}
 ```
 
 - [ ] **Step 3: Verify build**
@@ -285,6 +305,7 @@ git commit -m "feat(casl): gate Edit Mode button with ability check"
 ### Task 5: Gate ProfilePage layout actions with abilities
 
 **Files:**
+
 - Modify: `src/auth/ProfilePage.tsx`
 
 - [ ] **Step 1: Add ability imports**
@@ -310,6 +331,7 @@ const ability = useAbility();
 Wrap the "New Layout" button:
 
 Change:
+
 ```tsx
         <Button
           type="primary"
@@ -321,6 +343,7 @@ Change:
 ```
 
 To:
+
 ```tsx
         {ability.can(EAction.CREATE, ESubject.LAYOUT) && (
           <Button
@@ -377,6 +400,7 @@ Expected: Build succeeds.
 - [ ] **Step 6: Verify manually**
 
 Run: `pnpm dev`
+
 - Login as teamco@gmail.com (admin) → all buttons visible on all layouts
 - Login as another user (editor) → Edit Mode visible, CRUD only on own layouts
 - Check that non-owner layouts show no Edit/Delete/Publish buttons

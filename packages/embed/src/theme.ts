@@ -1,6 +1,9 @@
 import type { WidgetLayoutTheme } from './types';
 
-const THEME_MAP: Record<keyof WidgetLayoutTheme, { var: string; unit?: string }> = {
+const THEME_MAP: Record<
+  keyof WidgetLayoutTheme,
+  { var: string; unit?: string }
+> = {
   colorPrimary: { var: '--al-color-primary' },
   colorBg: { var: '--al-color-bg' },
   colorText: { var: '--al-color-text' },
@@ -21,7 +24,9 @@ export function themeToStyleVars(
   for (const [key, mapping] of Object.entries(THEME_MAP)) {
     const value = theme[key as keyof WidgetLayoutTheme];
     if (value === undefined) continue;
-    vars[mapping.var] = mapping.unit ? `${value}${mapping.unit}` : String(value);
+    vars[mapping.var] = mapping.unit
+      ? `${value}${mapping.unit}`
+      : String(value);
   }
 
   return vars;

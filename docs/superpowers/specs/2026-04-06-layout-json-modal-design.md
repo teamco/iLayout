@@ -9,6 +9,7 @@ A toolbar button opens a modal with two tabs: "View" (read-only JSON of the curr
 **Location:** `src/layout/components/LayoutJsonModal.tsx`
 
 Props:
+
 ```ts
 type LayoutJsonModalProps = {
   open: boolean;
@@ -47,6 +48,7 @@ type LayoutJsonModalProps = {
 ## State
 
 Local state only in `App.tsx`:
+
 - `const [jsonModalOpen, setJsonModalOpen] = useState(false)`
 
 No global store changes needed.

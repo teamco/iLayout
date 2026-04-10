@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { App } from 'antd';
 
-export function useErrorNotification(error: Error | null | undefined, fallbackMsg: string) {
+export function useErrorNotification(
+  error: Error | null | undefined,
+  fallbackMsg: string,
+) {
   const { notification } = App.useApp();
   const lastShownMsg = useRef<string | null>(null);
 

@@ -4,22 +4,55 @@ import { getWidgetDef } from '../widgets/registry';
 type Props = { widget: WidgetRef };
 
 const ALIGN_STYLES: Record<string, React.CSSProperties> = {
-  'top-left': { display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-start' },
-  'top-center': { display: 'flex', alignItems: 'flex-start', justifyContent: 'center' },
-  'top-right': { display: 'flex', alignItems: 'flex-start', justifyContent: 'flex-end' },
-  'center-left': { display: 'flex', alignItems: 'center', justifyContent: 'flex-start' },
-  'center': { display: 'flex', alignItems: 'center', justifyContent: 'center' },
-  'center-right': { display: 'flex', alignItems: 'center', justifyContent: 'flex-end' },
-  'bottom-left': { display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-start' },
-  'bottom-center': { display: 'flex', alignItems: 'flex-end', justifyContent: 'center' },
-  'bottom-right': { display: 'flex', alignItems: 'flex-end', justifyContent: 'flex-end' },
+  'top-left': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  'top-center': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+  },
+  'top-right': {
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-end',
+  },
+  'center-left': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  center: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  'center-right': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  'bottom-left': {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-start',
+  },
+  'bottom-center': {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  'bottom-right': {
+    display: 'flex',
+    alignItems: 'flex-end',
+    justifyContent: 'flex-end',
+  },
 };
 
 export function EmbedWidgetRenderer({ widget }: Props) {
   const def = getWidgetDef(widget.resource as EWidgetResource);
   const { bounds } = widget;
 
-  const alignStyle = ALIGN_STYLES[bounds?.align ?? 'top-left'] ?? ALIGN_STYLES['top-left'];
+  const alignStyle =
+    ALIGN_STYLES[bounds?.align ?? 'top-left'] ?? ALIGN_STYLES['top-left'];
 
   const mt = bounds?.marginTop;
   const mr = bounds?.marginRight;
@@ -32,7 +65,9 @@ export function EmbedWidgetRenderer({ widget }: Props) {
     width: '100%',
     height: '100%',
     position: hasMargins ? 'absolute' : 'relative',
-    ...(hasMargins ? { inset: `${mt ?? 0} ${mr ?? 0} ${mb ?? 0} ${ml ?? 0}` } : {}),
+    ...(hasMargins
+      ? { inset: `${mt ?? 0} ${mr ?? 0} ${mb ?? 0} ${ml ?? 0}` }
+      : {}),
   };
 
   if (!def) {

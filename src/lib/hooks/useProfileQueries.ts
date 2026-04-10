@@ -25,8 +25,13 @@ export function useProfile(userId: IUser['id'] | undefined) {
 export function useBlockUser() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, blocked }: { userId: IUser['id']; blocked: boolean }) =>
-      api.blockUser(userId, blocked),
+    mutationFn: ({
+      userId,
+      blocked,
+    }: {
+      userId: IUser['id'];
+      blocked: boolean;
+    }) => api.blockUser(userId, blocked),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: KEYS.profiles });
     },
@@ -46,8 +51,13 @@ export function useForceLogoutUser() {
 export function useUpdateProfile() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ userId, updates }: { userId: IUser['id']; updates: Partial<Pick<ProfileRecord, 'full_name' | 'avatar_url'>> }) =>
-      api.updateProfile(userId, updates),
+    mutationFn: ({
+      userId,
+      updates,
+    }: {
+      userId: IUser['id'];
+      updates: Partial<Pick<ProfileRecord, 'full_name' | 'avatar_url'>>;
+    }) => api.updateProfile(userId, updates),
     onSuccess: (updated) => {
       queryClient.setQueryData(KEYS.profile(updated.id), updated);
       void queryClient.invalidateQueries({ queryKey: KEYS.profiles });

@@ -6,11 +6,5 @@ export function ImageWidget({ content }: WidgetComponentProps) {
     return <div className="al-widget-empty">No image URL</div>;
   }
 
-  return (
-    <img
-      src={content.value}
-      alt="Widget"
-      className="al-widget-image"
-    />
-  );
+  return <img src={content.value} alt="Widget" className="al-widget-image" />;
 }

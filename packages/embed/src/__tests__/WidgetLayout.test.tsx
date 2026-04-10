@@ -47,7 +47,9 @@ describe('WidgetLayout', () => {
 
   it('shows loading state when fetching', () => {
     vi.spyOn(globalThis, 'fetch').mockReturnValue(new Promise(() => {})); // never resolves
-    const { container } = render(<WidgetLayout layoutUrl="https://example.com/a.json" />);
+    const { container } = render(
+      <WidgetLayout layoutUrl="https://example.com/a.json" />,
+    );
     expect(container.querySelector('.al-loading')).not.toBeNull();
   });
 
@@ -74,7 +76,9 @@ describe('WidgetLayout', () => {
       new Response('Not Found', { status: 404 }),
     );
     const onError = vi.fn();
-    render(<WidgetLayout layoutUrl="https://example.com/x.json" onError={onError} />);
+    render(
+      <WidgetLayout layoutUrl="https://example.com/x.json" onError={onError} />,
+    );
     await waitFor(() => {
       expect(onError).toHaveBeenCalled();
     });

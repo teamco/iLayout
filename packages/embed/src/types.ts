@@ -10,9 +10,15 @@ export type WidgetBounds = {
   marginBottom?: CssValue;
   marginLeft?: CssValue;
   align?:
-    | 'top-left' | 'top-center' | 'top-right'
-    | 'center-left' | 'center' | 'center-right'
-    | 'bottom-left' | 'bottom-center' | 'bottom-right';
+    | 'top-left'
+    | 'top-center'
+    | 'top-right'
+    | 'center-left'
+    | 'center'
+    | 'center-right'
+    | 'bottom-left'
+    | 'bottom-center'
+    | 'bottom-right';
 };
 
 // ─── Widget types ─────────────────────────────────────────────────────────────
@@ -24,7 +30,8 @@ export const EWidgetResource = {
   COMPONENT: 'component',
   EMPTY: 'empty',
 } as const;
-export type EWidgetResource = (typeof EWidgetResource)[keyof typeof EWidgetResource];
+export type EWidgetResource =
+  (typeof EWidgetResource)[keyof typeof EWidgetResource];
 
 export type WidgetContent = {
   value: string;

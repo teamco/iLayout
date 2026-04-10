@@ -11,13 +11,18 @@ type Props = {
 };
 
 const ARROWS: { dir: SplitDirection; label: string; className: string }[] = [
-  { dir: 'top',    label: '↑', className: styles.arrowTop },
-  { dir: 'left',   label: '←', className: styles.arrowLeft },
-  { dir: 'right',  label: '→', className: styles.arrowRight },
+  { dir: 'top', label: '↑', className: styles.arrowTop },
+  { dir: 'left', label: '←', className: styles.arrowLeft },
+  { dir: 'right', label: '→', className: styles.arrowRight },
   { dir: 'bottom', label: '↓', className: styles.arrowBottom },
 ];
 
-export function AddPanelModal({ open, onSelect, onCancel, isDirectionAllowed }: Props) {
+export function AddPanelModal({
+  open,
+  onSelect,
+  onCancel,
+  isDirectionAllowed,
+}: Props) {
   return (
     <Modal
       open={open}
@@ -31,7 +36,10 @@ export function AddPanelModal({ open, onSelect, onCancel, isDirectionAllowed }: 
         {ARROWS.map(({ dir, label, className }) => {
           const allowed = isDirectionAllowed ? isDirectionAllowed(dir) : true;
           return (
-            <Tooltip key={dir} title={!allowed ? 'Max depth reached' : undefined}>
+            <Tooltip
+              key={dir}
+              title={!allowed ? 'Max depth reached' : undefined}
+            >
               <Button
                 type="primary"
                 disabled={!allowed}

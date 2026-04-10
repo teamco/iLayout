@@ -1,6 +1,10 @@
-import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
+import {
+  AbilityBuilder,
+  createMongoAbility,
+  type MongoAbility,
+} from '@casl/ability';
 import type { User } from '@supabase/supabase-js';
-import type {IUser} from "@/lib/types.ts";
+import type { IUser } from '@/lib/types.ts';
 
 export const EAction = {
   VIEW: 'view',
@@ -25,16 +29,22 @@ export type ESubject = (typeof ESubject)[keyof typeof ESubject];
 export type LayoutSubject = { kind: 'layout'; user_id: IUser['id'] };
 export type WidgetSubject = { kind: 'widget'; user_id: string };
 
-export type AppAbility = MongoAbility<[EAction, LayoutSubject | WidgetSubject | ESubject | string]>;
+export type AppAbility = MongoAbility<
+  [EAction, LayoutSubject | WidgetSubject | ESubject | string]
+>;
 
 function isAdmin(email?: string): boolean {
   if (!email) return false;
-  const admins = (import.meta.env.VITE_ADMINS || '').split(',').map((e: string) => e.trim().toLowerCase());
+  const admins = (import.meta.env.VITE_ADMINS || '')
+    .split(',')
+    .map((e: string) => e.trim().toLowerCase());
   return admins.includes(email.toLowerCase());
 }
 
 export function defineAbilityFor(user: User | null): AppAbility {
-  const { can, cannot, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
+  const { can, cannot, build } = new AbilityBuilder<AppAbility>(
+    createMongoAbility,
+  );
 
   if (user && isAdmin(user.email)) {
     can(EAction.MANAGE, ESubject.ALL);

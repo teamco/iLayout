@@ -1,6 +1,16 @@
-import type { LayoutNode, SplitterNode, SplitDirection, SectionNode, ScrollRoot } from '../types';
+import type {
+  LayoutNode,
+  SplitterNode,
+  SplitDirection,
+  SectionNode,
+  ScrollRoot,
+} from '../types';
 
-type FindResult = { node: LayoutNode; parent: SplitterNode | null; index: number };
+type FindResult = {
+  node: LayoutNode;
+  parent: SplitterNode | null;
+  index: number;
+};
 
 export function findNode(root: LayoutNode, id: string): FindResult | null {
   if (root.id === id) return { node: root, parent: null, index: -1 };
@@ -56,7 +66,7 @@ export function updateNode(
   if (root.type === 'splitter') {
     return {
       ...root,
-      children: root.children.map(child => updateNode(child, id, fn)),
+      children: root.children.map((child) => updateNode(child, id, fn)),
     };
   }
   if (root.type === 'section') {
@@ -70,7 +80,7 @@ export function updateNode(
     const scroll = root as unknown as ScrollRoot;
     return {
       ...scroll,
-      sections: scroll.sections.map(s => ({
+      sections: scroll.sections.map((s) => ({
         ...s,
         child: updateNode(s.child, id, fn),
       })),
@@ -97,9 +107,10 @@ export function splitNode(
   const newLeaf: LayoutNode = { id: newId, type: 'leaf' };
   const axis = directionAxis(direction);
   const after = insertAfter(direction);
-  const found = target.id === root.id
-    ? { node: target, parent: null as SplitterNode | null, index: -1 }
-    : findNode(root, target.id);
+  const found =
+    target.id === root.id
+      ? { node: target, parent: null as SplitterNode | null, index: -1 }
+      : findNode(root, target.id);
 
   if (!found) return root;
 
@@ -108,7 +119,7 @@ export function splitNode(
   if (parent && parent.direction === axis) {
     return updateNode(root, parent.id, (p) => {
       const s = p as SplitterNode;
-      const idx = s.children.findIndex(c => c.id === target.id);
+      const idx = s.children.findIndex((c) => c.id === target.id);
       const newSizes = [...s.sizes];
       const half = newSizes[idx] / 2;
       newSizes[idx] = half;
@@ -134,7 +145,7 @@ export function splitNode(
 
   return updateNode(root, parent.id, (p) => {
     const s = p as SplitterNode;
-    const idx = s.children.findIndex(c => c.id === target.id);
+    const idx = s.children.findIndex((c) => c.id === target.id);
     const newChildren = [...s.children];
     newChildren[idx] = wrapper;
     return { ...s, children: newChildren };
@@ -143,18 +154,18 @@ export function splitNode(
 
 export function removeNode(root: LayoutNode, id: string): LayoutNode {
   if (root.type === 'splitter') {
-    const idx = root.children.findIndex(c => c.id === id);
+    const idx = root.children.findIndex((c) => c.id === id);
     if (idx !== -1) {
       const removed = root.sizes[idx];
       const remaining = root.sizes.filter((_, i) => i !== idx);
       const share = removed / remaining.length;
-      const newSizes = remaining.map(s => s + share);
-      const newChildren = root.children.filter(c => c.id !== id);
+      const newSizes = remaining.map((s) => s + share);
+      const newChildren = root.children.filter((c) => c.id !== id);
       if (newChildren.length === 1) return newChildren[0];
       return { ...root, children: newChildren, sizes: newSizes };
     }
-    const newChildren = root.children.map(child => removeNode(child, id));
-    const collapsed = newChildren.map(child =>
+    const newChildren = root.children.map((child) => removeNode(child, id));
+    const collapsed = newChildren.map((child) =>
       child.type === 'splitter' && child.children.length === 1
         ? child.children[0]
         : child,
@@ -169,7 +180,7 @@ export function removeNode(root: LayoutNode, id: string): LayoutNode {
     const scroll = root as unknown as ScrollRoot;
     return {
       ...scroll,
-      sections: scroll.sections.map(s => ({
+      sections: scroll.sections.map((s) => ({
         ...s,
         child: removeNode(s.child, id),
       })),

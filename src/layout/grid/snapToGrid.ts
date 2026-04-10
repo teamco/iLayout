@@ -2,12 +2,16 @@
  * Returns absolute pixel positions of all grid column edges (both sides of each gutter).
  * Includes 0 and canvasSize. Sorted and deduplicated.
  */
-export function getGridEdges(canvasSize: number, columns: number, gutter: number): number[] {
+export function getGridEdges(
+  canvasSize: number,
+  columns: number,
+  gutter: number,
+): number[] {
   const colWidth = (canvasSize - (columns - 1) * gutter) / columns;
   const edges: number[] = [0];
   for (let i = 1; i < columns; i++) {
     edges.push(i * (colWidth + gutter) - gutter); // right edge of column i
-    edges.push(i * (colWidth + gutter));           // left edge of column i+1
+    edges.push(i * (colWidth + gutter)); // left edge of column i+1
   }
   edges.push(canvasSize);
   return edges;
@@ -89,7 +93,7 @@ export function snapToGrid(
   }
 
   // If clamping produced invalid state, fall back to original sizes
-  if (result.some(s => s < 0)) return pixelSizes;
+  if (result.some((s) => s < 0)) return pixelSizes;
 
   // Normalize to preserve exact total
   const currentSum = result.reduce((a, b) => a + b, 0);
@@ -105,7 +109,11 @@ export function snapToGrid(
  * Returns absolute pixel positions of horizontal row edges.
  * Same logic as getGridEdges but for rows.
  */
-export function getHorizontalGridEdges(canvasHeight: number, rows: number, rowGutter: number): number[] {
+export function getHorizontalGridEdges(
+  canvasHeight: number,
+  rows: number,
+  rowGutter: number,
+): number[] {
   const rowHeight = (canvasHeight - (rows - 1) * rowGutter) / rows;
   const edges: number[] = [0];
   for (let i = 1; i < rows; i++) {

@@ -7,11 +7,12 @@ export function registerWidget(def: WidgetDefinition) {
   registry.set(def.resource, def);
 }
 
-export function getWidgetDef(resource: EWidgetResource): WidgetDefinition | undefined {
+export function getWidgetDef(
+  resource: EWidgetResource,
+): WidgetDefinition | undefined {
   return registry.get(resource);
 }
 
 export function getAllWidgetDefs(): WidgetDefinition[] {
   return Array.from(registry.values());
 }
-

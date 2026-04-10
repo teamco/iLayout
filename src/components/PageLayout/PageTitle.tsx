@@ -10,7 +10,10 @@ type PageTitleProps = {
   >;
 };
 
-export function PageTitle({ name, Icon = ControlOutlined }: PageTitleProps): React.ReactNode {
+export function PageTitle({
+  name,
+  Icon = ControlOutlined,
+}: PageTitleProps): React.ReactNode {
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
       <Icon />

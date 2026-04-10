@@ -15,7 +15,9 @@ export function AuthCallback() {
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_IN') {
         void navigate({ to: ERoutes.HOME });
       }

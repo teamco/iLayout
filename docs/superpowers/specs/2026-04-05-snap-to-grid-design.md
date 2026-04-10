@@ -14,14 +14,15 @@ A React context providing canvas dimensions and grid parameters to all layout co
 type GridContextValue = {
   canvasWidth: number;
   canvasHeight: number;
-  columns: number;  // 24
-  gutter: number;   // 16
+  columns: number; // 24
+  gutter: number; // 16
 };
 ```
 
 **Provider:** `GridProvider` wraps the `.canvas` div in `App.tsx`. Uses a `ResizeObserver` on its root element to track `canvasWidth` and `canvasHeight`.
 
 **Consumers:**
+
 - `GridOverlay` — reads `canvasWidth`, `canvasHeight` instead of its own ResizeObserver
 - `SplitterNodeComponent` — reads grid params for snap calculation
 
@@ -42,6 +43,7 @@ function snapToGrid(
 ```
 
 **Algorithm:**
+
 1. Compute global grid column edges: for each column boundary `i` (1 to N-1 panels), the snap targets are the right edge of column `k` (`k * (colWidth + gutter) - gutter`) and the left edge of column `k+1` (`k * (colWidth + gutter)`), where `colWidth = (canvasSize - (columns - 1) * gutter) / columns`.
 2. Convert each panel boundary to absolute canvas position: `containerOffset + sum(pixelSizes[0..i])`.
 3. For each boundary, find the nearest grid edge and snap to it.
@@ -50,6 +52,7 @@ function snapToGrid(
 6. Guarantee: `sum(output) === sum(input)` (total container size preserved).
 
 **Parameters:**
+
 - `pixelSizes` — raw pixel sizes from antd Splitter `onResize`
 - `containerOffset` — pixel offset of this splitter container from the canvas edge (left for horizontal, top for vertical)
 - `canvasSize` — total canvas width (for horizontal splitters) or height (for vertical)
@@ -83,6 +86,7 @@ src/layout/grid/
 ```
 
 Modified files:
+
 - `src/layout/components/GridOverlay.tsx` — consume GridContext instead of own ResizeObserver
 - `src/layout/components/SplitterNode.tsx` — snap in handleResize
 - `src/App.tsx` — wrap canvas in GridProvider

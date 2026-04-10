@@ -13,6 +13,7 @@
 ### Task 1: Apply Supabase migration
 
 **Files:**
+
 - No local files — migration applied via Supabase MCP
 
 - [ ] **Step 1: Apply migration**
@@ -73,11 +74,13 @@ No local files to commit for this task — migration is in Supabase.
 ### Task 2: Install dayjs and create formatDate utility
 
 **Files:**
+
 - Create: `src/lib/formatDate.ts`
 
 - [ ] **Step 1: Install dayjs**
 
 Run:
+
 ```bash
 pnpm add dayjs
 ```
@@ -111,6 +114,7 @@ git commit -m "feat(layout): add dayjs and formatDate utility"
 ### Task 3: Create TypeScript types
 
 **Files:**
+
 - Create: `src/lib/types.ts`
 
 - [ ] **Step 1: Create types.ts**
@@ -152,6 +156,7 @@ git commit -m "feat(layout): add LayoutRecord and LayoutStatus types"
 ### Task 4: Create layoutApi service
 
 **Files:**
+
 - Create: `src/lib/layoutApi.ts`
 
 - [ ] **Step 1: Create layoutApi.ts**
@@ -171,7 +176,9 @@ function getUserId(): string {
 }
 
 async function currentUserId(): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
@@ -215,7 +222,10 @@ export async function getLayout(id: string): Promise<LayoutRecord | null> {
   return data as LayoutRecord;
 }
 
-export async function getLayoutVersion(id: string, version: number): Promise<LayoutRecord | null> {
+export async function getLayoutVersion(
+  id: string,
+  version: number,
+): Promise<LayoutRecord | null> {
   const { data, error } = await supabase
     .from('layouts')
     .select('*')
@@ -228,7 +238,9 @@ export async function getLayoutVersion(id: string, version: number): Promise<Lay
   return data as LayoutRecord;
 }
 
-export async function getPublishedLayout(userId: string): Promise<LayoutRecord | null> {
+export async function getPublishedLayout(
+  userId: string,
+): Promise<LayoutRecord | null> {
   const { data, error } = await supabase
     .from('layouts')
     .select('*')
@@ -262,7 +274,10 @@ export async function createLayout(data: LayoutNode): Promise<LayoutRecord> {
   return row as LayoutRecord;
 }
 
-export async function saveLayout(id: string, data: LayoutNode): Promise<LayoutRecord> {
+export async function saveLayout(
+  id: string,
+  data: LayoutNode,
+): Promise<LayoutRecord> {
   const userId = await currentUserId();
 
   // Get current max version
@@ -296,21 +311,33 @@ export async function saveLayout(id: string, data: LayoutNode): Promise<LayoutRe
   return row as LayoutRecord;
 }
 
-export async function setStatus(id: string, version: number, status: LayoutStatus): Promise<void> {
+export async function setStatus(
+  id: string,
+  version: number,
+  status: LayoutStatus,
+): Promise<void> {
   const userId = await currentUserId();
 
   // If publishing, unpublish any currently published version of this layout
   if (status === 'published') {
     await supabase
       .from('layouts')
-      .update({ status: 'draft', updated_by: userId, updated_at: new Date().toISOString() })
+      .update({
+        status: 'draft',
+        updated_by: userId,
+        updated_at: new Date().toISOString(),
+      })
       .eq('id', id)
       .eq('status', 'published');
   }
 
   const { error } = await supabase
     .from('layouts')
-    .update({ status, updated_by: userId, updated_at: new Date().toISOString() })
+    .update({
+      status,
+      updated_by: userId,
+      updated_at: new Date().toISOString(),
+    })
     .eq('id', id)
     .eq('version', version);
 

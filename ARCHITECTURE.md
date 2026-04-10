@@ -69,11 +69,11 @@ User opens app
 
 ### Roles
 
-| Role | Determination | Capabilities |
-|------|--------------|-------------|
-| Admin | Email in `VITE_ADMINS` | `can(MANAGE, ALL)` — full access |
+| Role   | Determination          | Capabilities                                  |
+| ------ | ---------------------- | --------------------------------------------- |
+| Admin  | Email in `VITE_ADMINS` | `can(MANAGE, ALL)` — full access              |
 | Editor | Any authenticated user | CRUD own layouts/widgets with ownership check |
-| Viewer | Unauthenticated | View published layouts/widgets only |
+| Viewer | Unauthenticated        | View published layouts/widgets only           |
 
 ### Subjects
 
@@ -255,6 +255,7 @@ src/widgets/
 ### WidgetDefinition
 
 Each widget type provides:
+
 - `component` — renders the widget in the layout
 - `editor` (optional) — custom content editor in WidgetConfigModal
 - `icon`, `label`, `description` — for gallery display
@@ -293,12 +294,15 @@ Ant Design
 ## Shared Components
 
 ### AppHeader
+
 Global toolbar with language selector, theme toggle, user avatar dropdown. Pages pass extra buttons via `children`.
 
 ### PageLayout
+
 Wraps page content with title, CASL access check (`<Can>` / `AccessDenied`), loading spinner, optional description/extras.
 
 ### Table Utilities
+
 - `useTable` — pagination, sort, filter state with URL persistence
 - `useColumnsToggle` — show/hide columns
 - `GridToolbar` — toolbar with refresh, export, custom children

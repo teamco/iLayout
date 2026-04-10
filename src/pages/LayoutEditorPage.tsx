@@ -4,18 +4,29 @@ import { App as AntApp, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import App from '@/App';
 import { useLayoutStore } from '@/layout/store/layoutStore';
-import { useLayout, useCreateLayout, useSaveLayout } from '@/lib/hooks/useLayoutQueries';
+import {
+  useLayout,
+  useCreateLayout,
+  useSaveLayout,
+} from '@/lib/hooks/useLayoutQueries';
 import { useErrorNotification } from '@/lib/hooks/useErrorNotification';
 import { ERoutes } from '@/routes';
 
 export function LayoutEditorPage() {
-  const { layoutId } = useParams({ strict: false }) as { userId?: string; layoutId?: string };
+  const { layoutId } = useParams({ strict: false }) as {
+    userId?: string;
+    layoutId?: string;
+  };
   const navigate = useNavigate();
   const { message } = AntApp.useApp();
   const { t } = useTranslation();
   const isNew = !layoutId;
 
-  const { data: layout, isLoading, error: loadError } = useLayout(isNew ? undefined : layoutId);
+  const {
+    data: layout,
+    isLoading,
+    error: loadError,
+  } = useLayout(isNew ? undefined : layoutId);
   const createMutation = useCreateLayout();
   const saveMutation = useSaveLayout();
 
@@ -28,7 +39,10 @@ export function LayoutEditorPage() {
     if (layout?.data) {
       useLayoutStore.setState({ root: layout.data });
       // Sync layoutMode from loaded layout
-      const mode = (layout as unknown as Record<string, unknown>).mode as 'viewport' | 'scroll' | undefined;
+      const mode = (layout as unknown as Record<string, unknown>).mode as
+        | 'viewport'
+        | 'scroll'
+        | undefined;
       useLayoutStore.setState({ layoutMode: mode ?? 'viewport' });
     }
   }, [layout]);
@@ -37,10 +51,13 @@ export function LayoutEditorPage() {
   useEffect(() => {
     if (isNew) {
       const searchParams = new URLSearchParams(window.location.search);
-      const mode = (searchParams.get('mode') as 'viewport' | 'scroll') || 'viewport';
+      const mode =
+        (searchParams.get('mode') as 'viewport' | 'scroll') || 'viewport';
       useLayoutStore.getState().setLayoutMode(mode);
       if (mode !== 'scroll') {
-        useLayoutStore.setState({ root: { id: crypto.randomUUID(), type: 'leaf' } });
+        useLayoutStore.setState({
+          root: { id: crypto.randomUUID(), type: 'leaf' },
+        });
       }
       useLayoutStore.getState().setEditMode(true);
     }
@@ -60,9 +77,12 @@ export function LayoutEditorPage() {
         },
       });
     } else {
-      saveMutation.mutate({ id: layoutId, data: root }, {
-        onSuccess: () => void message.success(t('layout.layoutSaved')),
-      });
+      saveMutation.mutate(
+        { id: layoutId, data: root },
+        {
+          onSuccess: () => void message.success(t('layout.layoutSaved')),
+        },
+      );
     }
   }
 

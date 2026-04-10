@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { snapToGrid, getGridEdges, getHorizontalGridEdges, snapToNearestEdge } from '../snapToGrid';
+import {
+  snapToGrid,
+  getGridEdges,
+  getHorizontalGridEdges,
+  snapToNearestEdge,
+} from '../snapToGrid';
 
 const COLUMNS = 24;
 const GUTTER = 16;
@@ -12,8 +17,8 @@ describe('getGridEdges', () => {
     expect(edges[0]).toBeCloseTo(0);
     const colWidth = (1000 - 23 * GUTTER) / COLUMNS; // ≈ 26.333
     // First inner edges: right edge of col 1, left edge of col 2
-    expect(edges[1]).toBeCloseTo(colWidth);            // ≈ 26.333
-    expect(edges[2]).toBeCloseTo(colWidth + GUTTER);   // ≈ 42.333
+    expect(edges[1]).toBeCloseTo(colWidth); // ≈ 26.333
+    expect(edges[2]).toBeCloseTo(colWidth + GUTTER); // ≈ 42.333
     expect(edges[edges.length - 1]).toBeCloseTo(1000);
   });
 });
@@ -37,7 +42,7 @@ describe('snapToGrid', () => {
     expect(result[0] + result[1]).toBeCloseTo(1000);
     const edges = getGridEdges(1000, COLUMNS, GUTTER);
     const snappedBoundary = result[0];
-    const isOnEdge = edges.some(e => Math.abs(e - snappedBoundary) < 0.5);
+    const isOnEdge = edges.some((e) => Math.abs(e - snappedBoundary) < 0.5);
     expect(isOnEdge).toBe(true);
   });
 
@@ -55,7 +60,7 @@ describe('snapToGrid', () => {
     expect(result[0] + result[1]).toBeCloseTo(300);
     const edges = getGridEdges(1000, COLUMNS, GUTTER);
     const snappedAbsBoundary = 200 + result[0];
-    const isOnEdge = edges.some(e => Math.abs(e - snappedAbsBoundary) < 0.5);
+    const isOnEdge = edges.some((e) => Math.abs(e - snappedAbsBoundary) < 0.5);
     expect(isOnEdge).toBe(true);
   });
 
@@ -71,7 +76,7 @@ describe('snapToGrid', () => {
     // Three panels, two very small — clamping should not produce negatives
     const sizes = [5, 5, 990];
     const result = snapToGrid(sizes, 0, 1000, COLUMNS, GUTTER);
-    expect(result.every(s => s >= 0)).toBe(true);
+    expect(result.every((s) => s >= 0)).toBe(true);
     expect(result.reduce((a, b) => a + b, 0)).toBeCloseTo(1000);
   });
 });

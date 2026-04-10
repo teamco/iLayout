@@ -28,11 +28,11 @@ pnpm dev
 
 ### Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_SUPABASE_URL` | Supabase project URL |
-| `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | Supabase publishable key |
-| `VITE_ADMINS` | Comma-separated admin emails |
+| Variable                                | Description                  |
+| --------------------------------------- | ---------------------------- |
+| `VITE_SUPABASE_URL`                     | Supabase project URL         |
+| `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | Supabase publishable key     |
+| `VITE_ADMINS`                           | Comma-separated admin emails |
 
 ## Commands
 

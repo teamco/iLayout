@@ -2,8 +2,21 @@
 import { create, createStore } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { nanoid } from 'nanoid';
-import { splitNode, removeNode, updateNode, findNode } from '../utils/treeUtils';
-import type { LayoutNode, SplitDirection, WidgetRef, LayoutMode, SectionNode, SectionHeight, ScrollRoot } from '../types';
+import {
+  splitNode,
+  removeNode,
+  updateNode,
+  findNode,
+} from '../utils/treeUtils';
+import type {
+  LayoutNode,
+  SplitDirection,
+  WidgetRef,
+  LayoutMode,
+  SectionNode,
+  SectionHeight,
+  ScrollRoot,
+} from '../types';
 
 export type LayoutState = {
   root: LayoutNode;
@@ -30,7 +43,10 @@ export type LayoutActions = {
   addSection: (position: 'before' | 'after', targetSectionId: string) => void;
   removeSection: (sectionId: string) => void;
   resizeSection: (sectionId: string, height: SectionHeight) => void;
-  updateSectionConfig: (sectionId: string, config: Partial<Pick<SectionNode, 'overlap' | 'zIndex'>>) => void;
+  updateSectionConfig: (
+    sectionId: string,
+    config: Partial<Pick<SectionNode, 'overlap' | 'zIndex'>>,
+  ) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
 };
 
@@ -40,44 +56,61 @@ function makeInitialRoot(): LayoutNode {
   return { id: nanoid(), type: 'leaf' };
 }
 
-function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutActions {
+function makeActions(
+  set: (fn: (state: LayoutStore) => void) => void,
+): LayoutActions {
   return {
     addPanel(targetId, direction) {
-      set(state => {
+      set((state) => {
         const found = findNode(state.root, targetId);
         if (!found) return;
-        state.root = splitNode(state.root, found.node, direction, nanoid(), nanoid());
+        state.root = splitNode(
+          state.root,
+          found.node,
+          direction,
+          nanoid(),
+          nanoid(),
+        );
       });
     },
     removePanel(id) {
-      set(state => { state.root = removeNode(state.root, id); });
+      set((state) => {
+        state.root = removeNode(state.root, id);
+      });
     },
     setWidget(leafId, widget) {
-      set(state => { state.root = updateNode(state.root, leafId, n => ({ ...n, widget })); });
+      set((state) => {
+        state.root = updateNode(state.root, leafId, (n) => ({ ...n, widget }));
+      });
     },
     clearWidget(leafId) {
-      set(state => {
-        state.root = updateNode(state.root, leafId, n => {
+      set((state) => {
+        state.root = updateNode(state.root, leafId, (n) => {
           if (n.type !== 'leaf') return n;
           return { id: n.id, type: 'leaf' };
         });
       });
     },
     swapWidgets(idA, idB) {
-      set(state => {
+      set((state) => {
         const nodeA = findNode(state.root, idA)?.node;
         const nodeB = findNode(state.root, idB)?.node;
         const wA = nodeA?.type === 'leaf' ? nodeA.widget : undefined;
         const wB = nodeB?.type === 'leaf' ? nodeB.widget : undefined;
-        state.root = updateNode(state.root, idA, n => ({ ...n, widget: wB }));
-        state.root = updateNode(state.root, idB, n => ({ ...n, widget: wA }));
+        state.root = updateNode(state.root, idA, (n) => ({ ...n, widget: wB }));
+        state.root = updateNode(state.root, idB, (n) => ({ ...n, widget: wA }));
       });
     },
     resize(splitterId, sizes) {
-      set(state => { state.root = updateNode(state.root, splitterId, n => ({ ...n, sizes })); });
+      set((state) => {
+        state.root = updateNode(state.root, splitterId, (n) => ({
+          ...n,
+          sizes,
+        }));
+      });
     },
     setEditMode(on) {
-      set(state => {
+      set((state) => {
         state.editMode = on;
         if (!on) {
           state.showGrid = false;
@@ -86,17 +119,25 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
         }
       });
     },
-    setActiveWidgetEdit(id) { set(state => { state.activeWidgetEditId = id; }); },
-    setGalleryTarget(id) { set(state => { state.galleryTargetId = id; }); },
+    setActiveWidgetEdit(id) {
+      set((state) => {
+        state.activeWidgetEditId = id;
+      });
+    },
+    setGalleryTarget(id) {
+      set((state) => {
+        state.galleryTargetId = id;
+      });
+    },
     toggleGrid() {
-      set(state => {
+      set((state) => {
         if (!state.editMode) return;
         state.showGrid = !state.showGrid;
       });
     },
 
     setLayoutMode(mode) {
-      set(state => {
+      set((state) => {
         if (mode === 'scroll' && state.root.type !== 'scroll') {
           const section: SectionNode = {
             id: nanoid(),
@@ -111,17 +152,22 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
           } as unknown as LayoutNode;
         } else if (mode === 'viewport' && state.root.type === 'scroll') {
           const scrollRoot = state.root as unknown as ScrollRoot;
-          state.root = scrollRoot.sections[0]?.child ?? { id: nanoid(), type: 'leaf' };
+          state.root = scrollRoot.sections[0]?.child ?? {
+            id: nanoid(),
+            type: 'leaf',
+          };
         }
         state.layoutMode = mode;
       });
     },
 
     addSection(position, targetSectionId) {
-      set(state => {
+      set((state) => {
         if (state.root.type !== 'scroll') return;
         const scrollRoot = state.root as unknown as ScrollRoot;
-        const idx = scrollRoot.sections.findIndex(s => s.id === targetSectionId);
+        const idx = scrollRoot.sections.findIndex(
+          (s) => s.id === targetSectionId,
+        );
         if (idx === -1) return;
         const newSection: SectionNode = {
           id: nanoid(),
@@ -135,28 +181,30 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
     },
 
     removeSection(sectionId) {
-      set(state => {
+      set((state) => {
         if (state.root.type !== 'scroll') return;
         const scrollRoot = state.root as unknown as ScrollRoot;
         if (scrollRoot.sections.length <= 1) return;
-        scrollRoot.sections = scrollRoot.sections.filter(s => s.id !== sectionId);
+        scrollRoot.sections = scrollRoot.sections.filter(
+          (s) => s.id !== sectionId,
+        );
       });
     },
 
     resizeSection(sectionId, height) {
-      set(state => {
+      set((state) => {
         if (state.root.type !== 'scroll') return;
         const scrollRoot = state.root as unknown as ScrollRoot;
-        const section = scrollRoot.sections.find(s => s.id === sectionId);
+        const section = scrollRoot.sections.find((s) => s.id === sectionId);
         if (section) section.height = height;
       });
     },
 
     updateSectionConfig(sectionId, config) {
-      set(state => {
+      set((state) => {
         if (state.root.type !== 'scroll') return;
         const scrollRoot = state.root as unknown as ScrollRoot;
-        const section = scrollRoot.sections.find(s => s.id === sectionId);
+        const section = scrollRoot.sections.find((s) => s.id === sectionId);
         if (!section) return;
         if (config.overlap !== undefined) section.overlap = config.overlap;
         if (config.zIndex !== undefined) section.zIndex = config.zIndex;
@@ -164,7 +212,7 @@ function makeActions(set: (fn: (state: LayoutStore) => void) => void): LayoutAct
     },
 
     reorderSections(fromIndex, toIndex) {
-      set(state => {
+      set((state) => {
         if (state.root.type !== 'scroll') return;
         const scrollRoot = state.root as unknown as ScrollRoot;
         const [moved] = scrollRoot.sections.splice(fromIndex, 1);
@@ -186,7 +234,7 @@ export function createLayoutStore(initialRoot?: LayoutNode) {
       showGrid: false,
       layoutMode: 'viewport',
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ...makeActions(set as any),
+      ...makeActions(set as any),
     })),
   );
 }

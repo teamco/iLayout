@@ -22,18 +22,31 @@ function defToWidgetRef(def: WidgetDefinition): WidgetRef {
   };
 }
 
-function WidgetCard({ def, onSelect }: { def: WidgetDefinition; onSelect: (w: WidgetRef) => void }) {
+function WidgetCard({
+  def,
+  onSelect,
+}: {
+  def: WidgetDefinition;
+  onSelect: (w: WidgetRef) => void;
+}) {
   const Icon = def.icon;
 
   return (
     <div className={styles.cardWrapper}>
-      <Card size="small" hoverable onClick={() => onSelect(defToWidgetRef(def))}>
+      <Card
+        size="small"
+        hoverable
+        onClick={() => onSelect(defToWidgetRef(def))}
+      >
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Icon />
           <div>
             <Typography.Text strong>{def.label}</Typography.Text>
             {def.description && (
-              <Typography.Text type="secondary" className={styles.cardDescription}>
+              <Typography.Text
+                type="secondary"
+                className={styles.cardDescription}
+              >
                 {def.description}
               </Typography.Text>
             )}
@@ -49,9 +62,14 @@ export function WidgetGallery({ open, onSelect, onClose }: Props) {
   const builtIn = getAllWidgetDefs();
 
   return (
-    <Drawer title={t('profile.widgets')} open={open} onClose={onClose} size="default">
+    <Drawer
+      title={t('profile.widgets')}
+      open={open}
+      onClose={onClose}
+      size="default"
+    >
       <div className={styles.list}>
-        {builtIn.map(def => (
+        {builtIn.map((def) => (
           <WidgetCard key={def.resource} def={def} onSelect={onSelect} />
         ))}
       </div>

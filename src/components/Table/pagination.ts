@@ -10,7 +10,11 @@ type HandlePaginationArgs<T> = {
   pagination: TablePaginationConfig;
 };
 
-export function handlePagination<T>({ entities, total, pagination }: HandlePaginationArgs<T>): TablePaginationConfig {
+export function handlePagination<T>({
+  entities,
+  total,
+  pagination,
+}: HandlePaginationArgs<T>): TablePaginationConfig {
   return {
     ...pagination,
     total: total || entities.length,

@@ -15,6 +15,7 @@
 Single `<svg>` element covering 100% width/height of the canvas. Uses `<defs>` + `<pattern>` with `patternUnits="userSpaceOnUse"` to tile a single column+gutter unit across the viewport.
 
 **Grid parameters:**
+
 - 24 columns
 - 16px gutter between columns
 - Column width = `(containerWidth - 23 * 16) / 24`
@@ -43,12 +44,14 @@ When `editMode` is set to `false`, `showGrid` is automatically reset to `false`.
 ## Controls
 
 ### Toolbar button
+
 - Visible only when `editMode === true`
 - Ant Design `Button` with grid icon (`AppstoreOutlined` or similar)
 - Toggles `showGrid` on click
 - Visual indication when grid is active (e.g. `type="primary"`)
 
 ### Keyboard shortcut
+
 - `Ctrl+G` (or `Cmd+G` on macOS)
 - Active only when `editMode === true`
 - `useEffect` with `keydown` event listener in `App.tsx` or `GridOverlay`
@@ -62,6 +65,7 @@ src/layout/components/GridOverlay.module.less  # Styles
 ```
 
 Modified files:
+
 - `src/layout/store/layoutStore.ts` — add `showGrid` + `toggleGrid`
 - `src/App.tsx` — render `GridOverlay`, add toolbar button, add keyboard shortcut
 - `src/themes/mixin.module.less` — add `@z-grid` token

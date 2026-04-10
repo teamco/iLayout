@@ -24,16 +24,16 @@ Root layout in scroll mode = ordered array of `SectionNode`:
 
 ```ts
 type SectionHeight =
-  | { type: 'auto' }                    // grows with content
-  | { type: 'fixed'; value: string }    // "500px", "100vh", "50%"
-  | { type: 'min'; value: string };     // min-height, grows if needed
+  | { type: 'auto' } // grows with content
+  | { type: 'fixed'; value: string } // "500px", "100vh", "50%"
+  | { type: 'min'; value: string }; // min-height, grows if needed
 
 type SectionNode = {
   id: string;
   type: 'section';
   height: SectionHeight;
-  child: LayoutNode;           // section content (leaf or splitter)
-  overlap?: string;            // negative margin-top, e.g. "-50px"
+  child: LayoutNode; // section content (leaf or splitter)
+  overlap?: string; // negative margin-top, e.g. "-50px"
   zIndex?: number;
 };
 ```
@@ -41,6 +41,7 @@ type SectionNode = {
 `LayoutNode` union updated: `LeafNode | SplitterNode | SectionNode`
 
 In scroll mode, `root` is a special container holding `SectionNode[]` — stored as:
+
 ```ts
 type ScrollRoot = {
   id: string;
@@ -78,6 +79,7 @@ type ScrollRoot = {
 ### Section Rendering
 
 Each section renders as a `<div>` with:
+
 - `width: 100%` (constrained to viewport width)
 - `height` / `min-height` based on `SectionHeight` type
 - `margin-top` from `overlap` (allows negative for overlapping sections)
@@ -92,6 +94,7 @@ Content inside section = standard `LayoutNode` (leaf or horizontal splitter). Ho
 Horizontal bar between sections (visible in edit mode). Drag up/down changes the height of the section above.
 
 Behavior:
+
 - **Pushable** — dragging does NOT compress the neighbor, it pushes all sections below
 - When `height.type === 'auto'` — handle disabled (height determined by content)
 - When `height.type === 'fixed'` or `'min'` — handle enabled
@@ -100,6 +103,7 @@ Behavior:
 ### Adding Sections
 
 "+" buttons at top and bottom edges of each section (in edit mode):
+
 - Top "+" → insert empty section above
 - Bottom "+" → insert empty section below
 - New section: `{ height: { type: 'auto' }, child: { id, type: 'leaf' } }`
@@ -107,6 +111,7 @@ Behavior:
 ### Section Config
 
 In edit mode, clicking a section header/edge opens config (modal or inline panel):
+
 - **Height type:** Select (auto / fixed / min)
 - **Height value:** InputNumber with px/vh/% selector (disabled when auto)
 - **Overlap:** InputNumber with px suffix (margin-top, can be negative)
@@ -116,6 +121,7 @@ In edit mode, clicking a section header/edge opens config (modal or inline panel
 ### Horizontal Grid Overlay
 
 24-row grid overlay (complements existing 24-column vertical grid):
+
 - Horizontal lines across the viewport height
 - Row height = `canvasHeight / 24`
 - Semi-transparent lines (`rgba(24, 144, 255, 0.08)`) — same pattern as vertical
@@ -129,10 +135,12 @@ In layout editor toolbar or layout settings — Select: Viewport / Scroll.
 ### Conversion logic
 
 **Viewport → Scroll:**
+
 - Wrap existing root `LayoutNode` in a single `SectionNode` with `height: { type: 'fixed', value: '100vh' }`
 - Create `ScrollRoot` with one section
 
 **Scroll → Viewport:**
+
 - Take first section's `child` as the new root
 - Other sections are lost — show confirmation dialog before converting
 
@@ -155,6 +163,7 @@ setLayoutMode: (mode: LayoutMode) => void;
 ## Database Migration
 
 Add `mode` column to `layouts` table:
+
 ```sql
 alter table layouts add column mode text not null default 'viewport' check (mode in ('viewport', 'scroll'));
 ```
@@ -162,6 +171,7 @@ alter table layouts add column mode text not null default 'viewport' check (mode
 ## File Structure
 
 New files:
+
 ```
 src/layout/components/ScrollLayout.tsx      # Scroll mode root renderer
 src/layout/components/SectionNode.tsx       # Section component
@@ -170,6 +180,7 @@ src/layout/components/SectionConfig.tsx     # Section config modal/panel
 ```
 
 Modified files:
+
 - `src/layout/types.ts` — add LayoutMode, SectionNode, ScrollRoot, SectionHeight
 - `src/layout/components/LayoutRenderer.tsx` — switch by mode
 - `src/layout/store/layoutStore.ts` — section actions, mode switching

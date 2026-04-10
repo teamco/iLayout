@@ -129,6 +129,7 @@ getVersionHistory(id: string): Promise<LayoutRecord[]>
 ### `getMyLayouts` implementation note
 
 Returns latest version per layout id. Uses a subquery or `distinct on`:
+
 ```sql
 select distinct on (id) * from layouts
 where user_id = auth.uid() and status != 'deleted'
@@ -138,6 +139,7 @@ order by id, version desc;
 ### `setStatus` publish logic
 
 When setting status to `published`:
+
 1. Find any existing row with same `id` and `status = 'published'`
 2. Update that row to `status = 'draft'`
 3. Update target row to `status = 'published'`

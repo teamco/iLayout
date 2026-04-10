@@ -1,6 +1,10 @@
 import React, { type JSX } from 'react';
 import { Button, Dropdown, type MenuProps } from 'antd';
-import { MoreOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons';
+import {
+  MoreOutlined,
+  ReloadOutlined,
+  DownloadOutlined,
+} from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { ItemType } from 'antd/es/menu/interface';
 import type { SizeType } from 'antd/es/config-provider/SizeContext';
@@ -18,7 +22,14 @@ type GridToolbarProps = {
 };
 
 export function GridToolbar(props: GridToolbarProps): JSX.Element {
-  const { children, items = [], size = 'middle', onRefresh, exportData, exportFileName = 'export' } = props;
+  const {
+    children,
+    items = [],
+    size = 'middle',
+    onRefresh,
+    exportData,
+    exportFileName = 'export',
+  } = props;
   const { t } = useTranslation();
 
   let baseItems: MenuProps['items'] = [];
@@ -42,7 +53,9 @@ export function GridToolbar(props: GridToolbarProps): JSX.Element {
   }
 
   if (items?.length) {
-    baseItems = items.concat(baseItems.length ? [{ type: 'divider' }, ...baseItems] : []);
+    baseItems = items.concat(
+      baseItems.length ? [{ type: 'divider' }, ...baseItems] : [],
+    );
   }
 
   return (
@@ -50,7 +63,12 @@ export function GridToolbar(props: GridToolbarProps): JSX.Element {
       {children ?? null}
       {baseItems.length > 0 && (
         <Dropdown menu={{ items: baseItems }} trigger={['click']}>
-          <Button size={size} color="default" variant="filled" icon={<MoreOutlined />} />
+          <Button
+            size={size}
+            color="default"
+            variant="filled"
+            icon={<MoreOutlined />}
+          />
         </Dropdown>
       )}
     </div>

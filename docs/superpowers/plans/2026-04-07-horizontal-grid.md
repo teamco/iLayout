@@ -13,11 +13,13 @@
 ### Task 1: Extend GridContext with rows
 
 **Files:**
+
 - Modify: `src/layout/grid/GridContext.tsx`
 
 - [ ] **Step 1: Add rows and rowGutter to context**
 
 Update `GridContextValue`:
+
 ```ts
 export type GridContextValue = {
   canvasWidth: number;
@@ -30,6 +32,7 @@ export type GridContextValue = {
 ```
 
 Update default context value:
+
 ```ts
 const GridContext = createContext<GridContextValue>({
   canvasWidth: 0,
@@ -42,6 +45,7 @@ const GridContext = createContext<GridContextValue>({
 ```
 
 Update `GridProviderProps`:
+
 ```ts
 type GridProviderProps = {
   columns?: number;
@@ -53,6 +57,7 @@ type GridProviderProps = {
 ```
 
 Update `GridProvider`:
+
 ```ts
 export function GridProvider({ columns = 24, gutter = 16, rows = 24, rowGutter = 16, children }: GridProviderProps) {
   // ... existing code ...
@@ -80,6 +85,7 @@ git commit -m "feat(grid): add rows and rowGutter to GridContext"
 ### Task 2: Add horizontal lines to GridOverlay
 
 **Files:**
+
 - Modify: `src/layout/components/GridOverlay.tsx`
 
 - [ ] **Step 1: Add horizontal grid pattern**
@@ -97,7 +103,8 @@ const ROW_FILL = 'rgba(24, 144, 255, 0.06)';
 export function GridOverlay() {
   const colPatternId = useId();
   const rowPatternId = useId();
-  const { canvasWidth, canvasHeight, columns, gutter, rows, rowGutter } = useGridContext();
+  const { canvasWidth, canvasHeight, columns, gutter, rows, rowGutter } =
+    useGridContext();
 
   if (canvasWidth <= 0 || canvasHeight <= 0) return null;
 
@@ -120,7 +127,13 @@ export function GridOverlay() {
             height={canvasHeight}
             patternUnits="userSpaceOnUse"
           >
-            <rect x="0" y="0" width={colWidth} height={canvasHeight} fill={COL_FILL} />
+            <rect
+              x="0"
+              y="0"
+              width={colWidth}
+              height={canvasHeight}
+              fill={COL_FILL}
+            />
           </pattern>
 
           {/* Horizontal rows pattern */}
@@ -132,15 +145,29 @@ export function GridOverlay() {
             height={rowPatternHeight}
             patternUnits="userSpaceOnUse"
           >
-            <rect x="0" y="0" width={canvasWidth} height={rowHeight} fill={ROW_FILL} />
+            <rect
+              x="0"
+              y="0"
+              width={canvasWidth}
+              height={rowHeight}
+              fill={ROW_FILL}
+            />
           </pattern>
         </defs>
 
         {/* Vertical columns */}
-        <rect width={canvasWidth} height={canvasHeight} fill={`url(#${colPatternId})`} />
+        <rect
+          width={canvasWidth}
+          height={canvasHeight}
+          fill={`url(#${colPatternId})`}
+        />
 
         {/* Horizontal rows */}
-        <rect width={canvasWidth} height={canvasHeight} fill={`url(#${rowPatternId})`} />
+        <rect
+          width={canvasWidth}
+          height={canvasHeight}
+          fill={`url(#${rowPatternId})`}
+        />
       </svg>
     </div>
   );
@@ -167,6 +194,7 @@ git commit -m "feat(grid): add horizontal row lines to GridOverlay"
 ### Task 3: Add horizontal snap utility
 
 **Files:**
+
 - Modify: `src/layout/grid/snapToGrid.ts`
 - Modify: `src/layout/grid/__tests__/snapToGrid.test.ts`
 
@@ -179,7 +207,11 @@ Add to `src/layout/grid/snapToGrid.ts` after the existing `snapToGrid` function:
  * Returns absolute pixel positions of horizontal row edges.
  * Same logic as getGridEdges but for rows.
  */
-export function getHorizontalGridEdges(canvasHeight: number, rows: number, rowGutter: number): number[] {
+export function getHorizontalGridEdges(
+  canvasHeight: number,
+  rows: number,
+  rowGutter: number,
+): number[] {
   const rowHeight = (canvasHeight - (rows - 1) * rowGutter) / rows;
   const edges: number[] = [0];
   for (let i = 1; i < rows; i++) {

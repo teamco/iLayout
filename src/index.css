@@ -1,5 +1,5 @@
 :root,
-[data-theme="light"] {
+[data-theme='light'] {
   --text: #6b6375;
   --text-h: #08060d;
   --bg: #fff;
@@ -39,7 +39,7 @@
   }
 }
 
-[data-theme="dark"] {
+[data-theme='dark'] {
   --text: #9ca3af;
   --text-h: #f3f4f6;
   --bg: #16171d;
@@ -61,7 +61,7 @@
   --drag-card-bg: #1e2a3a;
 }
 
-[data-theme="dark"] #social .button-icon {
+[data-theme='dark'] #social .button-icon {
   filter: invert(1) brightness(2);
 }
 
@@ -124,9 +124,9 @@ code {
 }
 
 /* Fix Chrome autofill white background in dark mode */
-[data-theme="dark"] input:-webkit-autofill,
-[data-theme="dark"] input:-webkit-autofill:hover,
-[data-theme="dark"] input:-webkit-autofill:focus {
+[data-theme='dark'] input:-webkit-autofill,
+[data-theme='dark'] input:-webkit-autofill:hover,
+[data-theme='dark'] input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0 1000px #141414 inset;
   -webkit-text-fill-color: rgba(255, 255, 255, 0.85);
   transition: background-color 5000s ease-in-out 0s;

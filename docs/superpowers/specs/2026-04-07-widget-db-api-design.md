@@ -77,7 +77,8 @@ export const EWidgetCategory = {
   EMBED: 'embed',
   UTILITY: 'utility',
 } as const;
-export type EWidgetCategory = (typeof EWidgetCategory)[keyof typeof EWidgetCategory];
+export type EWidgetCategory =
+  (typeof EWidgetCategory)[keyof typeof EWidgetCategory];
 
 export const EWidgetResource = {
   YOUTUBE: 'youtube',
@@ -86,7 +87,8 @@ export const EWidgetResource = {
   COMPONENT: 'component',
   EMPTY: 'empty',
 } as const;
-export type EWidgetResource = (typeof EWidgetResource)[keyof typeof EWidgetResource];
+export type EWidgetResource =
+  (typeof EWidgetResource)[keyof typeof EWidgetResource];
 ```
 
 ### Widget types
@@ -149,12 +151,12 @@ deleteWidget(id: string): Promise<void>
 **Location:** `src/lib/hooks/useWidgetQueries.ts`
 
 ```ts
-useWidgets(userId)           // own widgets
-usePublicWidgets()           // public + published for gallery
-useWidget(id)                // single widget
-useCreateWidget()            // mutation
-useUpdateWidget()            // mutation
-useDeleteWidget()            // mutation (soft delete)
+useWidgets(userId); // own widgets
+usePublicWidgets(); // public + published for gallery
+useWidget(id); // single widget
+useCreateWidget(); // mutation
+useUpdateWidget(); // mutation
+useDeleteWidget(); // mutation (soft delete)
 ```
 
 Cache invalidation: mutations invalidate `['widgets']` prefix.

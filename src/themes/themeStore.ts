@@ -13,8 +13,11 @@ const CYCLE: ThemeMode[] = ['light', 'dark', 'system'];
 const STORAGE_KEY = 'theme-mode';
 
 function getSystemTheme(): ResolvedTheme {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function')
+    return 'light';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light';
 }
 
 function resolveTheme(mode: ThemeMode): ResolvedTheme {
@@ -24,13 +27,20 @@ function resolveTheme(mode: ThemeMode): ResolvedTheme {
 function loadMode(): ThemeMode {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored && CYCLE.includes(stored as ThemeMode)) return stored as ThemeMode;
-  } catch { /* ignore */ }
+    if (stored && CYCLE.includes(stored as ThemeMode))
+      return stored as ThemeMode;
+  } catch {
+    /* ignore */
+  }
   return 'system';
 }
 
 function persistMode(mode: ThemeMode) {
-  try { localStorage.setItem(STORAGE_KEY, mode); } catch { /* ignore */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, mode);
+  } catch {
+    /* ignore */
+  }
 }
 
 function makeStore(initialMode?: ThemeMode) {

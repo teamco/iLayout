@@ -14,23 +14,33 @@ type FormValues = {
   zIndex: number;
 };
 
-function parseHeight(height: SectionHeight): { type: string; value: number; unit: string } {
+function parseHeight(height: SectionHeight): {
+  type: string;
+  value: number;
+  unit: string;
+} {
   if (height.type === 'auto') return { type: 'auto', value: 0, unit: 'px' };
   const match = height.value.match(/^(-?\d+(?:\.\d+)?)\s*(px|vh|%)$/);
-  if (match) return { type: height.type, value: Number(match[1]), unit: match[2] };
-  return { type: height.type, value: parseFloat(height.value) || 0, unit: 'px' };
+  if (match)
+    return { type: height.type, value: Number(match[1]), unit: match[2] };
+  return {
+    type: height.type,
+    value: parseFloat(height.value) || 0,
+    unit: 'px',
+  };
 }
 
 export function SectionConfig({ open, sectionId, onClose }: Props) {
   const { t } = useTranslation();
   const [form] = Form.useForm<FormValues>();
-  const root = useLayoutStore(s => s.root);
-  const resizeSection = useLayoutStore(s => s.resizeSection);
-  const updateSectionConfig = useLayoutStore(s => s.updateSectionConfig);
-  const removeSection = useLayoutStore(s => s.removeSection);
+  const root = useLayoutStore((s) => s.root);
+  const resizeSection = useLayoutStore((s) => s.resizeSection);
+  const updateSectionConfig = useLayoutStore((s) => s.updateSectionConfig);
+  const removeSection = useLayoutStore((s) => s.removeSection);
 
-  const scrollRoot = root.type === 'scroll' ? root as unknown as ScrollRoot : null;
-  const section = scrollRoot?.sections.find(s => s.id === sectionId);
+  const scrollRoot =
+    root.type === 'scroll' ? (root as unknown as ScrollRoot) : null;
+  const section = scrollRoot?.sections.find((s) => s.id === sectionId);
 
   useEffect(() => {
     if (open && section) {
@@ -48,9 +58,13 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
   function handleSave() {
     if (!sectionId) return;
     const values = form.getFieldsValue();
-    const height: SectionHeight = values.heightType === 'auto'
-      ? { type: 'auto' }
-      : { type: values.heightType, value: `${values.heightValue}${values.heightUnit}` };
+    const height: SectionHeight =
+      values.heightType === 'auto'
+        ? { type: 'auto' }
+        : {
+            type: values.heightType,
+            value: `${values.heightValue}${values.heightUnit}`,
+          };
     resizeSection(sectionId, height);
     updateSectionConfig(sectionId, {
       overlap: values.overlap !== 0 ? `${values.overlap}px` : undefined,
@@ -74,10 +88,14 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
       onCancel={onClose}
       footer={
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button danger onClick={handleDelete}>{t('common.delete')}</Button>
+          <Button danger onClick={handleDelete}>
+            {t('common.delete')}
+          </Button>
           <Space>
             <Button onClick={onClose}>{t('common.cancel')}</Button>
-            <Button type="primary" onClick={handleSave}>{t('common.save')}</Button>
+            <Button type="primary" onClick={handleSave}>
+              {t('common.save')}
+            </Button>
           </Space>
         </div>
       }
@@ -85,13 +103,25 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
       forceRender
       destroyOnHidden={false}
     >
-      <Form form={form} layout="vertical" initialValues={{ heightType: 'auto', heightValue: 0, heightUnit: 'px', overlap: 0, zIndex: 0 }}>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          heightType: 'auto',
+          heightValue: 0,
+          heightUnit: 'px',
+          overlap: 0,
+          zIndex: 0,
+        }}
+      >
         <Form.Item label={t('layout.heightType', 'Height')} name="heightType">
-          <Select options={[
-            { value: 'auto', label: 'Auto' },
-            { value: 'fixed', label: 'Fixed' },
-            { value: 'min', label: 'Min height' },
-          ]} />
+          <Select
+            options={[
+              { value: 'auto', label: 'Auto' },
+              { value: 'fixed', label: 'Fixed' },
+              { value: 'min', label: 'Min height' },
+            ]}
+          />
         </Form.Item>
         {heightType !== 'auto' && (
           <Form.Item label={t('layout.heightValue', 'Value')}>
@@ -100,11 +130,14 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
                 <InputNumber min={0} style={{ flex: 1 }} />
               </Form.Item>
               <Form.Item name="heightUnit" noStyle>
-                <Select options={[
-                  { value: 'px', label: 'px' },
-                  { value: 'vh', label: 'vh' },
-                  { value: '%', label: '%' },
-                ]} style={{ width: 65 }} />
+                <Select
+                  options={[
+                    { value: 'px', label: 'px' },
+                    { value: 'vh', label: 'vh' },
+                    { value: '%', label: '%' },
+                  ]}
+                  style={{ width: 65 }}
+                />
               </Form.Item>
             </Space.Compact>
           </Form.Item>

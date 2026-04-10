@@ -1,7 +1,10 @@
 import type { LayoutNode } from './types';
 
-const DEFAULT_API_BASE = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const DEFAULT_API_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY as string | undefined;
+const DEFAULT_API_BASE = import.meta.env.VITE_SUPABASE_URL as
+  | string
+  | undefined;
+const DEFAULT_API_KEY = import.meta.env
+  .VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY as string | undefined;
 
 export type FetchOptions = {
   layout?: LayoutNode;
@@ -38,7 +41,8 @@ function setCache(key: string, data: LayoutNode): void {
 
 async function fetchFromUrl(url: string): Promise<LayoutNode> {
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
+  if (!res.ok)
+    throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
   return res.json() as Promise<LayoutNode>;
 }
 
@@ -54,7 +58,8 @@ async function fetchFromApi(
       'Content-Type': 'application/json',
     },
   });
-  if (!res.ok) throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
+  if (!res.ok)
+    throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
   const rows = (await res.json()) as Array<{ data: LayoutNode }>;
   if (rows.length === 0) throw new Error(`Layout not found: ${layoutId}`);
   return rows[0].data;
@@ -68,8 +73,14 @@ async function doFetch(opts: FetchOptions): Promise<LayoutNode> {
   if (opts.layoutId) {
     const apiBase = opts.apiBase ?? DEFAULT_API_BASE;
     const apiKey = opts.apiKey ?? DEFAULT_API_KEY;
-    if (!apiBase) throw new Error('apiBase is required when using layoutId (set VITE_SUPABASE_URL at build time or pass apiBase prop)');
-    if (!apiKey) throw new Error('apiKey is required when using layoutId (set VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY at build time or pass apiKey prop)');
+    if (!apiBase)
+      throw new Error(
+        'apiBase is required when using layoutId (set VITE_SUPABASE_URL at build time or pass apiBase prop)',
+      );
+    if (!apiKey)
+      throw new Error(
+        'apiKey is required when using layoutId (set VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY at build time or pass apiKey prop)',
+      );
     return fetchFromApi(opts.layoutId, apiBase, apiKey);
   }
 

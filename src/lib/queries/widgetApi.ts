@@ -2,7 +2,9 @@ import type { IUser, WidgetRecord } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 async function currentUserId(): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
@@ -43,7 +45,9 @@ export async function getWidget(id: string): Promise<WidgetRecord | null> {
   return data as WidgetRecord;
 }
 
-export async function createWidget(widget: Partial<WidgetRecord>): Promise<WidgetRecord> {
+export async function createWidget(
+  widget: Partial<WidgetRecord>,
+): Promise<WidgetRecord> {
   const userId = await currentUserId();
   const { data, error } = await supabase
     .from('widgets')
@@ -69,7 +73,10 @@ export async function createWidget(widget: Partial<WidgetRecord>): Promise<Widge
   return data as WidgetRecord;
 }
 
-export async function updateWidget(id: string, updates: Partial<WidgetRecord>): Promise<WidgetRecord> {
+export async function updateWidget(
+  id: string,
+  updates: Partial<WidgetRecord>,
+): Promise<WidgetRecord> {
   const userId = await currentUserId();
   const { data, error } = await supabase
     .from('widgets')

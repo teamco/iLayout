@@ -13,6 +13,7 @@
 ### Task 1: Create GridContext with ResizeObserver
 
 **Files:**
+
 - Create: `src/layout/grid/GridContext.tsx`
 
 - [ ] **Step 1: Create GridContext.tsx**
@@ -20,7 +21,15 @@
 Create `src/layout/grid/GridContext.tsx`:
 
 ```tsx
-import { createContext, useContext, useRef, useState, useEffect, useCallback, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  useEffect,
+  useCallback,
+  type ReactNode,
+} from 'react';
 
 export type GridContextValue = {
   canvasWidth: number;
@@ -46,7 +55,11 @@ type GridProviderProps = {
   children: ReactNode;
 };
 
-export function GridProvider({ columns = 24, gutter = 16, children }: GridProviderProps) {
+export function GridProvider({
+  columns = 24,
+  gutter = 16,
+  children,
+}: GridProviderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasWidth, setCanvasWidth] = useState(0);
   const [canvasHeight, setCanvasHeight] = useState(0);
@@ -68,8 +81,13 @@ export function GridProvider({ columns = 24, gutter = 16, children }: GridProvid
   }, [measure]);
 
   return (
-    <GridContext.Provider value={{ canvasWidth, canvasHeight, columns, gutter }}>
-      <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+    <GridContext.Provider
+      value={{ canvasWidth, canvasHeight, columns, gutter }}
+    >
+      <div
+        ref={containerRef}
+        style={{ width: '100%', height: '100%', position: 'relative' }}
+      >
         {children}
       </div>
     </GridContext.Provider>
@@ -94,6 +112,7 @@ git commit -m "feat(grid): create GridContext with ResizeObserver provider"
 ### Task 2: Create snapToGrid pure utility with tests
 
 **Files:**
+
 - Create: `src/layout/grid/snapToGrid.ts`
 - Create: `src/layout/grid/__tests__/snapToGrid.test.ts`
 
@@ -143,7 +162,7 @@ describe('snapToGrid', () => {
     // Boundary should be on a grid edge
     const edges = getGridEdges(1000, COLUMNS, GUTTER);
     const snappedBoundary = result[0];
-    const isOnEdge = edges.some(e => Math.abs(e - snappedBoundary) < 0.5);
+    const isOnEdge = edges.some((e) => Math.abs(e - snappedBoundary) < 0.5);
     expect(isOnEdge).toBe(true);
   });
 
@@ -163,7 +182,7 @@ describe('snapToGrid', () => {
     // Boundary at absolute 200 + 150 = 350, should snap to nearest grid edge
     const edges = getGridEdges(1000, COLUMNS, GUTTER);
     const snappedAbsBoundary = 200 + result[0];
-    const isOnEdge = edges.some(e => Math.abs(e - snappedAbsBoundary) < 0.5);
+    const isOnEdge = edges.some((e) => Math.abs(e - snappedAbsBoundary) < 0.5);
     expect(isOnEdge).toBe(true);
   });
 
@@ -192,7 +211,11 @@ Create `src/layout/grid/snapToGrid.ts`:
  * Returns absolute pixel positions of grid column left edges (including 0 and canvasSize).
  * For 24 columns there are 25 edges: [0, col1_start, col2_start, ..., canvasSize].
  */
-export function getGridEdges(canvasSize: number, columns: number, gutter: number): number[] {
+export function getGridEdges(
+  canvasSize: number,
+  columns: number,
+  gutter: number,
+): number[] {
   const colWidth = (canvasSize - (columns - 1) * gutter) / columns;
   const edges: number[] = [0];
   for (let i = 1; i < columns; i++) {
@@ -300,6 +323,7 @@ git commit -m "feat(grid): add snapToGrid pure utility with tests"
 ### Task 3: Refactor GridOverlay to use GridContext
 
 **Files:**
+
 - Modify: `src/layout/components/GridOverlay.tsx`
 
 - [ ] **Step 1: Rewrite GridOverlay to consume GridContext**
@@ -334,10 +358,20 @@ export function GridOverlay() {
             height={canvasHeight}
             patternUnits="userSpaceOnUse"
           >
-            <rect x="0" y="0" width={colWidth} height={canvasHeight} fill={FILL} />
+            <rect
+              x="0"
+              y="0"
+              width={colWidth}
+              height={canvasHeight}
+              fill={FILL}
+            />
           </pattern>
         </defs>
-        <rect width={canvasWidth} height={canvasHeight} fill={`url(#${patternId})`} />
+        <rect
+          width={canvasWidth}
+          height={canvasHeight}
+          fill={`url(#${patternId})`}
+        />
       </svg>
     </div>
   );
@@ -361,6 +395,7 @@ git commit -m "refactor(grid): simplify GridOverlay to consume GridContext"
 ### Task 4: Add snap logic to SplitterNode
 
 **Files:**
+
 - Modify: `src/layout/components/SplitterNode.tsx`
 
 - [ ] **Step 1: Add snap to handleResize**
@@ -382,9 +417,9 @@ type Props = { node: SplitterNode };
 
 export function SplitterNodeComponent({ node }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const resize = useLayoutStore(s => s.resize);
-  const editMode = useLayoutStore(s => s.editMode);
-  const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
+  const resize = useLayoutStore((s) => s.resize);
+  const editMode = useLayoutStore((s) => s.editMode);
+  const activeWidgetEditId = useLayoutStore((s) => s.activeWidgetEditId);
   const { canvasWidth, canvasHeight, columns, gutter } = useGridContext();
 
   const resizingDisabled = !editMode || activeWidgetEditId !== null;
@@ -392,33 +427,47 @@ export function SplitterNodeComponent({ node }: Props) {
   function handleResize(pixelSizes: number[]) {
     const container = containerRef.current;
     if (!container) return;
-    const total = node.direction === 'horizontal'
-      ? container.offsetWidth
-      : container.offsetHeight;
+    const total =
+      node.direction === 'horizontal'
+        ? container.offsetWidth
+        : container.offsetHeight;
     if (total === 0) return;
 
     let sizes = pixelSizes;
     if (editMode) {
-      const canvasSize = node.direction === 'horizontal' ? canvasWidth : canvasHeight;
+      const canvasSize =
+        node.direction === 'horizontal' ? canvasWidth : canvasHeight;
       const rect = container.getBoundingClientRect();
-      const canvasEl = container.closest('[data-grid-canvas]') as HTMLElement | null;
+      const canvasEl = container.closest(
+        '[data-grid-canvas]',
+      ) as HTMLElement | null;
       const canvasRect = canvasEl?.getBoundingClientRect();
       const containerOffset = canvasRect
-        ? (node.direction === 'horizontal' ? rect.left - canvasRect.left : rect.top - canvasRect.top)
+        ? node.direction === 'horizontal'
+          ? rect.left - canvasRect.left
+          : rect.top - canvasRect.top
         : 0;
-      sizes = snapToGrid(pixelSizes, containerOffset, canvasSize, columns, gutter);
+      sizes = snapToGrid(
+        pixelSizes,
+        containerOffset,
+        canvasSize,
+        columns,
+        gutter,
+      );
     }
 
-    const percentages = sizes.map(px => (px / total) * 100);
+    const percentages = sizes.map((px) => (px / total) * 100);
     const sum = percentages.reduce((a, b) => a + b, 0);
-    const normalized = percentages.map(p => (p / sum) * 100);
+    const normalized = percentages.map((p) => (p / sum) * 100);
     resize(node.id, normalized);
   }
 
   return (
     <div ref={containerRef} className={styles.container}>
       <Splitter
-        orientation={node.direction === 'horizontal' ? 'horizontal' : 'vertical'}
+        orientation={
+          node.direction === 'horizontal' ? 'horizontal' : 'vertical'
+        }
         onResize={handleResize}
       >
         {node.children.map((child, i) => (
@@ -455,6 +504,7 @@ git commit -m "feat(grid): add snap-to-grid in SplitterNode handleResize"
 ### Task 5: Wire GridProvider into App.tsx
 
 **Files:**
+
 - Modify: `src/App.tsx`
 - Modify: `src/layout/grid/GridContext.tsx` (add `data-grid-canvas` attribute)
 
@@ -463,11 +513,15 @@ git commit -m "feat(grid): add snap-to-grid in SplitterNode handleResize"
 In `src/layout/grid/GridContext.tsx`, update the wrapper div in the `GridProvider` return:
 
 ```tsx
-    <GridContext.Provider value={{ canvasWidth, canvasHeight, columns, gutter }}>
-      <div ref={containerRef} data-grid-canvas style={{ width: '100%', height: '100%', position: 'relative' }}>
-        {children}
-      </div>
-    </GridContext.Provider>
+<GridContext.Provider value={{ canvasWidth, canvasHeight, columns, gutter }}>
+  <div
+    ref={containerRef}
+    data-grid-canvas
+    style={{ width: '100%', height: '100%', position: 'relative' }}
+  >
+    {children}
+  </div>
+</GridContext.Provider>
 ```
 
 - [ ] **Step 2: Wrap canvas contents with GridProvider in App.tsx**
@@ -481,12 +535,12 @@ import { GridProvider } from '@/layout/grid/GridContext';
 Replace the canvas div contents:
 
 ```tsx
-        <div className={styles.canvas}>
-          <GridProvider>
-            <LayoutRenderer />
-            {showGrid && <GridOverlay />}
-          </GridProvider>
-        </div>
+<div className={styles.canvas}>
+  <GridProvider>
+    <LayoutRenderer />
+    {showGrid && <GridOverlay />}
+  </GridProvider>
+</div>
 ```
 
 - [ ] **Step 3: Verify build and tests**
@@ -497,6 +551,7 @@ Expected: Both pass.
 - [ ] **Step 4: Verify manually**
 
 Run: `pnpm dev`
+
 - Enable Edit Mode, toggle grid (Ctrl+G) — grid overlay still works
 - Add panels, resize splitters — boundaries snap to grid column edges
 - Nested splitters snap to the same global grid

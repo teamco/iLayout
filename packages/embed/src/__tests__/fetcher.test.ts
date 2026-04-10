@@ -24,7 +24,9 @@ describe('fetchLayout', () => {
       new Response(JSON.stringify(mockLeaf), { status: 200 }),
     );
 
-    const result = await fetchLayout({ layoutUrl: 'https://example.com/layout.json' });
+    const result = await fetchLayout({
+      layoutUrl: 'https://example.com/layout.json',
+    });
     expect(result).toEqual(mockLeaf);
     expect(fetch).toHaveBeenCalledWith('https://example.com/layout.json');
   });
@@ -104,13 +106,15 @@ describe('fetchLayout', () => {
     );
 
     await expect(
-      fetchLayout({ layoutId: 'missing-id', apiBase: 'https://api.test.com', apiKey: 'key' }),
+      fetchLayout({
+        layoutId: 'missing-id',
+        apiBase: 'https://api.test.com',
+        apiKey: 'key',
+      }),
     ).rejects.toThrow('Layout not found: missing-id');
   });
 
   it('throws when no source provided', async () => {
-    await expect(fetchLayout({})).rejects.toThrow(
-      'No layout source provided',
-    );
+    await expect(fetchLayout({})).rejects.toThrow('No layout source provided');
   });
 });

@@ -13,6 +13,7 @@
 ### Task 1: Apply Supabase migration
 
 **Files:**
+
 - No local files — migration via Supabase MCP
 
 - [ ] **Step 1: Apply migration**
@@ -76,6 +77,7 @@ Use Supabase MCP `list_tables` to confirm `widgets` table exists.
 ### Task 2: Add TypeScript enums and WidgetRecord type
 
 **Files:**
+
 - Modify: `src/lib/types.ts`
 
 - [ ] **Step 1: Add enums and types**
@@ -92,7 +94,8 @@ export const EWidgetCategory = {
   EMBED: 'embed',
   UTILITY: 'utility',
 } as const;
-export type EWidgetCategory = (typeof EWidgetCategory)[keyof typeof EWidgetCategory];
+export type EWidgetCategory =
+  (typeof EWidgetCategory)[keyof typeof EWidgetCategory];
 
 export const EWidgetResource = {
   YOUTUBE: 'youtube',
@@ -101,7 +104,8 @@ export const EWidgetResource = {
   COMPONENT: 'component',
   EMPTY: 'empty',
 } as const;
-export type EWidgetResource = (typeof EWidgetResource)[keyof typeof EWidgetResource];
+export type EWidgetResource =
+  (typeof EWidgetResource)[keyof typeof EWidgetResource];
 
 // ─── Widget types ─────────────────────────────────────────────────────────────
 
@@ -148,6 +152,7 @@ git commit -m "feat(widget): add widget enums and WidgetRecord type"
 ### Task 3: Create widgetApi service
 
 **Files:**
+
 - Create: `src/lib/queries/widgetApi.ts`
 
 - [ ] **Step 1: Create widgetApi.ts**
@@ -159,7 +164,9 @@ import type { IUser, WidgetRecord } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
 
 async function currentUserId(): Promise<string> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
@@ -200,7 +207,9 @@ export async function getWidget(id: string): Promise<WidgetRecord | null> {
   return data as WidgetRecord;
 }
 
-export async function createWidget(widget: Partial<WidgetRecord>): Promise<WidgetRecord> {
+export async function createWidget(
+  widget: Partial<WidgetRecord>,
+): Promise<WidgetRecord> {
   const userId = await currentUserId();
   const { data, error } = await supabase
     .from('widgets')
@@ -226,7 +235,10 @@ export async function createWidget(widget: Partial<WidgetRecord>): Promise<Widge
   return data as WidgetRecord;
 }
 
-export async function updateWidget(id: string, updates: Partial<WidgetRecord>): Promise<WidgetRecord> {
+export async function updateWidget(
+  id: string,
+  updates: Partial<WidgetRecord>,
+): Promise<WidgetRecord> {
   const userId = await currentUserId();
   const { data, error } = await supabase
     .from('widgets')
@@ -275,6 +287,7 @@ git commit -m "feat(widget): create widgetApi CRUD service"
 ### Task 4: Create TanStack Query hooks
 
 **Files:**
+
 - Create: `src/lib/hooks/useWidgetQueries.ts`
 
 - [ ] **Step 1: Create useWidgetQueries.ts**
@@ -329,7 +342,8 @@ export function useCreateWidget() {
 export function useUpdateWidget() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<WidgetRecord> }) => api.updateWidget(id, data),
+    mutationFn: ({ id, data }: { id: string; data: Partial<WidgetRecord> }) =>
+      api.updateWidget(id, data),
     onSuccess: (updated) => {
       queryClient.setQueryData(KEYS.widget(updated.id), updated);
       void queryClient.invalidateQueries({ queryKey: ['widgets'] });

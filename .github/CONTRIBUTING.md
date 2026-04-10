@@ -57,6 +57,7 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 ## 📜 Documentation
 
 **MANDATORY RULE**: Update all related documentation (`.md` files) upon successful completion of a task. This includes:
+
 - Updating `ARCHITECTURE.md` for structural changes.
 - Adding new test documentation in `docs/` if necessary.
 

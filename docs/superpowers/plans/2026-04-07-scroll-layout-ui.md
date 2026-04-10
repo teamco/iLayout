@@ -13,6 +13,7 @@
 ### Task 1: Create SectionNodeComponent
 
 **Files:**
+
 - Create: `src/layout/components/SectionNodeComponent.tsx`
 - Create: `src/layout/components/SectionNode.module.less`
 
@@ -107,13 +108,16 @@ function getSectionStyle(section: SectionNode): React.CSSProperties {
 }
 
 export function SectionNodeComponent({ section, onConfig }: Props) {
-  const editMode = useLayoutStore(s => s.editMode);
-  const addSection = useLayoutStore(s => s.addSection);
+  const editMode = useLayoutStore((s) => s.editMode);
+  const addSection = useLayoutStore((s) => s.addSection);
 
   return (
     <>
       {editMode && (
-        <div className={styles.addBtn} onClick={() => addSection('before', section.id)}>
+        <div
+          className={styles.addBtn}
+          onClick={() => addSection('before', section.id)}
+        >
           <PlusOutlined />
         </div>
       )}
@@ -134,7 +138,10 @@ export function SectionNodeComponent({ section, onConfig }: Props) {
         {renderNode(section.child)}
       </div>
       {editMode && (
-        <div className={styles.addBtn} onClick={() => addSection('after', section.id)}>
+        <div
+          className={styles.addBtn}
+          onClick={() => addSection('after', section.id)}
+        >
           <PlusOutlined />
         </div>
       )}
@@ -159,6 +166,7 @@ git commit -m "feat(scroll): create SectionNodeComponent"
 ### Task 2: Create SectionHandle
 
 **Files:**
+
 - Create: `src/layout/components/SectionHandle.tsx`
 
 - [ ] **Step 1: Create SectionHandle.tsx**
@@ -170,57 +178,76 @@ import React, { useCallback, useRef } from 'react';
 import type { ScrollRoot } from '@/layout/types';
 import { useLayoutStore } from '@/layout/store/layoutStore';
 import { useGridContext } from '@/layout/grid/GridContext';
-import { getHorizontalGridEdges, snapToNearestEdge } from '@/layout/grid/snapToGrid';
+import {
+  getHorizontalGridEdges,
+  snapToNearestEdge,
+} from '@/layout/grid/snapToGrid';
 
 type Props = {
   sectionId: string;
 };
 
 export function SectionHandle({ sectionId }: Props) {
-  const resizeSection = useLayoutStore(s => s.resizeSection);
-  const root = useLayoutStore(s => s.root);
+  const resizeSection = useLayoutStore((s) => s.resizeSection);
+  const root = useLayoutStore((s) => s.root);
   const { canvasHeight, rows, rowGutter } = useGridContext();
   const startRef = useRef<{ y: number; height: number } | null>(null);
 
   // Find the section to check if it's resizable
-  const scrollRoot = root.type === 'scroll' ? root as unknown as ScrollRoot : null;
-  const section = scrollRoot?.sections.find(s => s.id === sectionId);
+  const scrollRoot =
+    root.type === 'scroll' ? (root as unknown as ScrollRoot) : null;
+  const section = scrollRoot?.sections.find((s) => s.id === sectionId);
   const isDisabled = !section || section.height.type === 'auto';
 
-  const handlePointerDown = useCallback((e: React.PointerEvent) => {
-    if (isDisabled) return;
-    e.preventDefault();
-    e.stopPropagation();
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (isDisabled) return;
+      e.preventDefault();
+      e.stopPropagation();
 
-    const el = e.currentTarget as HTMLElement;
-    const sectionEl = el.previousElementSibling as HTMLElement | null;
-    if (!sectionEl) return;
+      const el = e.currentTarget as HTMLElement;
+      const sectionEl = el.previousElementSibling as HTMLElement | null;
+      if (!sectionEl) return;
 
-    startRef.current = { y: e.clientY, height: sectionEl.offsetHeight };
-    el.setPointerCapture(e.pointerId);
-  }, [isDisabled]);
+      startRef.current = { y: e.clientY, height: sectionEl.offsetHeight };
+      el.setPointerCapture(e.pointerId);
+    },
+    [isDisabled],
+  );
 
-  const handlePointerMove = useCallback((e: React.PointerEvent) => {
-    if (!startRef.current) return;
-    const dy = e.clientY - startRef.current.y;
-    const newHeight = Math.max(50, startRef.current.height + dy);
-    resizeSection(sectionId, { type: 'fixed', value: `${Math.round(newHeight)}px` });
-  }, [sectionId, resizeSection]);
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!startRef.current) return;
+      const dy = e.clientY - startRef.current.y;
+      const newHeight = Math.max(50, startRef.current.height + dy);
+      resizeSection(sectionId, {
+        type: 'fixed',
+        value: `${Math.round(newHeight)}px`,
+      });
+    },
+    [sectionId, resizeSection],
+  );
 
-  const handlePointerUp = useCallback((e: React.PointerEvent) => {
-    if (!startRef.current) return;
-    const dy = e.clientY - startRef.current.y;
-    let newHeight = Math.max(50, startRef.current.height + dy);
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!startRef.current) return;
+      const dy = e.clientY - startRef.current.y;
+      let newHeight = Math.max(50, startRef.current.height + dy);
 
-    // Snap to horizontal grid
-    if (canvasHeight > 0) {
-      const edges = getHorizontalGridEdges(canvasHeight, rows, rowGutter);
-      newHeight = snapToNearestEdge(newHeight, edges);
-    }
+      // Snap to horizontal grid
+      if (canvasHeight > 0) {
+        const edges = getHorizontalGridEdges(canvasHeight, rows, rowGutter);
+        newHeight = snapToNearestEdge(newHeight, edges);
+      }
 
-    resizeSection(sectionId, { type: 'fixed', value: `${Math.round(newHeight)}px` });
-    startRef.current = null;
-  }, [sectionId, resizeSection, canvasHeight, rows, rowGutter]);
+      resizeSection(sectionId, {
+        type: 'fixed',
+        value: `${Math.round(newHeight)}px`,
+      });
+      startRef.current = null;
+    },
+    [sectionId, resizeSection, canvasHeight, rows, rowGutter],
+  );
 
   return (
     <div
@@ -255,6 +282,7 @@ git commit -m "feat(scroll): create SectionHandle drag-to-resize"
 ### Task 3: Create SectionConfig modal
 
 **Files:**
+
 - Create: `src/layout/components/SectionConfig.tsx`
 
 - [ ] **Step 1: Create SectionConfig.tsx**
@@ -282,11 +310,20 @@ type FormValues = {
   zIndex: number;
 };
 
-function parseHeight(height: SectionHeight): { type: string; value: number; unit: string } {
+function parseHeight(height: SectionHeight): {
+  type: string;
+  value: number;
+  unit: string;
+} {
   if (height.type === 'auto') return { type: 'auto', value: 0, unit: 'px' };
   const match = height.value.match(/^(-?\d+(?:\.\d+)?)\s*(px|vh|%)$/);
-  if (match) return { type: height.type, value: Number(match[1]), unit: match[2] };
-  return { type: height.type, value: parseFloat(height.value) || 0, unit: 'px' };
+  if (match)
+    return { type: height.type, value: Number(match[1]), unit: match[2] };
+  return {
+    type: height.type,
+    value: parseFloat(height.value) || 0,
+    unit: 'px',
+  };
 }
 
 function parseOverlap(overlap?: string): number {
@@ -297,15 +334,18 @@ function parseOverlap(overlap?: string): number {
 export function SectionConfig({ open, sectionId, onClose }: Props) {
   const { t } = useTranslation();
   const [form] = Form.useForm<FormValues>();
-  const root = useLayoutStore(s => s.root);
-  const resizeSection = useLayoutStore(s => s.resizeSection);
-  const updateSectionConfig = useLayoutStore(s => s.updateSectionConfig);
-  const removeSection = useLayoutStore(s => s.removeSection);
+  const root = useLayoutStore((s) => s.root);
+  const resizeSection = useLayoutStore((s) => s.resizeSection);
+  const updateSectionConfig = useLayoutStore((s) => s.updateSectionConfig);
+  const removeSection = useLayoutStore((s) => s.removeSection);
 
   const scrollRoot = root.type === 'scroll' ? root : null;
-  const section = scrollRoot && 'sections' in scrollRoot
-    ? (scrollRoot as unknown as { sections: SectionNode[] }).sections.find(s => s.id === sectionId)
-    : null;
+  const section =
+    scrollRoot && 'sections' in scrollRoot
+      ? (scrollRoot as unknown as { sections: SectionNode[] }).sections.find(
+          (s) => s.id === sectionId,
+        )
+      : null;
 
   useEffect(() => {
     if (open && section) {
@@ -324,9 +364,13 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
     if (!sectionId) return;
     const values = form.getFieldsValue();
 
-    const height: SectionHeight = values.heightType === 'auto'
-      ? { type: 'auto' }
-      : { type: values.heightType, value: `${values.heightValue}${values.heightUnit}` };
+    const height: SectionHeight =
+      values.heightType === 'auto'
+        ? { type: 'auto' }
+        : {
+            type: values.heightType,
+            value: `${values.heightValue}${values.heightUnit}`,
+          };
 
     resizeSection(sectionId, height);
     updateSectionConfig(sectionId, {
@@ -351,23 +395,39 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
       onCancel={onClose}
       footer={
         <Space>
-          <Button danger onClick={handleDelete}>{t('common.delete')}</Button>
+          <Button danger onClick={handleDelete}>
+            {t('common.delete')}
+          </Button>
           <div style={{ flex: 1 }} />
           <Button onClick={onClose}>{t('common.cancel')}</Button>
-          <Button type="primary" onClick={handleSave}>{t('common.save')}</Button>
+          <Button type="primary" onClick={handleSave}>
+            {t('common.save')}
+          </Button>
         </Space>
       }
       width={380}
       forceRender
       destroyOnHidden={false}
     >
-      <Form form={form} layout="vertical" initialValues={{ heightType: 'auto', heightValue: 0, heightUnit: 'px', overlap: 0, zIndex: 0 }}>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          heightType: 'auto',
+          heightValue: 0,
+          heightUnit: 'px',
+          overlap: 0,
+          zIndex: 0,
+        }}
+      >
         <Form.Item label={t('layout.heightType', 'Height')} name="heightType">
-          <Select options={[
-            { value: 'auto', label: 'Auto' },
-            { value: 'fixed', label: 'Fixed' },
-            { value: 'min', label: 'Min height' },
-          ]} />
+          <Select
+            options={[
+              { value: 'auto', label: 'Auto' },
+              { value: 'fixed', label: 'Fixed' },
+              { value: 'min', label: 'Min height' },
+            ]}
+          />
         </Form.Item>
         {heightType !== 'auto' && (
           <Form.Item label={t('layout.heightValue', 'Value')}>
@@ -376,11 +436,14 @@ export function SectionConfig({ open, sectionId, onClose }: Props) {
                 <InputNumber min={0} style={{ flex: 1 }} />
               </Form.Item>
               <Form.Item name="heightUnit" noStyle>
-                <Select options={[
-                  { value: 'px', label: 'px' },
-                  { value: 'vh', label: 'vh' },
-                  { value: '%', label: '%' },
-                ]} style={{ width: 65 }} />
+                <Select
+                  options={[
+                    { value: 'px', label: 'px' },
+                    { value: 'vh', label: 'vh' },
+                    { value: '%', label: '%' },
+                  ]}
+                  style={{ width: 65 }}
+                />
               </Form.Item>
             </Space.Compact>
           </Form.Item>
@@ -413,6 +476,7 @@ git commit -m "feat(scroll): create SectionConfig modal"
 ### Task 4: Create ScrollLayout
 
 **Files:**
+
 - Create: `src/layout/components/ScrollLayout.tsx`
 
 - [ ] **Step 1: Create ScrollLayout.tsx**
@@ -432,7 +496,7 @@ type Props = {
 };
 
 export function ScrollLayout({ root }: Props) {
-  const editMode = useLayoutStore(s => s.editMode);
+  const editMode = useLayoutStore((s) => s.editMode);
   const [configSectionId, setConfigSectionId] = useState<string | null>(null);
 
   return (
@@ -474,6 +538,7 @@ git commit -m "feat(scroll): create ScrollLayout component"
 ### Task 5: Update LayoutRenderer to switch by mode
 
 **Files:**
+
 - Modify: `src/layout/components/LayoutRenderer.tsx`
 
 - [ ] **Step 1: Add scroll mode rendering**
@@ -481,6 +546,7 @@ git commit -m "feat(scroll): create ScrollLayout component"
 Update `src/layout/components/LayoutRenderer.tsx`:
 
 Add import:
+
 ```tsx
 import type { ScrollRoot } from '@/layout/types';
 import { ScrollLayout } from './ScrollLayout';
@@ -490,16 +556,17 @@ Update `LayoutRenderer` component to read `layoutMode` and switch:
 
 ```tsx
 export function LayoutRenderer() {
-  const root = useLayoutStore(s => s.root);
-  const layoutMode = useLayoutStore(s => s.layoutMode);
+  const root = useLayoutStore((s) => s.root);
+  const layoutMode = useLayoutStore((s) => s.layoutMode);
 
   return (
     <LayoutDndContext>
       <div className={styles.root}>
-        {layoutMode === 'scroll' && root.type === 'scroll'
-          ? <ScrollLayout root={root as unknown as ScrollRoot} />
-          : renderNode(root)
-        }
+        {layoutMode === 'scroll' && root.type === 'scroll' ? (
+          <ScrollLayout root={root as unknown as ScrollRoot} />
+        ) : (
+          renderNode(root)
+        )}
       </div>
     </LayoutDndContext>
   );
@@ -522,6 +589,7 @@ git commit -m "feat(scroll): update LayoutRenderer to switch by mode"
 ### Task 6: Conditional horizontal grid + scrollable canvas
 
 **Files:**
+
 - Modify: `src/layout/components/GridOverlay.tsx`
 - Modify: `src/App.tsx`
 
@@ -534,20 +602,29 @@ import { useLayoutStore } from '@/layout/store/layoutStore';
 ```
 
 Inside the component, read mode:
+
 ```tsx
-const layoutMode = useLayoutStore(s => s.layoutMode);
+const layoutMode = useLayoutStore((s) => s.layoutMode);
 ```
 
 Conditionally render the horizontal row pattern — only when `layoutMode === 'scroll'`:
 
 Change the second `<rect>` (row fill) to:
+
 ```tsx
-{layoutMode === 'scroll' && (
-  <rect width={canvasWidth} height={canvasHeight} fill={`url(#${rowPatternId})`} />
-)}
+{
+  layoutMode === 'scroll' && (
+    <rect
+      width={canvasWidth}
+      height={canvasHeight}
+      fill={`url(#${rowPatternId})`}
+    />
+  );
+}
 ```
 
 Also conditionally define the row pattern (skip computation when viewport):
+
 ```tsx
 {layoutMode === 'scroll' && (
   <pattern ...>
@@ -559,11 +636,13 @@ Also conditionally define the row pattern (skip computation when viewport):
 - [ ] **Step 2: Scrollable canvas in scroll mode**
 
 In `src/App.tsx`, read `layoutMode` from store:
+
 ```tsx
-const layoutMode = useLayoutStore(s => s.layoutMode);
+const layoutMode = useLayoutStore((s) => s.layoutMode);
 ```
 
 Update the canvas div to conditionally allow scroll:
+
 ```tsx
 <div className={styles.canvas} style={layoutMode === 'scroll' ? { overflowY: 'auto' } : undefined}>
 ```
@@ -584,6 +663,7 @@ git commit -m "feat(scroll): conditional horizontal grid + scrollable canvas"
 ### Task 7: Mode selection at layout creation
 
 **Files:**
+
 - Modify: `src/pages/profile/LayoutsSection.tsx`
 - Modify: `src/pages/HomePage.tsx`
 - Modify: `src/pages/LayoutEditorPage.tsx`
@@ -593,6 +673,7 @@ git commit -m "feat(scroll): conditional horizontal grid + scrollable canvas"
 In `src/pages/profile/LayoutsSection.tsx`:
 
 Add import:
+
 ```tsx
 import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
@@ -610,15 +691,18 @@ Replace the "New Layout" `<Button>` with:
         { key: 'viewport', label: 'Viewport' },
         { key: 'scroll', label: 'Scroll' },
       ],
-      onClick: ({ key }) => void navigate({
-        to: ERoutes.LAYOUT_NEW as string,
-        search: { mode: key },
-      }),
+      onClick: ({ key }) =>
+        void navigate({
+          to: ERoutes.LAYOUT_NEW as string,
+          search: { mode: key },
+        }),
     }}
-    onClick={() => void navigate({
-      to: ERoutes.LAYOUT_NEW as string,
-      search: { mode: 'viewport' },
-    })}
+    onClick={() =>
+      void navigate({
+        to: ERoutes.LAYOUT_NEW as string,
+        search: { mode: 'viewport' },
+      })
+    }
   >
     {t('layout.newLayout')}
   </Dropdown.Button>
@@ -630,27 +714,32 @@ Replace the "New Layout" `<Button>` with:
 In `src/pages/HomePage.tsx`, replace the "Create New Layout" button with similar Dropdown.Button:
 
 ```tsx
-{user && (
-  <Dropdown.Button
-    type="primary"
-    menu={{
-      items: [
-        { key: 'viewport', label: 'Viewport' },
-        { key: 'scroll', label: 'Scroll' },
-      ],
-      onClick: ({ key }) => void navigate({
-        to: ERoutes.LAYOUT_NEW as string,
-        search: { mode: key },
-      }),
-    }}
-    onClick={() => void navigate({
-      to: ERoutes.LAYOUT_NEW as string,
-      search: { mode: 'viewport' },
-    })}
-  >
-    {t('home.createNewLayout')}
-  </Dropdown.Button>
-)}
+{
+  user && (
+    <Dropdown.Button
+      type="primary"
+      menu={{
+        items: [
+          { key: 'viewport', label: 'Viewport' },
+          { key: 'scroll', label: 'Scroll' },
+        ],
+        onClick: ({ key }) =>
+          void navigate({
+            to: ERoutes.LAYOUT_NEW as string,
+            search: { mode: key },
+          }),
+      }}
+      onClick={() =>
+        void navigate({
+          to: ERoutes.LAYOUT_NEW as string,
+          search: { mode: 'viewport' },
+        })
+      }
+    >
+      {t('home.createNewLayout')}
+    </Dropdown.Button>
+  );
+}
 ```
 
 - [ ] **Step 3: Read mode from URL in LayoutEditorPage**
@@ -665,16 +754,20 @@ const mode = (searchParams.get('mode') as 'viewport' | 'scroll') || 'viewport';
 ```
 
 In the `isNew` reset effect, set the layout mode:
+
 ```tsx
 useEffect(() => {
   if (isNew) {
     const searchParams = new URLSearchParams(window.location.search);
-    const mode = (searchParams.get('mode') as 'viewport' | 'scroll') || 'viewport';
+    const mode =
+      (searchParams.get('mode') as 'viewport' | 'scroll') || 'viewport';
     useLayoutStore.getState().setLayoutMode(mode);
     if (mode === 'scroll') {
       // setLayoutMode already creates ScrollRoot, no extra setState needed
     } else {
-      useLayoutStore.setState({ root: { id: crypto.randomUUID(), type: 'leaf' } });
+      useLayoutStore.setState({
+        root: { id: crypto.randomUUID(), type: 'leaf' },
+      });
     }
     useLayoutStore.getState().setEditMode(true);
   }
@@ -682,6 +775,7 @@ useEffect(() => {
 ```
 
 In the `handleSave` create mutation, include mode:
+
 ```tsx
 createMutation.mutate({ ...root_payload, mode }, { ... });
 ```
@@ -704,6 +798,7 @@ git commit -m "feat(scroll): mode selection at layout creation via Dropdown.Butt
 ### Task 8: Add i18n translations for scroll mode
 
 **Files:**
+
 - Modify: `src/i18n/locales/en.json`
 - Modify: `src/i18n/locales/ru.json`
 - Modify: `src/i18n/locales/he.json`
@@ -713,6 +808,7 @@ git commit -m "feat(scroll): mode selection at layout creation via Dropdown.Butt
 Add to `layout` section in each locale:
 
 **en.json:**
+
 ```json
 "sectionConfig": "Section Config",
 "heightType": "Height",
@@ -722,6 +818,7 @@ Add to `layout` section in each locale:
 ```
 
 **ru.json:**
+
 ```json
 "sectionConfig": "Настройки секции",
 "heightType": "Высота",
@@ -731,6 +828,7 @@ Add to `layout` section in each locale:
 ```
 
 **he.json:**
+
 ```json
 "sectionConfig": "הגדרות מקטע",
 "heightType": "גובה",

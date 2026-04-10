@@ -19,7 +19,9 @@ type ActiveDragData = { type: 'panel' | 'gallery'; widgetRef?: WidgetRef };
 
 function DragPreview({ data }: { data: ActiveDragData }) {
   const resource = data.widgetRef?.resource as EWidgetResource | undefined;
-  const label = resource ? (getWidgetDef(resource)?.label ?? resource) : 'Empty';
+  const label = resource
+    ? (getWidgetDef(resource)?.label ?? resource)
+    : 'Empty';
   return <div className={styles.dragPreview}>{label}</div>;
 }
 
@@ -27,13 +29,15 @@ type Props = { children: React.ReactNode };
 
 export function LayoutDndContext({ children }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
-  const [activeDragData, setActiveDragData] = useState<ActiveDragData | null>(null);
-  const editMode = useLayoutStore(s => s.editMode);
-  const activeWidgetEditId = useLayoutStore(s => s.activeWidgetEditId);
-  const swapWidgets = useLayoutStore(s => s.swapWidgets);
-  const setWidget = useLayoutStore(s => s.setWidget);
-  const clearWidget = useLayoutStore(s => s.clearWidget);
-  const root = useLayoutStore(s => s.root);
+  const [activeDragData, setActiveDragData] = useState<ActiveDragData | null>(
+    null,
+  );
+  const editMode = useLayoutStore((s) => s.editMode);
+  const activeWidgetEditId = useLayoutStore((s) => s.activeWidgetEditId);
+  const swapWidgets = useLayoutStore((s) => s.swapWidgets);
+  const setWidget = useLayoutStore((s) => s.setWidget);
+  const clearWidget = useLayoutStore((s) => s.clearWidget);
+  const root = useLayoutStore((s) => s.root);
 
   const dndEnabled = editMode && activeWidgetEditId === null;
 
@@ -50,8 +54,14 @@ export function LayoutDndContext({ children }: Props) {
     const sourceId = String(active.id);
     const targetId = String(over.id);
 
-    const sourceData = active.data.current as { type: 'panel' | 'gallery'; widgetRef?: unknown };
-    const targetData = over.data.current as { type: 'panel'; hasWidget: boolean };
+    const sourceData = active.data.current as {
+      type: 'panel' | 'gallery';
+      widgetRef?: unknown;
+    };
+    const targetData = over.data.current as {
+      type: 'panel';
+      hasWidget: boolean;
+    };
 
     if (sourceData?.type === 'gallery') {
       setWidget(targetId, sourceData.widgetRef as WidgetRef);
@@ -59,7 +69,9 @@ export function LayoutDndContext({ children }: Props) {
       if (targetData?.hasWidget) {
         swapWidgets(sourceId, targetId);
       } else {
-        const sourceNode = findNode(root, sourceId)?.node as LeafNode | undefined;
+        const sourceNode = findNode(root, sourceId)?.node as
+          | LeafNode
+          | undefined;
         if (sourceNode?.widget) {
           setWidget(targetId, sourceNode.widget);
           clearWidget(sourceId);

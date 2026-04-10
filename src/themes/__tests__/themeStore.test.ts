@@ -32,11 +32,14 @@ describe('themeStore', () => {
   });
 
   it('resolves system to dark when matchMedia matches', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
-      matches: true,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
     const store = createThemeStore();
     expect(store.getState().themeMode).toBe('system');
     expect(store.getState().resolvedTheme).toBe('dark');
@@ -44,11 +47,14 @@ describe('themeStore', () => {
   });
 
   it('resolves system to light when matchMedia does not match', () => {
-    vi.stubGlobal('matchMedia', vi.fn().mockReturnValue({
-      matches: false,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-    }));
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn().mockReturnValue({
+        matches: false,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      }),
+    );
     const store = createThemeStore();
     expect(store.getState().themeMode).toBe('system');
     expect(store.getState().resolvedTheme).toBe('light');

@@ -12,7 +12,7 @@ const queryClient = new QueryClient();
 const RTL_LANGUAGES = new Set(['he', 'ar']);
 
 export function RootComponent() {
-  const resolvedTheme = useThemeStore(s => s.resolvedTheme);
+  const resolvedTheme = useThemeStore((s) => s.resolvedTheme);
   const { i18n } = useTranslation();
   const direction = RTL_LANGUAGES.has(i18n.language) ? 'rtl' : 'ltr';
 
@@ -36,8 +36,14 @@ export function RootComponent() {
           <ConfigProvider
             direction={direction}
             theme={{
-              algorithm: resolvedTheme === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
-              token: resolvedTheme === 'dark' ? { colorLink: '#4da6ff', colorPrimary: '#4da6ff' } : undefined,
+              algorithm:
+                resolvedTheme === 'dark'
+                  ? theme.darkAlgorithm
+                  : theme.defaultAlgorithm,
+              token:
+                resolvedTheme === 'dark'
+                  ? { colorLink: '#4da6ff', colorPrimary: '#4da6ff' }
+                  : undefined,
             }}
           >
             <AntApp>

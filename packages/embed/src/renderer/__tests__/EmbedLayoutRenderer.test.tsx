@@ -24,7 +24,16 @@ const splitter: SplitterNode = {
   sizes: [60, 40],
   children: [
     leaf,
-    { id: 'l3', type: 'leaf', widget: { widgetId: 'w2', resource: 'empty', content: { value: 'World' }, config: {} } },
+    {
+      id: 'l3',
+      type: 'leaf',
+      widget: {
+        widgetId: 'w2',
+        resource: 'empty',
+        content: { value: 'World' },
+        config: {},
+      },
+    },
   ],
 };
 
@@ -65,7 +74,9 @@ describe('EmbedLayoutRenderer', () => {
     const { container } = render(<EmbedLayoutRenderer root={splitter} />);
     const splitterEl = container.querySelector('.al-splitter');
     expect(splitterEl).not.toBeNull();
-    expect(splitterEl!.classList.contains('al-splitter--horizontal')).toBe(true);
+    expect(splitterEl!.classList.contains('al-splitter--horizontal')).toBe(
+      true,
+    );
 
     const panels = container.querySelectorAll('.al-panel');
     expect(panels).toHaveLength(2);

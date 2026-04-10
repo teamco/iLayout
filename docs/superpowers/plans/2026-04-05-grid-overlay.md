@@ -13,6 +13,7 @@
 ### Task 1: Add `showGrid` state to layout store
 
 **Files:**
+
 - Modify: `src/layout/store/layoutStore.ts`
 - Test: `src/layout/store/__tests__/layoutStore.test.ts`
 
@@ -50,16 +51,19 @@ Expected: FAIL — `showGrid` and `toggleGrid` don't exist yet.
 In `src/layout/store/layoutStore.ts`:
 
 Add to `LayoutState`:
+
 ```ts
 showGrid: boolean;
 ```
 
 Add to `LayoutActions`:
+
 ```ts
 toggleGrid: () => void;
 ```
 
 Add to `makeActions`:
+
 ```ts
 toggleGrid() {
   set(state => { state.showGrid = !state.showGrid; });
@@ -67,6 +71,7 @@ toggleGrid() {
 ```
 
 Modify `setEditMode` in `makeActions`:
+
 ```ts
 setEditMode(on) {
   set(state => {
@@ -95,6 +100,7 @@ git commit -m "feat(grid): add showGrid state and toggleGrid action to layout st
 ### Task 2: Add `@z-grid` token to theme mixins
 
 **Files:**
+
 - Modify: `src/themes/mixin.module.less`
 
 - [ ] **Step 1: Add z-grid token**
@@ -102,7 +108,7 @@ git commit -m "feat(grid): add showGrid state and toggleGrid action to layout st
 In `src/themes/mixin.module.less`, add after `@z-overlay: 10;`:
 
 ```less
-@z-grid:          12;
+@z-grid: 12;
 ```
 
 (Between `@z-overlay: 10` and `@z-toolbar: 20`, so the grid sits above leaf overlays but below everything interactive.)
@@ -124,6 +130,7 @@ git commit -m "feat(grid): add @z-grid z-index token"
 ### Task 3: Create `GridOverlay` component
 
 **Files:**
+
 - Create: `src/layout/components/GridOverlay.tsx`
 - Create: `src/layout/components/GridOverlay.module.less`
 
@@ -218,6 +225,7 @@ git commit -m "feat(grid): create GridOverlay SVG component"
 ### Task 4: Wire GridOverlay into App + add toolbar button and keyboard shortcut
 
 **Files:**
+
 - Modify: `src/App.tsx`
 - Modify: `src/App.module.less`
 
@@ -233,8 +241,8 @@ import { GridOverlay } from '@/layout/components/GridOverlay';
 Add store selectors alongside existing ones:
 
 ```tsx
-const showGrid = useLayoutStore(s => s.showGrid);
-const toggleGrid = useLayoutStore(s => s.toggleGrid);
+const showGrid = useLayoutStore((s) => s.showGrid);
+const toggleGrid = useLayoutStore((s) => s.toggleGrid);
 ```
 
 Add keyboard shortcut effect after the existing `useEffect`:
@@ -256,14 +264,16 @@ useEffect(() => {
 Add grid toggle button in the toolbar, after the Edit Mode button:
 
 ```tsx
-{editMode && (
-  <Button
-    type={showGrid ? 'primary' : 'default'}
-    size="small"
-    icon={<AppstoreOutlined />}
-    onClick={toggleGrid}
-  />
-)}
+{
+  editMode && (
+    <Button
+      type={showGrid ? 'primary' : 'default'}
+      size="small"
+      icon={<AppstoreOutlined />}
+      onClick={toggleGrid}
+    />
+  );
+}
 ```
 
 Wrap `.canvas` contents in `position: relative` and add GridOverlay:
@@ -291,6 +301,7 @@ In `src/App.module.less`, update `.canvas`:
 
 Run: `pnpm dev`
 Open browser, enable Edit Mode, click the grid button or press Ctrl+G. Verify:
+
 - 24 semi-transparent blue columns appear over the canvas
 - Columns have 16px gutters between them
 - Grid disappears when Edit Mode is turned off
