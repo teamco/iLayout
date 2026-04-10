@@ -8,7 +8,7 @@ function getSectionStyle(section: SectionNode): React.CSSProperties {
       style.height = section.height.value;
       break;
     case 'min':
-      style.minHeight = section.height.value;
+      style.height = section.height.value;
       break;
     default:
       break;

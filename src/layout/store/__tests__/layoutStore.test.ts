@@ -396,7 +396,11 @@ describe('grid section actions', () => {
       id: 'g1',
       type: 'grid',
       columns: [
-        { id: 'left-col', size: '200px', child: { id: 'sidebar', type: 'leaf' } },
+        {
+          id: 'left-col',
+          size: '200px',
+          child: { id: 'sidebar', type: 'leaf' },
+        },
         {
           id: 'scroll-col',
           size: '1fr',

@@ -174,7 +174,9 @@ const gridFooterLeaf: LayoutNode = { id: 'footer-leaf', type: 'leaf' };
 const gridRootWithSections: GridRoot = {
   id: 'grid-with-sections',
   type: 'grid',
-  columns: [{ id: 'col-main', size: '1fr', child: { id: 'col-leaf', type: 'leaf' } }],
+  columns: [
+    { id: 'col-main', size: '1fr', child: { id: 'col-leaf', type: 'leaf' } },
+  ],
   headerSections: [
     {
       id: 'header-sec',
@@ -250,19 +252,28 @@ describe('grid support', () => {
   });
 
   it('findNode finds nodes in grid headerSections', () => {
-    const result = findNode(gridRootWithSections as unknown as LayoutNode, 'header-leaf');
+    const result = findNode(
+      gridRootWithSections as unknown as LayoutNode,
+      'header-leaf',
+    );
     expect(result).not.toBeNull();
     expect(result!.node.id).toBe('header-leaf');
   });
 
   it('findNode finds nodes in grid footerSections', () => {
-    const result = findNode(gridRootWithSections as unknown as LayoutNode, 'footer-leaf');
+    const result = findNode(
+      gridRootWithSections as unknown as LayoutNode,
+      'footer-leaf',
+    );
     expect(result).not.toBeNull();
     expect(result!.node.id).toBe('footer-leaf');
   });
 
   it('findNode finds section nodes themselves in headerSections', () => {
-    const result = findNode(gridRootWithSections as unknown as LayoutNode, 'header-sec');
+    const result = findNode(
+      gridRootWithSections as unknown as LayoutNode,
+      'header-sec',
+    );
     expect(result).not.toBeNull();
     expect(result!.node.id).toBe('header-sec');
   });
@@ -313,7 +324,9 @@ describe('grid support', () => {
     const gridWithSplitterInHeader: GridRoot = {
       id: 'g2',
       type: 'grid',
-      columns: [{ id: 'c1', size: '1fr', child: { id: 'col-leaf', type: 'leaf' } }],
+      columns: [
+        { id: 'c1', size: '1fr', child: { id: 'col-leaf', type: 'leaf' } },
+      ],
       headerSections: [
         {
           id: 'header-sec2',
@@ -333,7 +346,10 @@ describe('grid support', () => {
       ],
       footerSections: [],
     };
-    const result = removeNode(gridWithSplitterInHeader as unknown as LayoutNode, 'ha');
+    const result = removeNode(
+      gridWithSplitterInHeader as unknown as LayoutNode,
+      'ha',
+    );
     const resultGrid = result as unknown as GridRoot;
     // Splitter with 2→1 should collapse to surviving child
     expect(resultGrid.headerSections[0].child.id).toBe('hb');
