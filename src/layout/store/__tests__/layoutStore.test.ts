@@ -3,7 +3,8 @@ import { describe, it, expect } from 'vitest';
 import { act } from '@testing-library/react';
 import { createLayoutStore } from '../layoutStore';
 import type { SplitterNode, LeafNode } from '../../types';
-import type { ScrollRoot } from '../../types';
+import type { ScrollRoot, GridRoot } from '../../types';
+import type { LayoutNode } from '../../types';
 
 describe('layoutStore', () => {
   it('adds a panel by splitting right', () => {
@@ -206,5 +207,67 @@ describe('layout modes', () => {
     act(() => store.getState().reorderSections(0, 2));
     const reordered = store.getState().root as unknown as ScrollRoot;
     expect(reordered.sections[2].id).toBe(ids[0]);
+  });
+});
+
+describe('grid column actions', () => {
+  it('addGridColumn wraps scroll root in grid with left column', () => {
+    const scrollRoot: ScrollRoot = {
+      id: 'sr1',
+      type: 'scroll',
+      sections: [{ id: 'sec1', type: 'section', height: { type: 'fixed', value: '100vh' }, child: { id: 'l1', type: 'leaf' } }],
+    };
+    const store = createLayoutStore(scrollRoot as unknown as LayoutNode);
+    store.getState().addGridColumn('left');
+    const root = store.getState().root as unknown as GridRoot;
+    expect(root.type).toBe('grid');
+    expect(root.columns).toHaveLength(2);
+    expect(root.columns[0].child.type).toBe('leaf');
+    expect(root.columns[1].child.type).toBe('scroll');
+  });
+
+  it('addGridColumn adds right column to existing grid', () => {
+    const gridRoot: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        { id: 'c1', size: '1fr', child: { id: 'sr1', type: 'scroll', sections: [] } as unknown as LayoutNode },
+      ],
+    };
+    const store = createLayoutStore(gridRoot as unknown as LayoutNode);
+    store.getState().addGridColumn('right');
+    const root = store.getState().root as unknown as GridRoot;
+    expect(root.columns).toHaveLength(2);
+    expect(root.columns[1].child.type).toBe('leaf');
+  });
+
+  it('removeGridColumn unwraps grid when one column left', () => {
+    const scrollChild = { id: 'sr1', type: 'scroll', sections: [] } as unknown as LayoutNode;
+    const gridRoot: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        { id: 'c1', size: '200px', child: { id: 'l1', type: 'leaf' } },
+        { id: 'c2', size: '1fr', child: scrollChild },
+      ],
+    };
+    const store = createLayoutStore(gridRoot as unknown as LayoutNode);
+    store.getState().removeGridColumn('c1');
+    expect(store.getState().root.type).toBe('scroll');
+  });
+
+  it('resizeGridColumn updates column size', () => {
+    const gridRoot: GridRoot = {
+      id: 'g1',
+      type: 'grid',
+      columns: [
+        { id: 'c1', size: '200px', child: { id: 'l1', type: 'leaf' } },
+        { id: 'c2', size: '1fr', child: { id: 'l2', type: 'leaf' } },
+      ],
+    };
+    const store = createLayoutStore(gridRoot as unknown as LayoutNode);
+    store.getState().resizeGridColumn('c1', '300px');
+    const root = store.getState().root as unknown as GridRoot;
+    expect(root.columns[0].size).toBe('300px');
   });
 });

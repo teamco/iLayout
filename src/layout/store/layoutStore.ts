@@ -16,6 +16,8 @@ import type {
   SectionNode,
   SectionHeight,
   ScrollRoot,
+  GridRoot,
+  GridColumn,
 } from '../types';
 
 export type LayoutState = {
@@ -48,6 +50,9 @@ export type LayoutActions = {
     config: Partial<Pick<SectionNode, 'overlap' | 'zIndex'>>,
   ) => void;
   reorderSections: (fromIndex: number, toIndex: number) => void;
+  addGridColumn: (position: 'left' | 'right', size?: string) => void;
+  removeGridColumn: (columnId: string) => void;
+  resizeGridColumn: (columnId: string, size: string) => void;
 };
 
 export type LayoutStore = LayoutState & LayoutActions;
@@ -217,6 +222,56 @@ function makeActions(
         const scrollRoot = state.root as unknown as ScrollRoot;
         const [moved] = scrollRoot.sections.splice(fromIndex, 1);
         scrollRoot.sections.splice(toIndex, 0, moved);
+      });
+    },
+
+    addGridColumn(position, size = '200px') {
+      set((state) => {
+        const newLeaf: LayoutNode = { id: nanoid(), type: 'leaf' };
+        const newColumn: GridColumn = { id: nanoid(), size, child: newLeaf };
+
+        if (state.root.type === 'grid') {
+          const grid = state.root as unknown as GridRoot;
+          if (position === 'left') {
+            grid.columns.unshift(newColumn);
+          } else {
+            grid.columns.push(newColumn);
+          }
+        } else {
+          const existingColumn: GridColumn = {
+            id: nanoid(),
+            size: '1fr',
+            child: state.root,
+          };
+          const columns = position === 'left'
+            ? [newColumn, existingColumn]
+            : [existingColumn, newColumn];
+          state.root = {
+            id: nanoid(),
+            type: 'grid',
+            columns,
+          } as unknown as LayoutNode;
+        }
+      });
+    },
+
+    removeGridColumn(columnId) {
+      set((state) => {
+        if (state.root.type !== 'grid') return;
+        const grid = state.root as unknown as GridRoot;
+        grid.columns = grid.columns.filter((c) => c.id !== columnId);
+        if (grid.columns.length === 1) {
+          state.root = grid.columns[0].child;
+        }
+      });
+    },
+
+    resizeGridColumn(columnId, size) {
+      set((state) => {
+        if (state.root.type !== 'grid') return;
+        const grid = state.root as unknown as GridRoot;
+        const col = grid.columns.find((c) => c.id === columnId);
+        if (col) col.size = size;
       });
     },
   };
