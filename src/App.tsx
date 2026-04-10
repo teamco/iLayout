@@ -123,22 +123,7 @@ export default function App({ onSave, saving }: AppProps) {
           setAddSectionModalOpen(false);
 
           if (dir === 'left' || dir === 'right') {
-            // Horizontal: wrap entire root in horizontal splitter
-            const { nanoid } = await import('nanoid');
-            const currentRoot = useLayoutStore.getState().root;
-            const newLeaf = { id: nanoid(), type: 'leaf' as const };
-            const after = dir === 'right';
-            useLayoutStore.setState({
-              root: {
-                id: nanoid(),
-                type: 'splitter' as const,
-                direction: 'horizontal' as const,
-                sizes: after ? [80, 20] : [20, 80],
-                children: after
-                  ? [currentRoot, newLeaf]
-                  : [newLeaf, currentRoot],
-              },
-            });
+            useLayoutStore.getState().addGridColumn(dir === 'left' ? 'left' : 'right');
           } else {
             // Vertical: add section (page grows, scrollable)
             // Ensure scroll mode
