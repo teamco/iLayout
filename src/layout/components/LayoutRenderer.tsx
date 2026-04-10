@@ -11,23 +11,25 @@ import styles from './LayoutRenderer.module.less';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function renderNode(node: LayoutNode): React.ReactNode {
-  if (node.type === 'splitter') return <SplitterNodeComponent key={node.id} node={node} />;
+  if (node.type === 'splitter')
+    return <SplitterNodeComponent key={node.id} node={node} />;
+  if (node.type === 'scroll') return <ScrollLayout key={node.id} root={node} />;
   if (node.type === 'section') return renderNode(node.child);
-  if (node.type === 'scroll') return <>{node.sections.map(s => renderNode(s))}</>;
   return <LeafNodeComponent key={node.id} node={node} />;
 }
 
 export function LayoutRenderer() {
-  const root = useLayoutStore(s => s.root);
-  const layoutMode = useLayoutStore(s => s.layoutMode);
+  const root = useLayoutStore((s) => s.root);
+  const layoutMode = useLayoutStore((s) => s.layoutMode);
 
   return (
     <LayoutDndContext>
       <div className={styles.root}>
-        {layoutMode === 'scroll' && root.type === 'scroll'
-          ? <ScrollLayout root={root as unknown as ScrollRoot} />
-          : renderNode(root)
-        }
+        {layoutMode === 'scroll' && root.type === 'scroll' ? (
+          <ScrollLayout root={root as unknown as ScrollRoot} />
+        ) : (
+          renderNode(root)
+        )}
       </div>
     </LayoutDndContext>
   );

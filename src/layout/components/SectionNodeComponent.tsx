@@ -15,9 +15,14 @@ type Props = {
 function getSectionStyle(section: SectionNode): React.CSSProperties {
   const style: React.CSSProperties = { width: '100%', position: 'relative' };
   switch (section.height.type) {
-    case 'fixed': style.height = section.height.value; break;
-    case 'min': style.minHeight = section.height.value; break;
-    default: break;
+    case 'fixed':
+      style.height = section.height.value;
+      break;
+    case 'min':
+      style.height = section.height.value;
+      break;
+    default:
+      break;
   }
   if (section.overlap) style.marginTop = section.overlap;
   if (section.zIndex) style.zIndex = section.zIndex;
@@ -25,7 +30,7 @@ function getSectionStyle(section: SectionNode): React.CSSProperties {
 }
 
 export function SectionNodeComponent({ section, onConfig }: Props) {
-  const editMode = useLayoutStore(s => s.editMode);
+  const editMode = useLayoutStore((s) => s.editMode);
 
   return (
     <div
@@ -34,7 +39,12 @@ export function SectionNodeComponent({ section, onConfig }: Props) {
     >
       {editMode && (
         <Tooltip title="Section config">
-          <Button size="small" icon={<SettingOutlined />} className={styles.configBtn} onClick={() => onConfig(section.id)} />
+          <Button
+            size="small"
+            icon={<SettingOutlined />}
+            className={styles.configBtn}
+            onClick={() => onConfig(section.id)}
+          />
         </Tooltip>
       )}
       {renderNode(section.child)}

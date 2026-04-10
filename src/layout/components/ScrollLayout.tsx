@@ -10,12 +10,16 @@ type Props = {
 };
 
 export function ScrollLayout({ root }: Props) {
-  const editMode = useLayoutStore(s => s.editMode);
+  const editMode = useLayoutStore((s) => s.editMode);
   const [configSectionId, setConfigSectionId] = useState<string | null>(null);
 
   return (
     <>
-      <div style={{ overflowY: 'auto', overflowX: 'hidden', height: '100%', width: '100%' }}>
+      <div
+        style={{
+          width: '100%',
+        }}
+      >
         {root.sections.map((section) => (
           <div key={section.id}>
             <SectionNodeComponent
