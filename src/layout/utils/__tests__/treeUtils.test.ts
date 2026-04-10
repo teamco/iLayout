@@ -167,6 +167,8 @@ const gridRoot: GridRoot = {
     { id: 'col-1', size: '200px', child: gridLeafA },
     { id: 'col-2', size: '1fr', child: gridLeafB },
   ],
+  headerSections: [],
+  footerSections: [],
 };
 
 const gridHeaderLeaf: LayoutNode = { id: 'header-leaf', type: 'leaf' };

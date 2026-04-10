@@ -248,6 +248,8 @@ describe('grid column actions', () => {
           } as unknown as LayoutNode,
         },
       ],
+      headerSections: [],
+      footerSections: [],
     };
     const store = createLayoutStore(gridRoot as unknown as LayoutNode);
     store.getState().addGridColumn('right');
@@ -269,6 +271,8 @@ describe('grid column actions', () => {
         { id: 'c1', size: '200px', child: { id: 'l1', type: 'leaf' } },
         { id: 'c2', size: '1fr', child: scrollChild },
       ],
+      headerSections: [],
+      footerSections: [],
     };
     const store = createLayoutStore(gridRoot as unknown as LayoutNode);
     store.getState().removeGridColumn('c1');
@@ -283,6 +287,8 @@ describe('grid column actions', () => {
         { id: 'c1', size: '200px', child: { id: 'l1', type: 'leaf' } },
         { id: 'c2', size: '1fr', child: { id: 'l2', type: 'leaf' } },
       ],
+      headerSections: [],
+      footerSections: [],
     };
     const store = createLayoutStore(gridRoot as unknown as LayoutNode);
     store.getState().resizeGridColumn('c1', '300px');
