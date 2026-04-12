@@ -4,11 +4,22 @@
   "type": "module",
   "description": "Standardized Supabase API for iLayout projects",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/teamco/iLayout",
+    "directory": "packages/supabase"
+  },
+  "keywords": [
+    "typescript",
+    "supabase",
+    "api"
+  ],
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist",
+    "LICENSE",
     "README.md"
   ],
   "dependencies": {
