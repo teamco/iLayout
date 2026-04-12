@@ -1,5 +1,6 @@
 [![Pipeline](https://github.com/teamco/iLayout/actions/workflows/pipeline.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/pipeline.yml)
-[![Publish to NPM](https://github.com/teamco/iLayout/actions/workflows/publish.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/publish.yml)
+[![Publish Embed to NPM](https://github.com/teamco/iLayout/actions/workflows/publish.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/publish.yml)
+[![Publish Supabase API to NPM](https://github.com/teamco/iLayout/actions/workflows/publish-supabase.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/publish-supabase.yml)
 
 # iLayout
 

@@ -1,3 +1,5 @@
+[![Publish to NPM](https://github.com/teamco/iLayout/actions/workflows/publish-supabase.yml/badge.svg)](https://github.com/teamco/iLayout/actions/workflows/publish-supabase.yml)
+
 # @idevconn/supabase
 
 Standardized Supabase API for iLayout projects. Provides a unified interface for authentication, CRUD operations, and error handling.
