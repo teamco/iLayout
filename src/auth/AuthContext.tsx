@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, type ReactNode } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, authService } from '@/lib/supabase';
 import { AuthContext } from '@/lib/hooks/useAuth';
 
 async function setOnlineStatus(userId: string, isOnline: boolean) {
@@ -15,7 +15,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    authService.getCurrentUser().then(({ session }) => {
       setSession(session);
       setLoading(false);
       if (session?.user) {
@@ -23,9 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    const subscription = authService.onAuthStateChange((event, session) => {
       setSession(session);
       setLoading(false);
 
@@ -68,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (userId) {
       await setOnlineStatus(userId, false);
     }
-    await supabase.auth.signOut();
+    await authService.logout();
   }, [session?.user?.id]);
 
   return (

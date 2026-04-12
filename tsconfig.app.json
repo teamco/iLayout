@@ -24,7 +24,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
     "allowSyntheticDefaultImports": true,
-    "paths": { "@/*": ["./src/*"] }
+    "paths": {
+      "@/*": ["./src/*"],
+      "@idevconn/supabase": ["./packages/supabase/src/index.ts"]
+    }
   },
   "include": ["src"]
 }

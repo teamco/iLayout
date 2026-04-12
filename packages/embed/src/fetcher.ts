@@ -43,7 +43,7 @@ async function fetchFromUrl(url: string): Promise<LayoutNode> {
   const res = await fetch(url);
   if (!res.ok)
     throw new Error(`Failed to fetch layout: ${res.status} ${res.statusText}`);
-  return res.json() as Promise<LayoutNode>;
+  return (await res.json()) as Promise<LayoutNode>;
 }
 
 async function fetchFromApi(

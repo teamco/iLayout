@@ -1,0 +1,26 @@
+{
+  "name": "@idevconn/supabase",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Standardized Supabase API for iLayout projects",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "dependencies": {
+    "@supabase/supabase-js": "^2.103.0"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2",
+    "vitest": "^4.1.4"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  }
+}

@@ -1,62 +1,47 @@
 import type { IUser, ProfileRecord } from '@/lib/types';
 import { supabase } from '@/lib/supabase';
+import { createTableApi } from '@idevconn/supabase';
+
+const profileTable = createTableApi<ProfileRecord>(supabase, 'profiles');
 
 export async function getProfiles(): Promise<ProfileRecord[]> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .order('last_sign_in_at', { ascending: false });
-
-  if (error) throw error;
-  return (data ?? []) as ProfileRecord[];
+  return profileTable.getAll({
+    order: { column: 'last_sign_in_at', ascending: false },
+  });
 }
 
 export async function getProfile(
   userId: IUser['id'],
 ): Promise<ProfileRecord | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', userId)
-    .single();
-
-  if (error && error.code === 'PGRST116') return null;
-  if (error) throw error;
-  return data as ProfileRecord;
+  return profileTable.getById(userId);
 }
 
 export async function blockUser(
   userId: IUser['id'],
   blocked: boolean,
 ): Promise<void> {
-  const { error } = await supabase
-    .from('profiles')
-    .update({ is_blocked: blocked, updated_at: new Date().toISOString() })
-    .eq('id', userId);
-
-  if (error) throw error;
+  await profileTable.update(userId, {
+    is_blocked: blocked,
+    updated_at: new Date().toISOString(),
+  } as Partial<ProfileRecord>);
 }
 
 export async function forceLogoutUser(userId: IUser['id']): Promise<void> {
-  const { error } = await supabase
-    .from('profiles')
-    .update({ is_online: false, updated_at: new Date().toISOString() })
-    .eq('id', userId);
-
-  if (error) throw error;
+  await profileTable.update(userId, {
+    is_online: false,
+    updated_at: new Date().toISOString(),
+  } as Partial<ProfileRecord>);
 }
 
 export async function updateProfile(
   userId: IUser['id'],
   updates: Partial<Pick<ProfileRecord, 'full_name' | 'avatar_url'>>,
 ): Promise<ProfileRecord> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('id', userId)
-    .select()
-    .single();
+  const result = await profileTable.update(userId, {
+    ...updates,
+    updated_at: new Date().toISOString(),
+  } as Partial<ProfileRecord>);
 
-  if (error) throw error;
-  return data as ProfileRecord;
+  if (!result) throw new Error('Failed to update profile');
+  return result;
 }

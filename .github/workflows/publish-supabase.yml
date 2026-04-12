@@ -1,4 +1,4 @@
-name: Publish Embed to NPM
+name: Publish Supabase API to NPM
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   publish:
-    name: 'Build & Publish @teamco/anthill-layout-embed'
+    name: 'Build & Publish @idevconn/supabase'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -31,12 +31,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build embed package
-        working-directory: packages/embed
+      - name: Build supabase package
+        working-directory: packages/supabase
         run: pnpm build
 
       - name: Check if version exists
-        working-directory: packages/embed
+        working-directory: packages/supabase
         run: |
           PACKAGE_NAME=$(node -p "require('./package.json').name")
           VERSION=$(node -p "require('./package.json').version")
@@ -49,5 +49,5 @@ jobs:
 
       - name: Publish
         if: env.SKIP_PUBLISH == 'false'
-        working-directory: packages/embed
+        working-directory: packages/supabase
         run: npm publish --provenance --access public

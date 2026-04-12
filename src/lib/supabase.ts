@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createSupabaseClient, AuthService } from '@idevconn/supabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY;
@@ -9,4 +9,9 @@ if (!supabaseUrl || !supabaseKey) {
   );
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export type SupportedProvider = 'google' | 'github';
+
+export const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
+export const authService = new AuthService<SupportedProvider>(supabase, {
+  allowedProviders: ['google', 'github'],
+});

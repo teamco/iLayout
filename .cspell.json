@@ -16,7 +16,9 @@
     "hoverable",
     "Popconfirm",
     "PGRST",
-    "apikey"
+    "apikey",
+    "Postgrest",
+    "idevconn"
   ],
   "ignorePaths": [
     "**/locales/**/*",

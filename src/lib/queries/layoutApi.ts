@@ -1,18 +1,19 @@
 import type { LayoutNode } from '@/layout/types';
 import type { IUser, LayoutRecord, LayoutStatus } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
+import { supabase, authService } from '@/lib/supabase';
+import { createTableApi } from '@idevconn/supabase';
+
+const layoutTable = createTableApi<LayoutRecord>(supabase, 'layouts');
 
 async function currentUserId(): Promise<string> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await authService.getCurrentUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
 
 export async function getLayouts(userId: IUser['id']): Promise<LayoutRecord[]> {
-  const { data, error } = await supabase
-    .from('layouts')
+  const { data, error } = await layoutTable
+    .query()
     .select('*')
     .eq('user_id', userId)
     .neq('status', 'deleted')
@@ -33,8 +34,8 @@ export async function getLayouts(userId: IUser['id']): Promise<LayoutRecord[]> {
 }
 
 export async function getLayout(id: string): Promise<LayoutRecord | null> {
-  const { data, error } = await supabase
-    .from('layouts')
+  const { data, error } = await layoutTable
+    .query()
     .select('*')
     .eq('id', id)
     .neq('status', 'deleted')
@@ -51,8 +52,8 @@ export async function getLayoutVersion(
   id: string,
   version: number,
 ): Promise<LayoutRecord | null> {
-  const { data, error } = await supabase
-    .from('layouts')
+  const { data, error } = await layoutTable
+    .query()
     .select('*')
     .eq('id', id)
     .eq('version', version)
@@ -66,8 +67,8 @@ export async function getLayoutVersion(
 export async function getPublishedLayout(
   userId: IUser['id'],
 ): Promise<LayoutRecord | null> {
-  const { data, error } = await supabase
-    .from('layouts')
+  const { data, error } = await layoutTable
+    .query()
     .select('*')
     .eq('user_id', userId)
     .eq('status', 'published')
@@ -82,8 +83,8 @@ export async function getPublishedLayout(
 
 export async function createLayout(data: LayoutNode): Promise<LayoutRecord> {
   const userId = await currentUserId();
-  const { data: row, error } = await supabase
-    .from('layouts')
+  const { data: row, error } = await layoutTable
+    .query()
     .insert({
       user_id: userId,
       version: 1,
@@ -105,8 +106,8 @@ export async function saveLayout(
 ): Promise<LayoutRecord> {
   const userId = await currentUserId();
 
-  const { data: current, error: fetchError } = await supabase
-    .from('layouts')
+  const { data: current, error: fetchError } = await layoutTable
+    .query()
     .select('version, user_id')
     .eq('id', id)
     .order('version', { ascending: false })
@@ -117,8 +118,8 @@ export async function saveLayout(
 
   const nextVersion = (current?.version ?? 0) + 1;
 
-  const { data: row, error } = await supabase
-    .from('layouts')
+  const { data: row, error } = await layoutTable
+    .query()
     .insert({
       id,
       user_id: current.user_id,
@@ -144,8 +145,8 @@ export async function setStatus(
 
   // Only 1 published layout per user — unpublish all user's layouts first
   if (status === 'published') {
-    await supabase
-      .from('layouts')
+    await layoutTable
+      .query()
       .update({
         status: 'draft',
         updated_by: userId,
@@ -155,8 +156,8 @@ export async function setStatus(
       .eq('status', 'published');
   }
 
-  const { error } = await supabase
-    .from('layouts')
+  const { error } = await layoutTable
+    .query()
     .update({
       status,
       updated_by: userId,
@@ -169,8 +170,8 @@ export async function setStatus(
 }
 
 export async function getVersionHistory(id: string): Promise<LayoutRecord[]> {
-  const { data, error } = await supabase
-    .from('layouts')
+  const { data, error } = await layoutTable
+    .query()
     .select('*')
     .eq('id', id)
     .order('version', { ascending: false });

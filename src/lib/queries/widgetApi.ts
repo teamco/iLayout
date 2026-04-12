@@ -1,17 +1,18 @@
 import type { IUser, WidgetRecord } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
+import { supabase, authService } from '@/lib/supabase';
+import { createTableApi } from '@idevconn/supabase';
+
+const widgetTable = createTableApi<WidgetRecord>(supabase, 'widgets');
 
 async function currentUserId(): Promise<string> {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user } = await authService.getCurrentUser();
   if (!user) throw new Error('Not authenticated');
   return user.id;
 }
 
 export async function getWidgets(userId: IUser['id']): Promise<WidgetRecord[]> {
-  const { data, error } = await supabase
-    .from('widgets')
+  const { data, error } = await widgetTable
+    .query()
     .select('*')
     .eq('user_id', userId)
     .neq('status', 'deleted')
@@ -22,8 +23,8 @@ export async function getWidgets(userId: IUser['id']): Promise<WidgetRecord[]> {
 }
 
 export async function getPublicWidgets(): Promise<WidgetRecord[]> {
-  const { data, error } = await supabase
-    .from('widgets')
+  const { data, error } = await widgetTable
+    .query()
     .select('*')
     .eq('is_public', true)
     .eq('status', 'published')
@@ -34,23 +35,15 @@ export async function getPublicWidgets(): Promise<WidgetRecord[]> {
 }
 
 export async function getWidget(id: string): Promise<WidgetRecord | null> {
-  const { data, error } = await supabase
-    .from('widgets')
-    .select('*')
-    .eq('id', id)
-    .single();
-
-  if (error && error.code === 'PGRST116') return null;
-  if (error) throw error;
-  return data as WidgetRecord;
+  return widgetTable.getById(id);
 }
 
 export async function createWidget(
   widget: Partial<WidgetRecord>,
 ): Promise<WidgetRecord> {
   const userId = await currentUserId();
-  const { data, error } = await supabase
-    .from('widgets')
+  const { data, error } = await widgetTable
+    .query()
     .insert({
       user_id: userId,
       name: widget.name ?? 'Empty',
@@ -78,31 +71,21 @@ export async function updateWidget(
   updates: Partial<WidgetRecord>,
 ): Promise<WidgetRecord> {
   const userId = await currentUserId();
-  const { data, error } = await supabase
-    .from('widgets')
-    .update({
-      ...updates,
-      updated_by: userId,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id)
-    .select()
-    .single();
+  const result = await widgetTable.update(id, {
+    ...updates,
+    updated_by: userId,
+    updated_at: new Date().toISOString(),
+  });
 
-  if (error) throw error;
-  return data as WidgetRecord;
+  if (!result) throw new Error('Failed to update widget');
+  return result;
 }
 
 export async function deleteWidget(id: string): Promise<void> {
   const userId = await currentUserId();
-  const { error } = await supabase
-    .from('widgets')
-    .update({
-      status: 'deleted',
-      updated_by: userId,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', id);
-
-  if (error) throw error;
+  await widgetTable.update(id, {
+    status: 'deleted',
+    updated_by: userId,
+    updated_at: new Date().toISOString(),
+  } as Partial<WidgetRecord>);
 }
