@@ -91,7 +91,7 @@ describe('TableApi', () => {
 
   it('delete calls correct Supabase methods', async () => {
     // Override the chain's promise for this test
-    mockQuery.then.mockImplementationOnce((onFulfilled) => {
+    mockQuery.then.mockImplementationOnce((onFulfilled: any) => {
       return Promise.resolve(onFulfilled({ error: null }));
     });
 
