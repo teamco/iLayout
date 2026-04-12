@@ -96,8 +96,18 @@ runs:
           cd ../..
         fi
 
-        # 5. Stage versioned files
+        # 4c. Sync supabase package version
+        if [ -f packages/supabase/package.json ]; then
+          cd packages/supabase
+          npm version "$NEW_V" --no-git-tag-version
+          cd ../..
+        fi
+
+        # 5. Stage embed versioned files
         git add package.json pnpm-lock.yaml packages/embed/package.json 2>/dev/null || git add package.json
+
+        # 5b. Stage supabase versioned files
+        git add package.json pnpm-lock.yaml packages/supabase/package.json 2>/dev/null || git add package.json
 
         # 6. Create commit message using the processed list
         printf "ci: %s version bump to %s [skip ci]\n\nChanges:\n\n%s\n" "$BUMP_TYPE" "$TAG" "$PROCESSED_COMMITS" > .commit_msg
